@@ -2,18 +2,13 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
 import SignOutButton from "./SignOutButton";
-import { useAppContext } from "../../contexts/AppContext";
 
 interface Props {
   isLoggedIn: boolean;
 }
-// const ADMIN_USER_ID = import.meta.env.ADMIN_USER_ID || '660c46ed2d49645fcbacc6be';
 
 const PopupMenu = ({ isLoggedIn }: Props) => {
-  const {
-  isAdmin
-  } = useAppContext();
-  // const isAdmin = (userId === ADMIN_USER_ID)
+
 
   const [isOpen, setIsOpen] = useState(false);
   useEffect(() => {
@@ -45,7 +40,7 @@ const PopupMenu = ({ isLoggedIn }: Props) => {
         <div className="absolute right-0 z-[999] mt-2 bg-white border border-gray-300 rounded-lg shadow-lg min-w-max">
           {isLoggedIn?(
             <ul className="divide-y divide-gray-200">
-            <li
+            {/* <li
               onClick={() => {
                 setIsOpen(false);
               }}
@@ -56,19 +51,8 @@ const PopupMenu = ({ isLoggedIn }: Props) => {
               >
                 Profile
               </Link>
-            </li>
-            {isAdmin && <li
-              onClick={() => {
-                setIsOpen(false);
-              }}
-            >
-              <Link
-                to="/admin"
-                className="block py-2 px-4 portrait:py-1 portrait:px-2 portrait:text-sm text-base font-medium poppins hover:bg-gray-100"
-              >
-                Admin
-              </Link>
-            </li>}
+            </li> */}
+            
             <li
               onClick={() => {
                 setIsOpen(false);
