@@ -59,7 +59,7 @@ function MapComponent() {
 
     return (
         <>
-            <div style={{ height: '100vh', width: '100%' }} id="map" className="map-container top-0 left-0" />
+            <div style={{ height: '90vh', width: '100%' }} id="map" className="map-container top-0 left-0" />
         </>
     );
 }
