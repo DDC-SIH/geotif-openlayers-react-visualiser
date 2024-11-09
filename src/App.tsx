@@ -9,9 +9,7 @@ function App() {
     <div className='relative flex'>
       <GeoDataProvider>
         <MapComponent />
-        <div className='top-0 absolute left-0 min-h-screen flex'>
-          <MenuArea />
-        </div>
+
       </GeoDataProvider>
     </div>
   )
