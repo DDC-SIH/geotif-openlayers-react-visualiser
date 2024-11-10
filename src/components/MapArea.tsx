@@ -1,13 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
+import GeoJSON from 'ol/format/GeoJSON.js';
 import 'ol/ol.css'; // OpenLayers CSS
 import { Map, View } from 'ol';
 import TileLayer from 'ol/layer/WebGLTile';
 import GeoTIFF from 'ol/source/GeoTIFF';
 import colormap from 'colormap';
 import { applyTransform } from 'ol/extent';
-import { get as getProjection, getTransform } from 'ol/proj';
-import { register } from 'ol/proj/proj4';
+import { get as getProjection, getTransform, Projection } from 'ol/proj';
+import { fromEPSGCode, register } from 'ol/proj/proj4';
 import proj4 from 'proj4';
+import VectorSource from 'ol/source/Vector';
+import VectorLayer from 'ol/layer/Vector';
+import { StadiaMaps } from 'ol/source';
 const citiesData = [
     {
         name: "New Delhi",
@@ -42,7 +46,7 @@ const citiesData = [
 ];
 
 const GeoTIFFMap = () => {
-    const tiffUrl = 'https://final-cog.s3.ap-south-1.amazonaws.com/L1CSGPSWIRCOG.tif'; // URL to the GeoTIFF file
+    const tiffUrl = 'https://final-cog.s3.ap-south-1.amazonaws.com/INS.tif'; // URL to the GeoTIFF file
     const mapRef = useRef<HTMLDivElement>(null); // Reference to the map container
     const mapInstanceRef = useRef<Map | null>(null);  // New ref for map instance
     const [searchQuery, setSearchQuery] = useState<string>('');
@@ -119,7 +123,19 @@ const GeoTIFFMap = () => {
             alert('No results found');
         }
     };
-
+    const clipLayer = new VectorLayer({
+        style: null,
+        source: new VectorSource({
+            url: './india-osm.geojson',
+            format: new GeoJSON(),
+        }),
+    });
+    const background = new TileLayer({
+        className: 'toner',
+        source: new StadiaMaps({
+            layer: 'stamen_toner',
+        }),
+    });
     useEffect(() => {
         if (!mapInstanceRef.current && mapRef.current) {
             const fetchGeoTIFF = async () => {
@@ -137,6 +153,7 @@ const GeoTIFFMap = () => {
                 const openLayersMap = new Map({
                     target: mapRef.current as HTMLElement,
                     layers: [
+                        // background,
                         new TileLayer({
                             source: geoTIFFSource,
                             // style: {
@@ -147,12 +164,13 @@ const GeoTIFFMap = () => {
                             //         ...getColorStops('jet', -0.5, 1, 10, true),
                             //     ],
                             // },
-                        }),
+                        }), clipLayer
                     ],
-                    view: new View({
-                        center: [0, 0],
-                        zoom: 2,
-                    }),
+                    view: geoTIFFSource
+                        .getView()
+                        .then((viewConfig) =>
+                            fromEPSGCode(viewConfig?.projection?.getCode()).then(() => viewConfig),
+                        ),
                 });
 
                 mapInstanceRef.current = openLayersMap;
