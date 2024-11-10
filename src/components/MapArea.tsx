@@ -46,7 +46,7 @@ const citiesData = [
 ];
 
 const GeoTIFFMap = () => {
-    const tiffUrl = 'https://final-cog.s3.ap-south-1.amazonaws.com/INS.tif'; // URL to the GeoTIFF file
+    const tiffUrl = 'https://final-cog.s3.ap-south-1.amazonaws.com/3RIMG_04SEP2024_1015_L2C_INS_V01R00_INS_cog.tif'; // URL to the GeoTIFF file
     const mapRef = useRef<HTMLDivElement>(null); // Reference to the map container
     const mapInstanceRef = useRef<Map | null>(null);  // New ref for map instance
     const [searchQuery, setSearchQuery] = useState<string>('');
@@ -153,7 +153,7 @@ const GeoTIFFMap = () => {
                 const openLayersMap = new Map({
                     target: mapRef.current as HTMLElement,
                     layers: [
-                        // background,
+                        background,
                         new TileLayer({
                             source: geoTIFFSource,
                             // style: {
@@ -164,12 +164,14 @@ const GeoTIFFMap = () => {
                             //         ...getColorStops('jet', -0.5, 1, 10, true),
                             //     ],
                             // },
-                        }), clipLayer
+                        }),
                     ],
                     view: geoTIFFSource
                         .getView()
                         .then((viewConfig) =>
-                            fromEPSGCode(viewConfig?.projection?.getCode()).then(() => viewConfig),
+                            typeof viewConfig?.projection === 'string'
+                                ? fromEPSGCode(viewConfig.projection).then(() => viewConfig)
+                                : viewConfig,
                         ),
                 });
 
