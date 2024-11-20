@@ -6,16 +6,20 @@ import TileLayer from 'ol/layer/WebGLTile';
 import GeoTIFF from 'ol/source/GeoTIFF';
 import colormap from 'colormap';
 import { applyTransform } from 'ol/extent';
-import { get as getProjection, getTransform, Projection } from 'ol/proj';
+import { get as getProjection, getTransform, Projection, fromLonLat } from 'ol/proj';
 import { fromEPSGCode, register } from 'ol/proj/proj4';
 import proj4 from 'proj4';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import { StadiaMaps } from 'ol/source';
-import { Search, Layers, Settings, Info, ChevronRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Search, Layers, Settings, Info, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { Slider } from "@/components/ui/slider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { defaults as defaultControls, ZoomToExtent, Zoom } from 'ol/control';
+import { defaults as defaultInteractions } from 'ol/interaction';
 
 const citiesData = [
     {
@@ -57,6 +61,15 @@ const GeoTIFFMap = () => {
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [activeSidebar, setActiveSidebar] = useState<string | null>(null);
+    const [colormapSettings, setColormapSettings] = useState({
+        type: 'jet',
+        min: -0.5,
+        max: 1,
+        steps: 10,
+        reverse: true
+    });
+    const [tiffLayer, setTiffLayer] = useState<TileLayer<GeoTIFF> | null>(null);
+    const [isColormapEnabled, setIsColormapEnabled] = useState(true);
 
 
     function getColorStops(name: string, min: number, max: number, steps: number, reverse: boolean) {
@@ -143,54 +156,79 @@ const GeoTIFFMap = () => {
             layer: 'stamen_toner',
         }),
     });
+    const updateColormap = () => {
+        if (tiffLayer) {
+            tiffLayer.setStyle({
+                color: isColormapEnabled ? [
+                    'interpolate',
+                    ['linear'],
+                    ['/', ['band', 1], 2],
+                    ...getColorStops(
+                        colormapSettings.type,
+                        colormapSettings.min,
+                        colormapSettings.max,
+                        colormapSettings.steps,
+                        colormapSettings.reverse
+                    ),
+                ] : null, // Remove style when colormap is disabled
+            });
+        }
+    };
+
+    useEffect(() => {
+        updateColormap();
+    }, [colormapSettings, isColormapEnabled]);
+
+    const fetchGeoTIFF = async () => {
+        const geoTIFFSource = new GeoTIFF({
+            sources: [
+                {
+                    url: tiffUrl,
+                    bands: [1],
+                    min: 26,
+                    max: 461,
+                },
+            ],
+        });
+
+        const layer = new TileLayer({
+            source: geoTIFFSource,
+        });
+
+        setTiffLayer(layer);
+
+        const openLayersMap = new Map({
+            target: mapRef.current as HTMLElement,
+            layers: [background, layer],
+            controls: defaultControls().extend([
+                new Zoom(),
+                new ZoomToExtent({
+                    extent: [
+                        68.1766, 6.4627, 97.4026, 35.5175 // India's extent
+                    ]
+                })
+            ]),
+            interactions: defaultInteractions({
+                pinchRotate: false,
+                doubleClickZoom: true,
+                mouseWheelZoom: true,
+            }),
+            view: new View({
+                center: fromLonLat([78.9629, 20.5937]), // India center coordinates
+                zoom: 5,
+                maxZoom: 19,
+                minZoom: 2,
+            })
+        });
+
+        mapInstanceRef.current = openLayersMap;
+
+        // Apply initial colormap
+        updateColormap();
+    };
+
     useEffect(() => {
         if (!mapInstanceRef.current && mapRef.current) {
-            const fetchGeoTIFF = async () => {
-                const geoTIFFSource = new GeoTIFF({
-                    sources: [
-                        {
-                            url: tiffUrl,
-                            bands: [1],
-                            min: 26,
-                            max: 461,
-                        },
-                    ],
-                });
-
-                const openLayersMap = new Map({
-                    target: mapRef.current as HTMLElement,
-                    layers: [
-                        background,
-                        new TileLayer({
-                            source: geoTIFFSource,
-                            // style: {
-                            //     color: [
-                            //         'interpolate',
-                            //         ['linear'],
-                            //         ['/', ['band', 1], 2],
-                            //         ...getColorStops('jet', -0.5, 1, 10, true),
-                            //     ],
-                            // },
-                        }),
-                    ],
-                    view: geoTIFFSource
-                        .getView()
-                        .then((viewConfig) =>
-                            typeof viewConfig?.projection === 'string'
-                                ? fromEPSGCode(viewConfig.projection).then(() => viewConfig)
-                                : viewConfig,
-                        ),
-                });
-
-                mapInstanceRef.current = openLayersMap;
-
-                geoTIFFSource.getView().then((viewConfig) => {
-                    if (viewConfig?.extent) {
-                        openLayersMap.getView().fit(viewConfig.extent, { size: openLayersMap.getSize() });
-                    }
-                });
-            };
-
             fetchGeoTIFF();
         }
 
@@ -203,9 +241,25 @@ const GeoTIFFMap = () => {
     }, []);
 
     return (
-        <div className='w-screen h-screen relative'>
-            <div ref={mapRef} className="absolute inset-0" />
-            
+        <div className='w-screen h-screen relative overflow-hidden'>
+            <style jsx global>{`
+                .ol-zoom {
+                    top: 4em;
+                    left: .5em;
+                }
+                .ol-control button {
+                    background-color: rgba(255,255,255,0.8);
+                    color: #666;
+                }
+                .ol-control button:hover {
+                    background-color: rgba(255,255,255,1);
+                }
+                html, body {
+                    overscroll-behavior-y: none;
+                    touch-action: none;
+                }
+            `}</style>
+
             {/* UI Layer */}
             <div className="absolute inset-0 pointer-events-none">
                 {/* Sidebar */}
@@ -251,9 +305,84 @@ const GeoTIFFMap = () => {
                                 </div>
                             )}
                             {activeSidebar === 'settings' && (
-                                <div>
+                                <div className="space-y-6">
                                     <h3 className="font-semibold mb-4">Settings</h3>
-                                    {/* Add settings controls here */}
+
+                                    <div className="space-y-4">
+                                        <div className="flex items-center space-x-2 mb-4">
+                                            <Button
+                                                variant={isColormapEnabled ? "default" : "secondary"}
+                                                onClick={() => setIsColormapEnabled(!isColormapEnabled)}
+                                            >
+                                                Colormap: {isColormapEnabled ? "On" : "Off"}
+                                            </Button>
+                                        </div>
+
+                                        {isColormapEnabled && (
+                                            <>
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium">Colormap Type</label>
+                                                    <Select
+                                                        value={colormapSettings.type}
+                                                        onValueChange={(value) => setColormapSettings(prev => ({ ...prev, type: value }))}
+                                                    >
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select colormap" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {['jet', 'rainbow', 'terrain', 'portland', 'bone'].map(type => (
+                                                                <SelectItem key={type} value={type}>
+                                                                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium">Min Value</label>
+                                                    <Slider
+                                                        value={[colormapSettings.min]}
+                                                        min={-2}
+                                                        max={2}
+                                                        step={0.1}
+                                                        onValueChange={([value]) => setColormapSettings(prev => ({ ...prev, min: value }))}
+                                                    />
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium">Max Value</label>
+                                                    <Slider
+                                                        value={[colormapSettings.max]}
+                                                        min={-2}
+                                                        max={2}
+                                                        step={0.1}
+                                                        onValueChange={([value]) => setColormapSettings(prev => ({ ...prev, max: value }))}
+                                                    />
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium">Steps</label>
+                                                    <Slider
+                                                        value={[colormapSettings.steps]}
+                                                        min={5}
+                                                        max={20}
+                                                        step={1}
+                                                        onValueChange={([value]) => setColormapSettings(prev => ({ ...prev, steps: value }))}
+                                                    />
+                                                </div>
+
+                                                <div className="flex items-center space-x-2">
+                                                    <Button
+                                                        variant="outline"
+                                                        onClick={() => setColormapSettings(prev => ({ ...prev, reverse: !prev.reverse }))}
+                                                    >
+                                                        {colormapSettings.reverse ? "Reverse Colors: On" : "Reverse Colors: Off"}
+                                                    </Button>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
                             )}
                             {activeSidebar === 'info' && (
@@ -288,8 +417,8 @@ const GeoTIFFMap = () => {
                                 }}
                             />
                         </div>
-                        <Button 
-                            size="icon" 
+                        <Button
+                            size="icon"
                             variant="ghost"
                             className="rounded-full"
                             onClick={() => setIsSearchOpen(!isSearchOpen)}
@@ -299,6 +428,8 @@ const GeoTIFFMap = () => {
                     </div>
                 </div>
             </div>
+            <div ref={mapRef} className="absolute inset-0 w-full h-full" />
+
         </div>
     );
 };
