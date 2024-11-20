@@ -203,69 +203,71 @@ const GeoTIFFMap = () => {
     }, []);
 
     return (
-        <div className='w-screen h-screen flex relative'>
-            {/* Sidebar */}
-            <div className="h-full flex z-50">
-                {/* Icons Bar */}
-                <div className="h-full bg-white/80 backdrop-blur-sm shadow-lg flex flex-col gap-2 p-2">
-                    <Button
-                        size="icon"
-                        variant={activeSidebar === 'layers' ? 'default' : 'ghost'}
-                        className="rounded-full"
-                        onClick={() => setActiveSidebar(activeSidebar === 'layers' ? null : 'layers')}
-                    >
-                        <Layers className="h-4 w-4" />
-                    </Button>
-                    <Button
-                        size="icon"
-                        variant={activeSidebar === 'settings' ? 'default' : 'ghost'}
-                        className="rounded-full"
-                        onClick={() => setActiveSidebar(activeSidebar === 'settings' ? null : 'settings')}
-                    >
-                        <Settings className="h-4 w-4" />
-                    </Button>
-                    <Button
-                        size="icon"
-                        variant={activeSidebar === 'info' ? 'default' : 'ghost'}
-                        className="rounded-full"
-                        onClick={() => setActiveSidebar(activeSidebar === 'info' ? null : 'info')}
-                    >
-                        <Info className="h-4 w-4" />
-                    </Button>
-                </div>
+        <div className='w-screen h-screen relative'>
+            <div ref={mapRef} className="absolute inset-0" />
+            
+            {/* UI Layer */}
+            <div className="absolute inset-0 pointer-events-none">
+                {/* Sidebar */}
+                <div className="h-full flex pointer-events-auto">
+                    {/* Icons Bar */}
+                    <div className="h-full bg-white/80 backdrop-blur-sm shadow-lg flex flex-col gap-2 p-2 z-50">
+                        <Button
+                            size="icon"
+                            variant={activeSidebar === 'layers' ? 'default' : 'ghost'}
+                            className="rounded-full"
+                            onClick={() => setActiveSidebar(activeSidebar === 'layers' ? null : 'layers')}
+                        >
+                            <Layers className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            size="icon"
+                            variant={activeSidebar === 'settings' ? 'default' : 'ghost'}
+                            className="rounded-full"
+                            onClick={() => setActiveSidebar(activeSidebar === 'settings' ? null : 'settings')}
+                        >
+                            <Settings className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            size="icon"
+                            variant={activeSidebar === 'info' ? 'default' : 'ghost'}
+                            className="rounded-full"
+                            onClick={() => setActiveSidebar(activeSidebar === 'info' ? null : 'info')}
+                        >
+                            <Info className="h-4 w-4" />
+                        </Button>
+                    </div>
 
-                {/* Expandable Section */}
-                <div className={cn(
-                    "bg-white/80 backdrop-blur-sm shadow-lg transition-all duration-300 overflow-hidden",
-                    activeSidebar ? "w-[300px]" : "w-0"
-                )}>
-                    <div className="p-4 w-[300px]">
-                        {activeSidebar === 'layers' && (
-                            <div>
-                                <h3 className="font-semibold mb-4">Layers</h3>
-                                {/* Add layer controls here */}
-                            </div>
-                        )}
-                        {activeSidebar === 'settings' && (
-                            <div>
-                                <h3 className="font-semibold mb-4">Settings</h3>
-                                {/* Add settings controls here */}
-                            </div>
-                        )}
-                        {activeSidebar === 'info' && (
-                            <div>
-                                <h3 className="font-semibold mb-4">Information</h3>
-                                {/* Add information content here */}
-                            </div>
-                        )}
+                    {/* Expandable Section */}
+                    <div className={cn(
+                        "fixed left-[52px] h-full bg-white/80 backdrop-blur-sm shadow-lg transition-transform duration-200 ease-out pointer-events-auto z-40",
+                        activeSidebar ? "translate-x-0" : "-translate-x-full"
+                    )}>
+                        <div className="w-[300px] h-full p-4">
+                            {activeSidebar === 'layers' && (
+                                <div>
+                                    <h3 className="font-semibold mb-4">Layers</h3>
+                                    {/* Add layer controls here */}
+                                </div>
+                            )}
+                            {activeSidebar === 'settings' && (
+                                <div>
+                                    <h3 className="font-semibold mb-4">Settings</h3>
+                                    {/* Add settings controls here */}
+                                </div>
+                            )}
+                            {activeSidebar === 'info' && (
+                                <div>
+                                    <h3 className="font-semibold mb-4">Information</h3>
+                                    {/* Add information content here */}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Main Content */}
-            <div className="flex-1">
                 {/* Search Bar */}
-                <div className="fixed right-4 top-4 z-50 flex gap-2 items-center">
+                <div className="fixed right-4 top-4 pointer-events-auto z-50">
                     <div className="flex items-center bg-white/80 backdrop-blur-sm rounded-full shadow-lg overflow-hidden">
                         <div
                             className={cn(
@@ -296,7 +298,6 @@ const GeoTIFFMap = () => {
                         </Button>
                     </div>
                 </div>
-                <div ref={mapRef} style={{ width: '100%', height: '100vh' }} />
             </div>
         </div>
     );
