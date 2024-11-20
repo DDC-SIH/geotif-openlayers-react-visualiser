@@ -12,6 +12,11 @@ import proj4 from 'proj4';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import { StadiaMaps } from 'ol/source';
+import { Search, Layers, Settings, Info, ChevronRight } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils";
+
 const citiesData = [
     {
         name: "New Delhi",
@@ -50,6 +55,8 @@ const GeoTIFFMap = () => {
     const mapRef = useRef<HTMLDivElement>(null); // Reference to the map container
     const mapInstanceRef = useRef<Map | null>(null);  // New ref for map instance
     const [searchQuery, setSearchQuery] = useState<string>('');
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [activeSidebar, setActiveSidebar] = useState<string | null>(null);
 
 
     function getColorStops(name: string, min: number, max: number, steps: number, reverse: boolean) {
@@ -196,20 +203,101 @@ const GeoTIFFMap = () => {
     }, []);
 
     return (
-        <div style={{
-            height: '100vh',
-            width: '100vw',
-        }}>
-            <div>
-                <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search for a location"
-                />
-                <button onClick={() => search(searchQuery)}>Search</button>
+        <div className='w-screen h-screen flex relative'>
+            {/* Sidebar */}
+            <div className="h-full flex z-50">
+                {/* Icons Bar */}
+                <div className="h-full bg-white/80 backdrop-blur-sm shadow-lg flex flex-col gap-2 p-2">
+                    <Button
+                        size="icon"
+                        variant={activeSidebar === 'layers' ? 'default' : 'ghost'}
+                        className="rounded-full"
+                        onClick={() => setActiveSidebar(activeSidebar === 'layers' ? null : 'layers')}
+                    >
+                        <Layers className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        size="icon"
+                        variant={activeSidebar === 'settings' ? 'default' : 'ghost'}
+                        className="rounded-full"
+                        onClick={() => setActiveSidebar(activeSidebar === 'settings' ? null : 'settings')}
+                    >
+                        <Settings className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        size="icon"
+                        variant={activeSidebar === 'info' ? 'default' : 'ghost'}
+                        className="rounded-full"
+                        onClick={() => setActiveSidebar(activeSidebar === 'info' ? null : 'info')}
+                    >
+                        <Info className="h-4 w-4" />
+                    </Button>
+                </div>
+
+                {/* Expandable Section */}
+                <div className={cn(
+                    "bg-white/80 backdrop-blur-sm shadow-lg transition-all duration-300 overflow-hidden",
+                    activeSidebar ? "w-[300px]" : "w-0"
+                )}>
+                    <div className="p-4 w-[300px]">
+                        {activeSidebar === 'layers' && (
+                            <div>
+                                <h3 className="font-semibold mb-4">Layers</h3>
+                                {/* Add layer controls here */}
+                            </div>
+                        )}
+                        {activeSidebar === 'settings' && (
+                            <div>
+                                <h3 className="font-semibold mb-4">Settings</h3>
+                                {/* Add settings controls here */}
+                            </div>
+                        )}
+                        {activeSidebar === 'info' && (
+                            <div>
+                                <h3 className="font-semibold mb-4">Information</h3>
+                                {/* Add information content here */}
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
-            <div ref={mapRef} style={{ width: '100%', height: '100vh' }} />
+
+            {/* Main Content */}
+            <div className="flex-1">
+                {/* Search Bar */}
+                <div className="fixed right-4 top-4 z-50 flex gap-2 items-center">
+                    <div className="flex items-center bg-white/80 backdrop-blur-sm rounded-full shadow-lg overflow-hidden">
+                        <div
+                            className={cn(
+                                "transition-all duration-300 ease-in-out",
+                                isSearchOpen ? "w-[200px] opacity-100" : "w-0 opacity-0 hidden"
+                            )}
+                        >
+                            <input
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="Search location..."
+                                className="h-9 border-none bg-transparent px-2 focus:outline-none"
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        search(searchQuery);
+                                    }
+                                }}
+                            />
+                        </div>
+                        <Button 
+                            size="icon" 
+                            variant="ghost"
+                            className="rounded-full"
+                            onClick={() => setIsSearchOpen(!isSearchOpen)}
+                        >
+                            <Search className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
+                <div ref={mapRef} style={{ width: '100%', height: '100vh' }} />
+            </div>
         </div>
     );
 };
