@@ -39,7 +39,7 @@ const GeoTIFFMap = () => {
     max: 1,
     steps: 10,
     reverse: true,
-    alpha: 0.85,
+    alpha: 0.7,
     brightness: 0,
     contrast:0,
     saturation:0,
@@ -186,7 +186,7 @@ const GeoTIFFMap = () => {
           contrast: colormapSettings.contrast,
           saturation: colormapSettings.saturation,
           exposure: colormapSettings.exposure,
-
+          
         });
       }
     }
