@@ -66,20 +66,24 @@ const GeoTIFFMap = () => {
         min: -0.5,
         max: 1,
         steps: 10,
-        reverse: true
+        reverse: true,
+        alpha: 0.7
     });
     const [tiffLayer, setTiffLayer] = useState<TileLayer<GeoTIFF> | null>(null);
     const [isColormapEnabled, setIsColormapEnabled] = useState(true);
 
 
-    function getColorStops(name: string, min: number, max: number, steps: number, reverse: boolean) {
+    function getColorStops(name: string, min: number, max: number, steps: number, reverse: boolean, alpha: number) {
         const delta = (max - min) / (steps - 1);
         const stops = new Array(steps * 2);
-        const colors = colormap({ colormap: name, nshades: steps, format: 'rgba', alpha: 0.7 });
+        const colors = colormap({ colormap: name, nshades: steps, format: 'rgba', alpha: alpha });
         if (reverse) {
             colors.reverse();
         }
-        for (let i = 0; i < steps; i++) {
+        // Manually add a transparent stop for NoData values
+        stops[0] = min;
+        stops[1] = 'rgba(0,0,0,0)';
+        for (let i = 1; i < steps; i++) {
             stops[i * 2] = min + i * delta;
             stops[i * 2 + 1] = colors[i];
         }
@@ -165,12 +169,19 @@ const GeoTIFFMap = () => {
                     ['/', ['band', 1], 2],
                     ...getColorStops(
                         colormapSettings.type,
-                        colormapSettings.min,
+                        Math.max(colormapSettings.min, 0), // Ensure min value is >= 0
                         colormapSettings.max,
                         colormapSettings.steps,
-                        colormapSettings.reverse
+                        colormapSettings.reverse,
+                        colormapSettings.alpha
                     ),
                 ] : null, // Remove style when colormap is disabled
+                opacity: [
+                    'case',
+                    ['<', ['band', 1], 0], // Ensure NoData values are always transparent
+                    0, // Transparent
+                    1  // Opaque
+                ]
             });
         }
     };
@@ -348,6 +359,10 @@ const GeoTIFFMap = () => {
                                                         step={0.1}
                                                         onValueChange={([value]) => setColormapSettings(prev => ({ ...prev, min: value }))}
                                                     />
+                                                    <div className="flex justify-between text-xs">
+                                                        <span>{colormapSettings.min}</span>
+                                                        <span>2</span>
+                                                    </div>
                                                 </div>
 
                                                 <div className="space-y-2">
@@ -359,6 +374,10 @@ const GeoTIFFMap = () => {
                                                         step={0.1}
                                                         onValueChange={([value]) => setColormapSettings(prev => ({ ...prev, max: value }))}
                                                     />
+                                                    <div className="flex justify-between text-xs">
+                                                        <span>-2</span>
+                                                        <span>{colormapSettings.max}</span>
+                                                    </div>
                                                 </div>
 
                                                 <div className="space-y-2">
@@ -370,6 +389,25 @@ const GeoTIFFMap = () => {
                                                         step={1}
                                                         onValueChange={([value]) => setColormapSettings(prev => ({ ...prev, steps: value }))}
                                                     />
+                                                    <div className="flex justify-between text-xs">
+                                                        <span>5</span>
+                                                        <span>{colormapSettings.steps}</span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium">Transparency</label>
+                                                    <Slider
+                                                        value={[colormapSettings.alpha]}
+                                                        min={0}
+                                                        max={1}
+                                                        step={0.1}
+                                                        onValueChange={([value]) => setColormapSettings(prev => ({ ...prev, alpha: value }))}
+                                                    />
+                                                    <div className="flex justify-between text-xs">
+                                                        <span>0</span>
+                                                        <span>{colormapSettings.alpha}</span>
+                                                    </div>
                                                 </div>
 
                                                 <div className="flex items-center space-x-2">
