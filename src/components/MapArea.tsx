@@ -62,7 +62,7 @@ const GeoTIFFMap = () => {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [activeSidebar, setActiveSidebar] = useState<string | null>(null);
     const [colormapSettings, setColormapSettings] = useState({
-        type: 'jet',
+        type: 'none',
         min: -0.5,
         max: 1,
         steps: 10,
@@ -165,27 +165,27 @@ const GeoTIFFMap = () => {
     });
     const updateColormap = () => {
         if (tiffLayer) {
-            tiffLayer.setStyle({
-                color: colormapSettings.type !== 'none' ? [
-                    'interpolate',
-                    ['linear'],
-                    ['/', ['band', 1], 2],
-                    ...getColorStops(
-                        colormapSettings.type,
-                        Math.max(colormapSettings.min, 0), // Ensure min value is >= 0
-                        colormapSettings.max,
-                        colormapSettings.steps,
-                        colormapSettings.reverse,
-                        colormapSettings.alpha
-                    ),
-                ] : null, // Remove style when colormap is 'none'
-                opacity: colormapSettings.type !== 'none' ? [
-                    'case',
-                    ['<', ['band', 1], 0], // Ensure NoData values are always transparent
-                    0, // Transparent
-                    1  // Opaque
-                ] : 1 // Default opacity when colormap is 'none'
-            });
+            if (isColormapEnabled === false|| colormapSettings.type === 'none') {
+                tiffLayer.setStyle({
+                });
+            } else {
+                tiffLayer.setStyle({
+                    color: [
+                        'interpolate',
+                        ['linear'],
+                        ['/', ['band', 1], 2],
+                        ...getColorStops(
+                            colormapSettings.type,
+                            Math.max(colormapSettings.min, 0), // Ensure min value is >= 0
+                            colormapSettings.max,
+                            colormapSettings.steps,
+                            colormapSettings.reverse,
+                            colormapSettings.alpha
+                        ),
+                    ],
+
+                });
+            }
         }
     };
 
@@ -327,13 +327,22 @@ const GeoTIFFMap = () => {
                                             <label className="text-sm font-medium">Colormap Type</label>
                                             <Select
                                                 value={colormapSettings.type}
-                                                onValueChange={(value) => setColormapSettings(prev => ({ ...prev, type: value }))}
+                                                onValueChange={(value) => {
+                                                    if (value === 'none') {
+                                                        setIsColormapEnabled(false);
+                                                        setColormapSettings(prev => ({ ...prev, type: value }))
+                                                    } else {
+                                                        setIsColormapEnabled(true);
+                                                        setColormapSettings(prev => ({ ...prev, type: value }))
+                                                    }
+                                                }
+                                                }
                                             >
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select colormap" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    {['none', 'jet', 'rainbow', 'terrain', 'portland', 'bone'].map(type => (
+                                                    {['none', 'jet', 'rainbow', 'portland', 'bone'].map(type => (
                                                         <SelectItem key={type} value={type}>
                                                             {type.charAt(0).toUpperCase() + type.slice(1)}
                                                         </SelectItem>
