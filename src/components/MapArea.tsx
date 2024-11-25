@@ -22,39 +22,9 @@ import { cn } from "@/lib/utils";
 import { defaults as defaultControls, ZoomToExtent, Zoom } from "ol/control";
 import { defaults as defaultInteractions } from "ol/interaction";
 import MapSideBar from "./Sidebar/MapSideBar";
+import { citiesData } from "constants/consts";
 
-const citiesData = [
-  {
-    name: "New Delhi",
-    code: "IN:DEL",
-    proj4def: "+proj=longlat +datum=WGS84 +no_defs",
-    bbox: [77.0369, 28.6139, 77.3616, 28.859], // Example bounding box for New Delhi
-  },
-  {
-    name: "Mumbai",
-    code: "IN:MUM",
-    proj4def: "+proj=longlat +datum=WGS84 +no_defs",
-    bbox: [72.7397, 18.9282, 72.9447, 19.307], // Example bounding box for Mumbai
-  },
-  {
-    name: "Bangalore",
-    code: "IN:BLR",
-    proj4def: "+proj=longlat +datum=WGS84 +no_defs",
-    bbox: [77.5043, 12.9, 77.69, 13.2015], // Example bounding box for Bangalore
-  },
-  {
-    name: "Chennai",
-    code: "IN:CHE",
-    proj4def: "+proj=longlat +datum=WGS84 +no_defs",
-    bbox: [80.1161, 13.0475, 80.287, 13.302], // Example bounding box for Chennai
-  },
-  {
-    name: "India",
-    code: "IN",
-    proj4def: "+proj=longlat +datum=WGS84 +no_defs",
-    bbox: [68.1766, 6.4627, 97.4026, 35.5175], // Bounding box for all of India
-  },
-];
+
 
 const GeoTIFFMap = () => {
   const tiffUrl =

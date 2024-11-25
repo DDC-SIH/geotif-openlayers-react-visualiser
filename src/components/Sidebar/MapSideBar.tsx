@@ -1,14 +1,6 @@
 import { Info, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Slider } from "@/components/ui/slider";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { SetStateAction, useState } from "react";
 import Information from "./Information";
 import Filters from "./Filters";
