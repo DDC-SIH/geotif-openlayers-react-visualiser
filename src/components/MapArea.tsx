@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 import { defaults as defaultControls, ZoomToExtent, Zoom } from "ol/control";
 import { defaults as defaultInteractions } from "ol/interaction";
 import MapSideBar from "./Sidebar/MapSideBar";
-import { citiesData } from "constants/consts";
+import { citiesData } from "@/../constants/consts";
 
 
 
