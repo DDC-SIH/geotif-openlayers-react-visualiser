@@ -209,6 +209,7 @@ const GeoTIFFMap = () => {
     });
 
     const layer = new TileLayer({
+      className: "tiff",
       source: geoTIFFSource,
     });
 
