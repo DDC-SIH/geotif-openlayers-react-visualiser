@@ -1,9 +1,10 @@
-import { Info, Filter } from "lucide-react";
+import { Info, Filter, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { SetStateAction, useState } from "react";
 import Information from "./Information";
 import Filters from "./Filters";
+import Effects from "./Effects";
 
 interface ColormapSettings {
   type: string;
@@ -65,6 +66,16 @@ function MapSideBar({
         >
           <Filter className="h-4 w-4" />
         </Button>
+        <Button
+          size="icon"
+          variant={activeSidebar === "effects" ? "default" : "ghost"}
+          className="rounded-full"
+          onClick={() =>
+            setActiveSidebar(activeSidebar === "effects" ? null : "effects")
+          }
+        >
+          <Sparkles className="h-4 w-4" />
+        </Button>
       </div>
 
       {/* Expandable Section */}
@@ -90,7 +101,10 @@ function MapSideBar({
             />
           )}
           {activeSidebar === "info" && (
-            <Information
+            <Information/>
+          )}
+          {activeSidebar === "effects" && (
+            <Effects
               colormapSettings={colormapSettings}
               setColormapSettings={setColormapSettings}
             />
