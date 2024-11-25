@@ -63,7 +63,6 @@ const GeoTIFFMap = () => {
   const mapInstanceRef = useRef<Map | null>(null); // New ref for map instance
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [activeSidebar, setActiveSidebar] = useState<string | null>(null);
   const [colormapSettings, setColormapSettings] = useState({
     type: "none",
     min: 0,
@@ -72,7 +71,7 @@ const GeoTIFFMap = () => {
     reverse: true,
     alpha: 0.7,
   });
-  const [tiffLayer, setTiffLayer] = useState<TileLayer<GeoTIFF> | null>(null);
+  const [tiffLayer, setTiffLayer] = useState<TileLayer | null>(null);
 
   function getColorStops(
     name: string,
@@ -202,7 +201,7 @@ const GeoTIFFMap = () => {
               colormapSettings.alpha
             ),
           ],
-          opacity: [
+          gamma: [
             "case",
             ["<", ["band", 1], 0], // Ensure NoData values are always transparent
             0, // Transparent
@@ -283,7 +282,8 @@ const GeoTIFFMap = () => {
 
   return (
     <div className="w-screen h-screen relative overflow-hidden">
-      <style jsx global>{`
+      <style>
+        {`
         .ol-zoom {
           top: 4em;
           left: 0.5em;
@@ -300,7 +300,8 @@ const GeoTIFFMap = () => {
           overscroll-behavior-y: none;
           touch-action: none;
         }
-      `}</style>
+        `}
+      </style>
 
       {/* UI Layer */}
       <div className="absolute inset-0 pointer-events-none">
