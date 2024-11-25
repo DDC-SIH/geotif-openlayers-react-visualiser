@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { defaults as defaultControls, ZoomToExtent, Zoom } from "ol/control";
 import { defaults as defaultInteractions } from "ol/interaction";
-import MapSideBar from "./MapSideBar";
+import MapSideBar from "./Sidebar/MapSideBar";
 
 const citiesData = [
   {
