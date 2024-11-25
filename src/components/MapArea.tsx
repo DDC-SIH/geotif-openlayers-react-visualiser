@@ -1,4 +1,4 @@
-import { SetStateAction, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import GeoJSON from "ol/format/GeoJSON.js";
 import "ol/ol.css"; // OpenLayers CSS
 import { Map, View } from "ol";
@@ -9,26 +9,16 @@ import { applyTransform } from "ol/extent";
 import {
   get as getProjection,
   getTransform,
-  Projection,
   fromLonLat,
 } from "ol/proj";
-import { fromEPSGCode, register } from "ol/proj/proj4";
+import { register } from "ol/proj/proj4";
 import proj4 from "proj4";
 import VectorSource from "ol/source/Vector";
 import VectorLayer from "ol/layer/Vector";
 import { StadiaMaps } from "ol/source";
-import { Search, Layers, Settings, Info, ChevronRight } from "lucide-react";
+import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { Slider } from "@/components/ui/slider";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { defaults as defaultControls, ZoomToExtent, Zoom } from "ol/control";
 import { defaults as defaultInteractions } from "ol/interaction";
 import MapSideBar from "./MapSideBar";
