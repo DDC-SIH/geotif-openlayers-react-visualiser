@@ -74,6 +74,9 @@ const GeoTIFFMap = () => {
 
 
     function getColorStops(name: string, min: number, max: number, steps: number, reverse: boolean, alpha: number) {
+        if (name === 'none') {
+            return [];
+        }
         const delta = (max - min) / (steps - 1);
         const stops = new Array(steps * 2);
         const colors = colormap({ colormap: name, nshades: steps, format: 'rgba', alpha: alpha });
@@ -163,7 +166,7 @@ const GeoTIFFMap = () => {
     const updateColormap = () => {
         if (tiffLayer) {
             tiffLayer.setStyle({
-                color: isColormapEnabled ? [
+                color: colormapSettings.type !== 'none' ? [
                     'interpolate',
                     ['linear'],
                     ['/', ['band', 1], 2],
@@ -175,13 +178,13 @@ const GeoTIFFMap = () => {
                         colormapSettings.reverse,
                         colormapSettings.alpha
                     ),
-                ] : null, // Remove style when colormap is disabled
-                opacity: [
+                ] : null, // Remove style when colormap is 'none'
+                opacity: colormapSettings.type !== 'none' ? [
                     'case',
                     ['<', ['band', 1], 0], // Ensure NoData values are always transparent
                     0, // Transparent
                     1  // Opaque
-                ]
+                ] : 1 // Default opacity when colormap is 'none'
             });
         }
     };
@@ -320,106 +323,93 @@ const GeoTIFFMap = () => {
                                     <h3 className="font-semibold mb-4">Settings</h3>
 
                                     <div className="space-y-4">
-                                        <div className="flex items-center space-x-2 mb-4">
-                                            <Button
-                                                variant={isColormapEnabled ? "default" : "secondary"}
-                                                onClick={() => setIsColormapEnabled(!isColormapEnabled)}
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">Colormap Type</label>
+                                            <Select
+                                                value={colormapSettings.type}
+                                                onValueChange={(value) => setColormapSettings(prev => ({ ...prev, type: value }))}
                                             >
-                                                Colormap: {isColormapEnabled ? "On" : "Off"}
-                                            </Button>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select colormap" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {['none', 'jet', 'rainbow', 'terrain', 'portland', 'bone'].map(type => (
+                                                        <SelectItem key={type} value={type}>
+                                                            {type.charAt(0).toUpperCase() + type.slice(1)}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
                                         </div>
 
-                                        {isColormapEnabled && (
-                                            <>
-                                                <div className="space-y-2">
-                                                    <label className="text-sm font-medium">Colormap Type</label>
-                                                    <Select
-                                                        value={colormapSettings.type}
-                                                        onValueChange={(value) => setColormapSettings(prev => ({ ...prev, type: value }))}
-                                                    >
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="Select colormap" />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            {['jet', 'rainbow', 'terrain', 'portland', 'bone'].map(type => (
-                                                                <SelectItem key={type} value={type}>
-                                                                    {type.charAt(0).toUpperCase() + type.slice(1)}
-                                                                </SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
-                                                </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">Min Value</label>
+                                            <Slider
+                                                value={[colormapSettings.min]}
+                                                min={-2}
+                                                max={2}
+                                                step={0.1}
+                                                onValueChange={([value]) => setColormapSettings(prev => ({ ...prev, min: value }))}
+                                            />
+                                            <div className="flex justify-between text-xs">
+                                                <span>{colormapSettings.min}</span>
+                                                <span>2</span>
+                                            </div>
+                                        </div>
 
-                                                <div className="space-y-2">
-                                                    <label className="text-sm font-medium">Min Value</label>
-                                                    <Slider
-                                                        value={[colormapSettings.min]}
-                                                        min={-2}
-                                                        max={2}
-                                                        step={0.1}
-                                                        onValueChange={([value]) => setColormapSettings(prev => ({ ...prev, min: value }))}
-                                                    />
-                                                    <div className="flex justify-between text-xs">
-                                                        <span>{colormapSettings.min}</span>
-                                                        <span>2</span>
-                                                    </div>
-                                                </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">Max Value</label>
+                                            <Slider
+                                                value={[colormapSettings.max]}
+                                                min={-2}
+                                                max={2}
+                                                step={0.1}
+                                                onValueChange={([value]) => setColormapSettings(prev => ({ ...prev, max: value }))}
+                                            />
+                                            <div className="flex justify-between text-xs">
+                                                <span>-2</span>
+                                                <span>{colormapSettings.max}</span>
+                                            </div>
+                                        </div>
 
-                                                <div className="space-y-2">
-                                                    <label className="text-sm font-medium">Max Value</label>
-                                                    <Slider
-                                                        value={[colormapSettings.max]}
-                                                        min={-2}
-                                                        max={2}
-                                                        step={0.1}
-                                                        onValueChange={([value]) => setColormapSettings(prev => ({ ...prev, max: value }))}
-                                                    />
-                                                    <div className="flex justify-between text-xs">
-                                                        <span>-2</span>
-                                                        <span>{colormapSettings.max}</span>
-                                                    </div>
-                                                </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">Steps</label>
+                                            <Slider
+                                                value={[colormapSettings.steps]}
+                                                min={5}
+                                                max={20}
+                                                step={1}
+                                                onValueChange={([value]) => setColormapSettings(prev => ({ ...prev, steps: value }))}
+                                            />
+                                            <div className="flex justify-between text-xs">
+                                                <span>5</span>
+                                                <span>{colormapSettings.steps}</span>
+                                            </div>
+                                        </div>
 
-                                                <div className="space-y-2">
-                                                    <label className="text-sm font-medium">Steps</label>
-                                                    <Slider
-                                                        value={[colormapSettings.steps]}
-                                                        min={5}
-                                                        max={20}
-                                                        step={1}
-                                                        onValueChange={([value]) => setColormapSettings(prev => ({ ...prev, steps: value }))}
-                                                    />
-                                                    <div className="flex justify-between text-xs">
-                                                        <span>5</span>
-                                                        <span>{colormapSettings.steps}</span>
-                                                    </div>
-                                                </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">Transparency</label>
+                                            <Slider
+                                                value={[colormapSettings.alpha]}
+                                                min={0}
+                                                max={1}
+                                                step={0.1}
+                                                onValueChange={([value]) => setColormapSettings(prev => ({ ...prev, alpha: value }))}
+                                            />
+                                            <div className="flex justify-between text-xs">
+                                                <span>0</span>
+                                                <span>{colormapSettings.alpha}</span>
+                                            </div>
+                                        </div>
 
-                                                <div className="space-y-2">
-                                                    <label className="text-sm font-medium">Transparency</label>
-                                                    <Slider
-                                                        value={[colormapSettings.alpha]}
-                                                        min={0}
-                                                        max={1}
-                                                        step={0.1}
-                                                        onValueChange={([value]) => setColormapSettings(prev => ({ ...prev, alpha: value }))}
-                                                    />
-                                                    <div className="flex justify-between text-xs">
-                                                        <span>0</span>
-                                                        <span>{colormapSettings.alpha}</span>
-                                                    </div>
-                                                </div>
-
-                                                <div className="flex items-center space-x-2">
-                                                    <Button
-                                                        variant="outline"
-                                                        onClick={() => setColormapSettings(prev => ({ ...prev, reverse: !prev.reverse }))}
-                                                    >
-                                                        {colormapSettings.reverse ? "Reverse Colors: On" : "Reverse Colors: Off"}
-                                                    </Button>
-                                                </div>
-                                            </>
-                                        )}
+                                        <div className="flex items-center space-x-2">
+                                            <Button
+                                                variant="outline"
+                                                onClick={() => setColormapSettings(prev => ({ ...prev, reverse: !prev.reverse }))}
+                                            >
+                                                {colormapSettings.reverse ? "Reverse Colors: On" : "Reverse Colors: Off"}
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
                             )}
