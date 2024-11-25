@@ -63,14 +63,13 @@ const GeoTIFFMap = () => {
     const [activeSidebar, setActiveSidebar] = useState<string | null>(null);
     const [colormapSettings, setColormapSettings] = useState({
         type: 'none',
-        min: -0.5,
+        min: 0,
         max: 1,
         steps: 10,
         reverse: true,
         alpha: 0.7
     });
     const [tiffLayer, setTiffLayer] = useState<TileLayer<GeoTIFF> | null>(null);
-    const [isColormapEnabled, setIsColormapEnabled] = useState(true);
 
 
     function getColorStops(name: string, min: number, max: number, steps: number, reverse: boolean, alpha: number) {
@@ -79,7 +78,7 @@ const GeoTIFFMap = () => {
         }
         const delta = (max - min) / (steps - 1);
         const stops = new Array(steps * 2);
-        const colors = colormap({ colormap: name, nshades: steps, format: 'rgba', alpha: alpha });
+        let colors = colormap({ colormap: name, nshades: steps, format: 'rgba', alpha: alpha });
         if (reverse) {
             colors.reverse();
         }
@@ -165,9 +164,8 @@ const GeoTIFFMap = () => {
     });
     const updateColormap = () => {
         if (tiffLayer) {
-            if (isColormapEnabled === false|| colormapSettings.type === 'none') {
-                tiffLayer.setStyle({
-                });
+            if (colormapSettings.type === 'none') {
+                tiffLayer.setStyle({}); // Remove colormap style
             } else {
                 tiffLayer.setStyle({
                     color: [
@@ -176,14 +174,19 @@ const GeoTIFFMap = () => {
                         ['/', ['band', 1], 2],
                         ...getColorStops(
                             colormapSettings.type,
-                            Math.max(colormapSettings.min, 0), // Ensure min value is >= 0
-                            colormapSettings.max,
+                            Math.min(colormapSettings.min, colormapSettings.max), // Ensure min value is <= max value
+                            Math.max(colormapSettings.min, colormapSettings.max), // Ensure max value is >= min value
                             colormapSettings.steps,
                             colormapSettings.reverse,
                             colormapSettings.alpha
                         ),
                     ],
-
+                    opacity: [
+                        'case',
+                        ['<', ['band', 1], 0], // Ensure NoData values are always transparent
+                        0, // Transparent
+                        1  // Opaque
+                    ]
                 });
             }
         }
@@ -191,7 +194,7 @@ const GeoTIFFMap = () => {
 
     useEffect(() => {
         updateColormap();
-    }, [colormapSettings, isColormapEnabled]);
+    }, [colormapSettings]);
 
     const fetchGeoTIFF = async () => {
         const geoTIFFSource = new GeoTIFF({
@@ -329,10 +332,8 @@ const GeoTIFFMap = () => {
                                                 value={colormapSettings.type}
                                                 onValueChange={(value) => {
                                                     if (value === 'none') {
-                                                        setIsColormapEnabled(false);
                                                         setColormapSettings(prev => ({ ...prev, type: value }))
                                                     } else {
-                                                        setIsColormapEnabled(true);
                                                         setColormapSettings(prev => ({ ...prev, type: value }))
                                                     }
                                                 }
@@ -358,7 +359,7 @@ const GeoTIFFMap = () => {
                                                 min={-2}
                                                 max={2}
                                                 step={0.1}
-                                                onValueChange={([value]) => setColormapSettings(prev => ({ ...prev, min: value }))}
+                                                onValueChange={([value]) => setColormapSettings(prev => ({ ...prev, min: Math.min(value, colormapSettings.max) }))}
                                             />
                                             <div className="flex justify-between text-xs">
                                                 <span>{colormapSettings.min}</span>
@@ -373,7 +374,7 @@ const GeoTIFFMap = () => {
                                                 min={-2}
                                                 max={2}
                                                 step={0.1}
-                                                onValueChange={([value]) => setColormapSettings(prev => ({ ...prev, max: value }))}
+                                                onValueChange={([value]) => setColormapSettings(prev => ({ ...prev, max: Math.max(value, colormapSettings.min) }))}
                                             />
                                             <div className="flex justify-between text-xs">
                                                 <span>-2</span>
