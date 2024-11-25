@@ -40,6 +40,10 @@ const GeoTIFFMap = () => {
     steps: 10,
     reverse: true,
     alpha: 0.7,
+    brightness: 0,
+    contrast:0,
+    saturation:0,
+    exposure:0
   });
   const [tiffLayer, setTiffLayer] = useState<TileLayer | null>(null);
 
@@ -158,6 +162,7 @@ const GeoTIFFMap = () => {
         tiffLayer.setStyle({}); // Remove colormap style
       } else {
         tiffLayer.setStyle({
+          
           color: [
             "interpolate",
             ["linear"],
@@ -177,6 +182,11 @@ const GeoTIFFMap = () => {
             0, // Transparent
             1, // Opaque
           ],
+          brightness: colormapSettings.brightness,
+          contrast: colormapSettings.contrast,
+          saturation: colormapSettings.saturation,
+          exposure: colormapSettings.exposure,
+          
         });
       }
     }

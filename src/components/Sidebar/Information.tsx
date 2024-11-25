@@ -7,6 +7,10 @@ interface ColormapSettings {
   steps: number;
   alpha: number;
   reverse: boolean;
+  brightness: number;
+  contrast: number;
+  saturation: number;
+  exposure: number;
 }
 
 function Information({
@@ -62,6 +66,84 @@ function Information({
               {Math.round(value * 100)}%
             </button>
           ))}
+        </div>
+      </div>
+
+      <div className="space-y-4 mt-4">
+        <div className="space-y-2">
+          <span className="text-sm font-medium flex justify-between w-full">
+            <label>Brightness</label>
+            <span>{Math.round(colormapSettings.brightness * 100)}%</span>
+          </span>
+          <Slider
+            value={[colormapSettings.brightness]}
+            min={-1}
+            max={1}
+            step={0.01}
+            onValueChange={([value]) =>
+              setColormapSettings((prev) => ({
+                ...prev,
+                brightness: value,
+              }))
+            }
+          />
+        </div>
+
+        <div className="space-y-2">
+          <span className="text-sm font-medium flex justify-between w-full">
+            <label>Contrast</label>
+            <span>{Math.round(colormapSettings.contrast * 100)}%</span>
+          </span>
+          <Slider
+            value={[colormapSettings.contrast]}
+            min={-1}
+            max={1}
+            step={0.01}
+            onValueChange={([value]) =>
+              setColormapSettings((prev) => ({
+                ...prev,
+                contrast: value,
+              }))
+            }
+          />
+        </div>
+
+        <div className="space-y-2">
+          <span className="text-sm font-medium flex justify-between w-full">
+            <label>Saturation</label>
+            <span>{Math.round(colormapSettings.saturation * 100)}%</span>
+          </span>
+          <Slider
+            value={[colormapSettings.saturation]}
+            min={-1}
+            max={1}
+            step={0.01}
+            onValueChange={([value]) =>
+              setColormapSettings((prev) => ({
+                ...prev,
+                saturation: value,
+              }))
+            }
+          />
+        </div>
+
+        <div className="space-y-2">
+          <span className="text-sm font-medium flex justify-between w-full">
+            <label>Exposure</label>
+            <span>{Math.round(colormapSettings.exposure * 100)}%</span>
+          </span>
+          <Slider
+            value={[colormapSettings.exposure]}
+            min={-1}
+            max={1}
+            step={0.01}
+            onValueChange={([value]) =>
+              setColormapSettings((prev) => ({
+                ...prev,
+                exposure: value,
+              }))
+            }
+          />
         </div>
       </div>
     </div>

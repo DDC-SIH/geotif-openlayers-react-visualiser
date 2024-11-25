@@ -12,6 +12,10 @@ interface ColormapSettings {
   steps: number;
   alpha: number;
   reverse: boolean;
+  brightness: number;
+  contrast: number;
+  saturation: number;
+  exposure: number;
 }
 
 function MapSideBar({
@@ -80,10 +84,16 @@ function MapSideBar({
             </div>
           )}
           {activeSidebar === "filters" && (
-            <Filters  colormapSettings={colormapSettings} setColormapSettings={setColormapSettings}/>
+            <Filters
+              colormapSettings={colormapSettings}
+              setColormapSettings={setColormapSettings}
+            />
           )}
           {activeSidebar === "info" && (
-            <Information colormapSettings={colormapSettings} setColormapSettings={setColormapSettings}/>
+            <Information
+              colormapSettings={colormapSettings}
+              setColormapSettings={setColormapSettings}
+            />
           )}
         </div>
       </div>

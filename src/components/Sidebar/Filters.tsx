@@ -17,6 +17,10 @@ interface ColormapSettings {
     steps: number;
     alpha: number;
     reverse: boolean;
+    brightness: number;
+    contrast: number;
+    saturation: number;
+      exposure: number;
   }
   
   function Filters({
