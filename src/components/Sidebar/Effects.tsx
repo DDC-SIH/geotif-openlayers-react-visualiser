@@ -25,7 +25,6 @@ function Effects({
   return (
     <div>
       <h3 className="font-semibold mb-4">Information</h3>
-      <p className="my-2">Render Meta Data Here</p>
       <div className="space-y-2">
         <span className="text-sm font-medium flex justify-between w-full">
           <label>Transparency</label>
