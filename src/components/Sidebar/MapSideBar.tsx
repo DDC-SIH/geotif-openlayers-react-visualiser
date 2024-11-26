@@ -1,10 +1,12 @@
-import { Info, Filter, Sparkles } from "lucide-react";
+import { Info, Filter, Sparkles, MapIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { SetStateAction, useState } from "react";
 import Information from "./Information";
 import Filters from "./Filters";
 import Effects from "./Effects";
+import { mapSources } from "@/utils/mapSourcces";
+import TileLayer from "ol/layer/Tile";
 
 interface ColormapSettings {
   type: string;
@@ -22,29 +24,31 @@ interface ColormapSettings {
 function MapSideBar({
   colormapSettings,
   setColormapSettings,
+  setBasemapLayer,
 }: {
   colormapSettings: ColormapSettings;
   setColormapSettings: React.Dispatch<SetStateAction<ColormapSettings>>;
+  setBasemapLayer: (layer: TileLayer) => void;
 }) {
   const [activeSidebar, setActiveSidebar] = useState<string | null>(null);
+  const [selectedMap, setSelectedMap] = useState(mapSources[0].name);
 
   return (
     <div className="fixed right-4 top-4 flex flex-col gap-2 pointer-events-auto z-50">
       {/* Icons Bar */}
       <div
-        className={`bg-white z-50  shadow-lg rounded-lg p-3 flex flex-col gap-3 ${
-          activeSidebar ? "shadow-lg" : "shadow-none"
-        }`}
+        className={`bg-white z-50  shadow-lg rounded-lg p-3 flex flex-col gap-3 ${activeSidebar ? "shadow-lg" : "shadow-none"
+          }`}
       >
         {/* <Button
           size="icon"
-          variant={activeSidebar === "layers" ? "default" : "ghost"}
+          variant={activeSidebar MapIcon" ? "default" : "ghost"}
           className="rounded-full"
           onClick={() =>
-            setActiveSidebar(activeSidebar === "layers" ? null : "layers")
+            setActiveSidebar(activeSidebar MapIcon" ? nulMapIcon")
           }
         >
-          <Layers className="h-4 w-4" />
+  MapIcon className="h-4 w-4" />
         </Button> */}
         <Button
           size="icon"
@@ -55,6 +59,16 @@ function MapSideBar({
           }
         >
           <Info className="h-4 w-4" />
+        </Button>
+        <Button
+          size="icon"
+          variant={activeSidebar === "basemap" ? "default" : "ghost"}
+          className="rounded-full"
+          onClick={() =>
+            setActiveSidebar(activeSidebar === "basemap" ? null : "basemap")
+          }
+        >
+          <MapIcon className="h-4 w-4" />
         </Button>
         <Button
           size="icon"
@@ -88,10 +102,34 @@ function MapSideBar({
         )}
       >
         <div className="w-[300px] h-full p-4">
-          {activeSidebar === "layers" && (
+          {activeSidebar === "basemap" && (
             <div>
-              <h3 className="font-semibold mb-4">Layers</h3>
-              {/* Add layer controls here */}
+              <h3 className="font-semibold mb-4">Map Basemap</h3>
+              <div className="space-y-2 max-h-[500px] overflow-y-auto">
+                {mapSources.map((source) => (
+                  <div
+                    key={source.name}
+                    className={cn(
+                      "flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors",
+                      selectedMap === source.name ? "bg-gray-100 ring-2 ring-blue-500" : ""
+                    )}
+                    onClick={() => {
+                      setSelectedMap(source.name);
+                      setBasemapLayer(source.layer);
+                    }}
+                  >
+                    <img
+                      src={source.previewUrl}
+                      alt={source.name}
+                      className="w-16 h-16 object-cover rounded"
+                    />
+                    <div>
+                      <h4 className="font-medium">{source.name}</h4>
+                      <p className="text-sm text-gray-500">{source.type}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
           {activeSidebar === "filters" && (
@@ -101,7 +139,7 @@ function MapSideBar({
             />
           )}
           {activeSidebar === "info" && (
-            <Information/>
+            <Information />
           )}
           {activeSidebar === "effects" && (
             <Effects
