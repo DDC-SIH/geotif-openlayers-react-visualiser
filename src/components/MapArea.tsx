@@ -10,6 +10,7 @@ import {
     get as getProjection,
     getTransform,
     fromLonLat,
+    transform,
 } from "ol/proj";
 import { register } from "ol/proj/proj4";
 import proj4 from "proj4";
@@ -20,6 +21,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { defaults as defaultControls, ZoomToExtent, Zoom } from "ol/control";
 import { defaults as defaultInteractions } from "ol/interaction";
+import { DragBox } from 'ol/interaction';
+import { platformModifierKeyOnly } from 'ol/events/condition';
 import MapSideBar from "./Sidebar/MapSideBar";
 import { citiesData } from "@/../constants/consts";
 import { mapSources } from "@/utils/mapSourcces";
@@ -199,6 +202,39 @@ const GeoTIFFMap = () => {
         }
     }, [basemapLayer]);
 
+    const addDragBoxInteraction = (map: Map) => {
+        const dragBox = new DragBox({
+            condition: platformModifierKeyOnly
+        });
+
+        dragBox.on('boxend', () => {
+            const extent = dragBox.getGeometry().getExtent();
+            
+            // Convert to geographic coordinates (EPSG:4326 - lat/long)
+            const bottomLeft = transform(
+                [extent[0], extent[1]], 
+                map.getView().getProjection(), 
+                'EPSG:4326'
+            );
+            const topRight = transform(
+                [extent[2], extent[3]], 
+                map.getView().getProjection(), 
+                'EPSG:4326'
+            );
+
+            const bbox = [
+                Number(bottomLeft[0].toFixed(4)), // minLon
+                Number(bottomLeft[1].toFixed(4)), // minLat
+                Number(topRight[0].toFixed(4)),   // maxLon
+                Number(topRight[1].toFixed(4))    // maxLat
+            ];
+
+            console.log('bbox:', bbox);
+        });
+
+        map.addInteraction(dragBox);
+    };
+
     const fetchGeoTIFF = async () => {
         const geoTIFFSource = new GeoTIFF({
             sources: [
@@ -246,7 +282,7 @@ const GeoTIFFMap = () => {
         });
 
         mapInstanceRef.current = openLayersMap;
-
+        addDragBoxInteraction(openLayersMap);
         // Apply initial colormap
         updateColormap();
     };
