@@ -1,4 +1,4 @@
-import { Info, Filter, Sparkles, MapIcon } from "lucide-react";
+import { Info, Filter, Sparkles, MapIcon, DownloadCloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { SetStateAction, useState } from "react";
@@ -7,6 +7,7 @@ import Filters from "./Filters";
 import Effects from "./Effects";
 import { mapSources } from "@/utils/mapSourcces";
 import TileLayer from "ol/layer/Tile";
+import Export from "./Export";
 
 interface ColormapSettings {
   type: string;
@@ -90,6 +91,16 @@ function MapSideBar({
         >
           <Sparkles className="h-4 w-4" />
         </Button>
+        <Button
+          size="icon"
+          variant={activeSidebar === "export" ? "default" : "ghost"}
+          className="rounded-full"
+          onClick={() =>
+            setActiveSidebar(activeSidebar === "export" ? null : "export")
+          }
+        >
+          <DownloadCloud className="h-4 w-4" />
+        </Button>
       </div>
 
       {/* Expandable Section */}
@@ -146,6 +157,9 @@ function MapSideBar({
               colormapSettings={colormapSettings}
               setColormapSettings={setColormapSettings}
             />
+          )}
+          {activeSidebar === "export" && (
+            <Export />
           )}
         </div>
       </div>

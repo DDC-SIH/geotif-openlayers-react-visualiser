@@ -8,8 +8,10 @@ interface GeoDataContextType {
     setUrl: React.Dispatch<React.SetStateAction<string>>;
     loading: boolean;
     setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-    reqInfo: RequestInfo;
-    setReqInfo: React.Dispatch<React.SetStateAction<RequestInfo>>;
+    selectedAOI: boolean;
+    setSelectedAOI: React.Dispatch<React.SetStateAction<boolean>>;
+    boundingBox: number[] | null;
+    setBoundingBox: React.Dispatch<React.SetStateAction<number[] | null>>;
 
 }
 
@@ -33,6 +35,8 @@ export const GeoDataProvider: React.FC<GeoDataProviderProps> = ({ children }) =>
         rescale: false,
     });
     const [loading, setLoading] = useState<boolean>(false);
+    const [selectedAOI, setSelectedAOI] = useState<boolean>(false);
+    const [boundingBox, setBoundingBox] = useState<number[] | null>(null);
     // Fetch the GeoJSON data when the URL changes
     useEffect(() => {
         const fetchGeoData = async () => {
@@ -55,7 +59,7 @@ export const GeoDataProvider: React.FC<GeoDataProviderProps> = ({ children }) =>
     }, [url]);
 
     return (
-        <GeoDataContext.Provider value={{ geoData, url, setUrl, loading, setLoading, reqInfo, setReqInfo }}>
+        <GeoDataContext.Provider value={{ geoData, url, setUrl, loading, setLoading, selectedAOI, setSelectedAOI, boundingBox, setBoundingBox }}>
             {children}
         </GeoDataContext.Provider>
     );

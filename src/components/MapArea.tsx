@@ -26,9 +26,12 @@ import { platformModifierKeyOnly } from 'ol/events/condition';
 import MapSideBar from "./Sidebar/MapSideBar";
 import { citiesData } from "@/../constants/consts";
 import { mapSources } from "@/utils/mapSourcces";
+import { useGeoData } from "../../contexts/GeoDataProvider";
+import { set } from "ol/transform";
 
 
 const GeoTIFFMap = () => {
+    const { boundingBox, setSelectedAOI, setBoundingBox } = useGeoData();
     const tiffUrl =
         "https://final-cog.s3.ap-south-1.amazonaws.com/3RIMG_04SEP2024_1015_L2C_INS_V01R00_INS_cog.tif"; // URL to the GeoTIFF file
     const mapRef = useRef<HTMLDivElement>(null); // Reference to the map container
@@ -209,16 +212,16 @@ const GeoTIFFMap = () => {
 
         dragBox.on('boxend', () => {
             const extent = dragBox.getGeometry().getExtent();
-            
+
             // Convert to geographic coordinates (EPSG:4326 - lat/long)
             const bottomLeft = transform(
-                [extent[0], extent[1]], 
-                map.getView().getProjection(), 
+                [extent[0], extent[1]],
+                map.getView().getProjection(),
                 'EPSG:4326'
             );
             const topRight = transform(
-                [extent[2], extent[3]], 
-                map.getView().getProjection(), 
+                [extent[2], extent[3]],
+                map.getView().getProjection(),
                 'EPSG:4326'
             );
 
@@ -229,7 +232,8 @@ const GeoTIFFMap = () => {
                 Number(topRight[1].toFixed(4))    // maxLat
             ];
 
-            console.log('bbox:', bbox);
+            setBoundingBox(bbox);
+
         });
 
         map.addInteraction(dragBox);
