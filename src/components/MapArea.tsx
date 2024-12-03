@@ -47,7 +47,7 @@ const GeoTIFFMap = () => {
         min: 0,
         max: 1,
         steps: 10,
-        reverse: true,
+        reverse: false,
         alpha: 0.7,
         brightness: 0,
         contrast: 0,
@@ -55,13 +55,13 @@ const GeoTIFFMap = () => {
         exposure: 0
     });
     const [tiffLayer, setTiffLayer] = useState<TileLayer | null>(null);
-    const [basemapLayer, setBasemapLayer] = useState<TileLayer<any>>(mapSources[1].layer);
+    const [basemapLayer, setBasemapLayer] = useState<any>(mapSources[1].layer);
     const [selectedIndex, setSelectedIndex] = useState("ndvi");
     const [selectedColormap, setSelectedColormap] = useState("viridis");
 
     function getColorStops(
         name: string,
-        min: number,
+        min: number,    
         max: number,
         steps: number,
         reverse: boolean,

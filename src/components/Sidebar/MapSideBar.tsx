@@ -36,7 +36,7 @@ function MapSideBar({
   setSelectedIndex: (value: string) => void;
 }) {
   const [activeSidebar, setActiveSidebar] = useState<string | null>(null);
-  const [selectedMap, setSelectedMap] = useState(mapSources[0].name);
+  const [selectedMap, setSelectedMap] = useState(mapSources[1].name);
 
   return (
     <div className="fixed right-4 top-4 flex flex-col gap-2 pointer-events-auto z-50">

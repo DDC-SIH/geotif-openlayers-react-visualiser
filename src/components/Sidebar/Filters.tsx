@@ -135,8 +135,8 @@ function Filters({
           </span>{" "}
           <Slider
             value={[colormapSettings.steps]}
-            min={5}
-            max={20}
+            min={10}
+            max={50}
             step={1}
             onValueChange={([value]) =>
               setColormapSettings((prev) => ({
@@ -146,8 +146,8 @@ function Filters({
             }
           />
           <div className="flex justify-between text-xs">
-            <span>5</span>
-            <span>20</span>
+            <span>10</span>
+            <span>50</span>
           </div>
         </div>
 
