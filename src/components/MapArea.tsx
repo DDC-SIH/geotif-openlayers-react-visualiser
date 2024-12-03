@@ -55,7 +55,7 @@ const GeoTIFFMap = () => {
     const [tiffLayer, setTiffLayer] = useState<TileLayer | null>(null);
     const [basemapLayer, setBasemapLayer] = useState<TileLayer>(mapSources[1].layer);
     const [selectedIndex, setSelectedIndex] = useState("ndvi");
-
+    const [selectedColormap, setSelectedColormap] = useState("viridis");
 
     function getColorStops(
         name: string,
@@ -176,27 +176,14 @@ const GeoTIFFMap = () => {
                         'interpolate',
                         ['linear'],
                         getBandArithmeticExpression(selectedIndex),
-                        // color ramp for index values
-                        -0.2, [191, 191, 191],
-                        -0.1, [219, 219, 219],
-                        0, [255, 255, 224],
-                        0.025, [255, 250, 204],
-                        0.05, [237, 232, 181],
-                        0.075, [222, 217, 156],
-                        0.1, [204, 199, 130],
-                        0.125, [189, 184, 107],
-                        0.15, [176, 194, 97],
-                        0.175, [163, 204, 89],
-                        0.2, [145, 191, 82],
-                        0.25, [128, 179, 71],
-                        0.3, [112, 163, 64],
-                        0.35, [97, 150, 54],
-                        0.4, [79, 138, 46],
-                        0.45, [64, 125, 36],
-                        0.5, [48, 110, 28],
-                        0.55, [33, 97, 18],
-                        0.6, [15, 84, 10],
-                        0.65, [0, 69, 0]
+                        ...getColorStops(
+                            selectedColormap,
+                            min,
+                            max,
+                            20,  // More steps for smoother interpolation
+                            false,
+                            1.0
+                        )
                     ],
                     [0, 0, 0, 0]
                 ]
@@ -219,6 +206,12 @@ const GeoTIFFMap = () => {
             mapInstanceRef.current.getLayers().setAt(0, basemapLayer);
         }
     }, [basemapLayer]);
+
+    useEffect(() => {
+        if (tiffLayer) {
+            updateColormap();
+        }
+    }, [selectedColormap, selectedIndex, tiffLayer]);
 
     const addDragBoxInteraction = (map: Map) => {
         const dragBox = new DragBox({
@@ -490,7 +483,7 @@ const GeoTIFFMap = () => {
                 </div>
 
                 {/* Add Band Arithmetic Selector */}
-                <div className="fixed right-4 top-4 pointer-events-auto z-50">
+                <div className="fixed right-4 top-4 pointer-events-auto z-50 flex flex-col gap-2">
                     <Select onValueChange={setSelectedIndex} defaultValue={selectedIndex}>
                         <SelectTrigger className="w-[200px] bg-white">
                             <SelectValue placeholder="Select Index" />
@@ -502,6 +495,21 @@ const GeoTIFFMap = () => {
                             <SelectItem value="nbr">NBR - Burn Ratio</SelectItem>
                             <SelectItem value="msavi">MSAVI - Modified Soil VI</SelectItem>
                             <SelectItem value="ndwi">NDWI - Water Index</SelectItem>
+                        </SelectContent>
+                    </Select>
+
+                    <Select onValueChange={setSelectedColormap} defaultValue={selectedColormap}>
+                        <SelectTrigger className="w-[200px] bg-white">
+                            <SelectValue placeholder="Select Colormap" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="viridis">Viridis</SelectItem>
+                            <SelectItem value="plasma">Plasma</SelectItem>
+                            <SelectItem value="magma">Magma</SelectItem>
+                            <SelectItem value="inferno">Inferno</SelectItem>
+                            <SelectItem value="rainbow">Rainbow</SelectItem>
+                            <SelectItem value="jet">Jet</SelectItem>
+                            <SelectItem value="terrain">Terrain</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
