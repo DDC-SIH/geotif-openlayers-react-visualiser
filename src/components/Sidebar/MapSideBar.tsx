@@ -120,7 +120,7 @@ function MapSideBar({
           {activeSidebar === "basemap" && (
             <div>
               <h3 className="font-semibold mb-4">Map Basemap</h3>
-              <div className="space-y-2 max-h-[500px] overflow-y-auto">
+              <div className="space-y-2 max-h-[600px] overflow-y-auto p-2">
                 {mapSources.map((source) => (
                   <div
                     key={source.name}
