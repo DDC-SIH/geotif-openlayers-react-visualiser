@@ -1,7 +1,7 @@
 import { Info, Filter, Sparkles, MapIcon, DownloadCloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { SetStateAction, useState } from "react";
+import { useState } from "react";
 import Information from "./Information";
 import Filters from "./Filters";
 import Effects from "./Effects";

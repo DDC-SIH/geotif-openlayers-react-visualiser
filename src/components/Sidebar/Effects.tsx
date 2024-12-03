@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Slider } from "../ui/slider";
-import { ColorWheel, ColorWheelTrack, ColorThumb, Color } from "react-aria-components";
+import { ColorWheel, ColorWheelTrack, ColorThumb } from "react-aria-components";
 
 interface ColormapSettings {
   type: string;
@@ -23,12 +24,12 @@ function Effects({
   setColormapSettings: any;
 }) {
   const transparencyOptions = [0, 0.25, 0.5, 0.75, 1]; // Transparency values
-
+  const [hueshiftkey, setHueshiftkey] = useState(0);
   const handleColourWheelChange = (color: any) => {
-    setColormapSettings((prev:any) => ({
+    setColormapSettings((prev: any) => ({
       ...prev,
       hueshift: color.hue,
-    }))
+    }));
   };
 
   return (
@@ -47,7 +48,7 @@ function Effects({
           max={1}
           step={0.01}
           onValueChange={([value]) =>
-            setColormapSettings((prev:any) => ({
+            setColormapSettings((prev: any) => ({
               ...prev,
               alpha: value,
             }))
@@ -60,7 +61,7 @@ function Effects({
             <button
               key={index}
               onClick={() =>
-                setColormapSettings((prev:any) => ({
+                setColormapSettings((prev: any) => ({
                   ...prev,
                   alpha: value,
                 }))
@@ -81,7 +82,22 @@ function Effects({
         <div className="space-y-2">
           <span className="text-sm font-medium flex justify-between w-full">
             <label>Brightness</label>
-            <span>{Math.round(colormapSettings.brightness * 100)}%</span>
+            <span>
+              {colormapSettings.brightness !== 0 && (
+                <span
+                  className="mr-2 cursor-pointer hover:underline"
+                  onClick={() =>
+                    setColormapSettings((prev: any) => ({
+                      ...prev,
+                      brightness: 0,
+                    }))
+                  }
+                >
+                  Reset
+                </span>
+              )}
+              {Math.round(colormapSettings.brightness * 100)}%
+            </span>
           </span>
           <Slider
             value={[colormapSettings.brightness]}
@@ -89,7 +105,7 @@ function Effects({
             max={1}
             step={0.01}
             onValueChange={([value]) =>
-              setColormapSettings((prev:any) => ({
+              setColormapSettings((prev: any) => ({
                 ...prev,
                 brightness: value,
               }))
@@ -100,7 +116,22 @@ function Effects({
         <div className="space-y-2">
           <span className="text-sm font-medium flex justify-between w-full">
             <label>Contrast</label>
-            <span>{Math.round(colormapSettings.contrast * 200 - 100)}%</span>
+            <span>
+              {colormapSettings.contrast !== 0.5 && (
+                <span
+                  className="mr-2 cursor-pointer hover:underline"
+                  onClick={() =>
+                    setColormapSettings((prev: any) => ({
+                      ...prev,
+                      contrast: 0.5,
+                    }))
+                  }
+                >
+                  Reset
+                </span>
+              )}
+              {Math.round(colormapSettings.contrast * 200 - 100)}%
+            </span>
           </span>
           <Slider
             value={[colormapSettings.contrast]}
@@ -108,7 +139,7 @@ function Effects({
             max={1}
             step={0.01}
             onValueChange={([value]) =>
-              setColormapSettings((prev:any) => ({
+              setColormapSettings((prev: any) => ({
                 ...prev,
                 contrast: value,
               }))
@@ -119,7 +150,22 @@ function Effects({
         <div className="space-y-2">
           <span className="text-sm font-medium flex justify-between w-full">
             <label>Saturation</label>
-            <span>{Math.round(colormapSettings.saturation * 200 - 100)}%</span>
+            <span>
+              {colormapSettings.saturation !== 0.5 && (
+                <span
+                  className="mr-2 cursor-pointer hover:underline"
+                  onClick={() =>
+                    setColormapSettings((prev: any) => ({
+                      ...prev,
+                      saturation: 0.5,
+                    }))
+                  }
+                >
+                  Reset
+                </span>
+              )}
+              {Math.round(colormapSettings.saturation * 200 - 100)}%
+            </span>
           </span>
           <Slider
             value={[colormapSettings.saturation]}
@@ -127,7 +173,7 @@ function Effects({
             max={1}
             step={0.01}
             onValueChange={([value]) =>
-              setColormapSettings((prev:any) => ({
+              setColormapSettings((prev: any) => ({
                 ...prev,
                 saturation: value,
               }))
@@ -138,7 +184,22 @@ function Effects({
         <div className="space-y-2">
           <span className="text-sm font-medium flex justify-between w-full">
             <label>Exposure</label>
-            <span>{Math.round(colormapSettings.exposure * 200 - 100)}%</span>
+            <span>
+              {colormapSettings.exposure !== 0.5 && (
+                <span
+                  className="mr-2 cursor-pointer hover:underline"
+                  onClick={() =>
+                    setColormapSettings((prev: any) => ({
+                      ...prev,
+                      exposure: 0.5,
+                    }))
+                  }
+                >
+                  Reset
+                </span>
+              )}
+              {Math.round(colormapSettings.exposure * 200 - 100)}%
+            </span>
           </span>
           <Slider
             value={[colormapSettings.exposure]}
@@ -146,7 +207,7 @@ function Effects({
             max={1}
             step={0.01}
             onValueChange={([value]) =>
-              setColormapSettings((prev:any) => ({
+              setColormapSettings((prev: any) => ({
                 ...prev,
                 exposure: value,
               }))
@@ -157,9 +218,30 @@ function Effects({
         <div className="space-y-2">
           <span className="text-sm font-medium flex justify-between w-full">
             <label>Hue Shift</label>
+            {colormapSettings.hueshift !== 0 && (
+              <span
+                className="mr-2 cursor-pointer hover:underline"
+                onClick={() =>{
+                  setColormapSettings((prev: any) => ({
+                    ...prev,
+                    hueshift: 0,
+                  }));
+                setHueshiftkey((prev) => prev + 1);}
+                }
+              >
+                Reset
+              </span>
+            )}
           </span>
-          <ColorWheel outerRadius={75} innerRadius={50}  onChange={handleColourWheelChange}>
-            <ColorThumb className={'h-6 w-6 rounded-full z-[100] border-4 border-white'}/>
+          <ColorWheel
+            outerRadius={75}
+            innerRadius={50}
+            onChange={handleColourWheelChange}
+            key={hueshiftkey}
+          >
+            <ColorThumb
+              className={"h-6 w-6 rounded-full z-[100] border-4 border-white"}
+            />
             <ColorWheelTrack />
           </ColorWheel>
         </div>
