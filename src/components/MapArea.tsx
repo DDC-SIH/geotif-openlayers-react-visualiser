@@ -32,8 +32,10 @@ import { set } from "ol/transform";
 
 const GeoTIFFMap = () => {
     const { boundingBox, setSelectedAOI, setBoundingBox } = useGeoData();
-    const tiffUrl =
-        "https://final-cog.s3.ap-south-1.amazonaws.com/3RIMG_04SEP2024_1015_L2C_INS_V01R00_INS_cog.tif"; // URL to the GeoTIFF file
+    const tiffUrls = {
+        VIS: "https://final-cog.s3.ap-south-1.amazonaws.com/VIS.tif",
+        TIR1: "https://final-cog.s3.ap-south-1.amazonaws.com/TIR1.tif"
+    };
     const mapRef = useRef<HTMLDivElement>(null); // Reference to the map container
     const mapInstanceRef = useRef<Map | null>(null); // New ref for map instance
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -243,10 +245,22 @@ const GeoTIFFMap = () => {
         const geoTIFFSource = new GeoTIFF({
             sources: [
                 {
-                    url: tiffUrl,
+                    url: tiffUrls.VIS,
                     bands: [1],
-                    min: 26,
-                    max: 461,
+                    min: 16,
+                    max: 216,
+                },
+                {
+                    url: tiffUrls.VIS,
+                    bands: [1],
+                    min: 16,
+                    max: 216,
+                },
+                {
+                    url: tiffUrls.TIR1,
+                    bands: [1],
+                    min: 496,
+                    max: 942,
                 },
             ],
         });
@@ -254,6 +268,7 @@ const GeoTIFFMap = () => {
         const layer = new TileLayer({
             className: "tiff",
             source: geoTIFFSource,
+           
         });
 
         setTiffLayer(layer);
