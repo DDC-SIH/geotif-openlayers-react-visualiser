@@ -26,10 +26,14 @@ function MapSideBar({
   colormapSettings,
   setColormapSettings,
   setBasemapLayer,
+  selectedIndex,
+  setSelectedIndex,
 }: {
   colormapSettings: ColormapSettings;
   setColormapSettings: React.Dispatch<SetStateAction<ColormapSettings>>;
   setBasemapLayer: (layer: TileLayer) => void;
+  selectedIndex: string;
+  setSelectedIndex: (value: string) => void;
 }) {
   const [activeSidebar, setActiveSidebar] = useState<string | null>(null);
   const [selectedMap, setSelectedMap] = useState(mapSources[0].name);
@@ -147,6 +151,8 @@ function MapSideBar({
             <Filters
               colormapSettings={colormapSettings}
               setColormapSettings={setColormapSettings}
+              selectedIndex={selectedIndex}
+              setSelectedIndex={setSelectedIndex}
             />
           )}
           {activeSidebar === "info" && (
