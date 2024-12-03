@@ -28,7 +28,7 @@ import { citiesData } from "@/../constants/consts";
 import { mapSources } from "@/utils/mapSourcces";
 import { useGeoData } from "../../contexts/GeoDataProvider";
 import { set } from "ol/transform";
-
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const GeoTIFFMap = () => {
     const { boundingBox, setSelectedAOI, setBoundingBox } = useGeoData();
@@ -54,7 +54,7 @@ const GeoTIFFMap = () => {
     });
     const [tiffLayer, setTiffLayer] = useState<TileLayer | null>(null);
     const [basemapLayer, setBasemapLayer] = useState<TileLayer>(mapSources[1].layer);
-
+    const [selectedIndex, setSelectedIndex] = useState("ndvi");
 
 
     function getColorStops(
@@ -163,43 +163,56 @@ const GeoTIFFMap = () => {
 
     const updateColormap = () => {
         if (tiffLayer) {
-            if (colormapSettings.type === "none") {
-                tiffLayer.setStyle({}); // Remove colormap style
-            } else {
-                tiffLayer.setStyle({
-
-                    color: [
-                        "interpolate",
-                        ["linear"],
-                        ["/", ["band", 1], 2],
-                        ...getColorStops(
-                            colormapSettings.type,
-                            Math.min(colormapSettings.min, colormapSettings.max), // Ensure min value is <= max value
-                            Math.max(colormapSettings.min, colormapSettings.max), // Ensure max value is >= min value
-                            colormapSettings.steps,
-                            colormapSettings.reverse,
-                            colormapSettings.alpha
-                        ),
+            const { min, max } = getIndexMinMax(selectedIndex);
+            tiffLayer.setStyle({
+                color: [
+                    'case',
+                    ['all',
+                        ['>', ['band', 1], 0],
+                        ['>', ['band', 2], 0],
+                        ['>', ['band', 3], 0]
                     ],
-                    gamma: [
-                        "case",
-                        ["<", ["band", 1], 0], // Ensure NoData values are always transparent
-                        0, // Transparent
-                        1, // Opaque
+                    [
+                        'interpolate',
+                        ['linear'],
+                        getBandArithmeticExpression(selectedIndex),
+                        // color ramp for index values
+                        -0.2, [191, 191, 191],
+                        -0.1, [219, 219, 219],
+                        0, [255, 255, 224],
+                        0.025, [255, 250, 204],
+                        0.05, [237, 232, 181],
+                        0.075, [222, 217, 156],
+                        0.1, [204, 199, 130],
+                        0.125, [189, 184, 107],
+                        0.15, [176, 194, 97],
+                        0.175, [163, 204, 89],
+                        0.2, [145, 191, 82],
+                        0.25, [128, 179, 71],
+                        0.3, [112, 163, 64],
+                        0.35, [97, 150, 54],
+                        0.4, [79, 138, 46],
+                        0.45, [64, 125, 36],
+                        0.5, [48, 110, 28],
+                        0.55, [33, 97, 18],
+                        0.6, [15, 84, 10],
+                        0.65, [0, 69, 0]
                     ],
-                    brightness: colormapSettings.brightness,
-                    contrast: colormapSettings.contrast,
-                    saturation: colormapSettings.saturation,
-                    exposure: colormapSettings.exposure,
-
-                });
-            }
+                    [0, 0, 0, 0]
+                ]
+            });
         }
     };
 
     useEffect(() => {
         updateColormap();
     }, [colormapSettings]);
+
+    useEffect(() => {
+        if (tiffLayer) {
+            updateColormap();
+        }
+    }, [selectedIndex, tiffLayer]);
 
     useEffect(() => {
         if (mapInstanceRef.current) {
@@ -241,6 +254,43 @@ const GeoTIFFMap = () => {
         map.addInteraction(dragBox);
     };
 
+    const getBandArithmeticExpression = (type: string) => {
+        switch (type) {
+            case "ndvi":
+                return ['/', ['-', ['band', 3], ['band', 2]], ['+', ['band', 3], ['band', 2]]];
+            case "evi":
+                return ['*', 2.5, ['/', ['-', ['band', 3], ['band', 2]], ['+', ['band', 3], ['*', 6, ['band', 2]], ['*', 7.5, ['band', 1]], 1]]];
+            case "savi":
+                return ['*', 1.5, ['/', ['-', ['band', 3], ['band', 2]], ['+', ['band', 3], ['band', 2], 0.5]]];
+            case "nbr":
+                return ['/', ['-', ['band', 3], ['band', 1]], ['+', ['band', 3], ['band', 1]]];
+            case "msavi":
+                return ['*', 0.5, ['+', 2, ['*', ['band', 3], 1], ['-', ['sqrt', ['-', ['*', ['*', 2, ['band', 3]], 1], ['*', 8, ['-', ['band', 3], ['band', 2]]]]], 1]]];
+            case "ndwi":
+                return ['/', ['-', ['band', 2], ['band', 3]], ['+', ['band', 2], ['band', 3]]];
+            default:
+                return ['band', 1];
+        }
+    };
+
+    const getIndexMinMax = (type: string) => {
+        switch (type) {
+            case "ndvi":
+            case "ndwi":
+                return { min: -1, max: 1 };
+            case "evi":
+                return { min: -1, max: 1 };
+            case "savi":
+                return { min: -1.5, max: 1.5 };
+            case "nbr":
+                return { min: -1, max: 1 };
+            case "msavi":
+                return { min: -1, max: 1 };
+            default:
+                return { min: 0, max: 1 };
+        }
+    };
+
     const fetchGeoTIFF = async () => {
         const geoTIFFSource = new GeoTIFF({
             sources: [
@@ -279,8 +329,7 @@ const GeoTIFFMap = () => {
                     [
                         'interpolate',
                         ['linear'],
-                        // calculate NDVI, bands come from the sources below
-                        ['/', ['-', ['band', 3], ['band', 2]], ['+', ['band', 3], ['band', 2]]],
+                        getBandArithmeticExpression(selectedIndex),
                         // color ramp for NDVI values, ranging from -1 to 1
                         -0.2,
                         [191, 191, 191],
@@ -440,7 +489,22 @@ const GeoTIFFMap = () => {
                     </div>
                 </div>
 
-
+                {/* Add Band Arithmetic Selector */}
+                <div className="fixed right-4 top-4 pointer-events-auto z-50">
+                    <Select onValueChange={setSelectedIndex} defaultValue={selectedIndex}>
+                        <SelectTrigger className="w-[200px] bg-white">
+                            <SelectValue placeholder="Select Index" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="ndvi">NDVI - Vegetation Index</SelectItem>
+                            <SelectItem value="evi">EVI - Enhanced Vegetation</SelectItem>
+                            <SelectItem value="savi">SAVI - Soil Adjusted VI</SelectItem>
+                            <SelectItem value="nbr">NBR - Burn Ratio</SelectItem>
+                            <SelectItem value="msavi">MSAVI - Modified Soil VI</SelectItem>
+                            <SelectItem value="ndwi">NDWI - Water Index</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
 
             </div>
             <div ref={mapRef} className="absolute inset-0 w-full h-full" />
