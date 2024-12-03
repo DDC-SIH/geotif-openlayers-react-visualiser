@@ -20,6 +20,7 @@ interface ColormapSettings {
   contrast: number;
   saturation: number;
   exposure: number;
+  hueshift: number;
 }
 
 function MapSideBar({
@@ -30,7 +31,7 @@ function MapSideBar({
   setSelectedIndex,
 }: {
   colormapSettings: ColormapSettings;
-  setColormapSettings: React.Dispatch<SetStateAction<ColormapSettings>>;
+  setColormapSettings: any;
   setBasemapLayer: (layer: TileLayer) => void;
   selectedIndex: string;
   setSelectedIndex: (value: string) => void;

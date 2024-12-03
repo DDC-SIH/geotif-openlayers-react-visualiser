@@ -1,4 +1,5 @@
 import { Slider } from "../ui/slider";
+import { ColorWheel, ColorWheelTrack, ColorThumb, Color } from "react-aria-components";
 
 interface ColormapSettings {
   type: string;
@@ -11,6 +12,7 @@ interface ColormapSettings {
   contrast: number;
   saturation: number;
   exposure: number;
+  hueshift: number;
 }
 
 function Effects({
@@ -18,13 +20,20 @@ function Effects({
   setColormapSettings,
 }: {
   colormapSettings: ColormapSettings;
-  setColormapSettings: React.Dispatch<React.SetStateAction<ColormapSettings>>;
+  setColormapSettings: any;
 }) {
   const transparencyOptions = [0, 0.25, 0.5, 0.75, 1]; // Transparency values
 
+  const handleColourWheelChange = (color: any) => {
+    setColormapSettings((prev:any) => ({
+      ...prev,
+      hueshift: color.hue,
+    }))
+  };
+
   return (
     <div>
-      <h3 className="font-semibold mb-4">Information</h3>
+      <h3 className="font-semibold mb-4">Effects</h3>
       <div className="space-y-2">
         <span className="text-sm font-medium flex justify-between w-full">
           <label>Transparency</label>
@@ -38,7 +47,7 @@ function Effects({
           max={1}
           step={0.01}
           onValueChange={([value]) =>
-            setColormapSettings((prev) => ({
+            setColormapSettings((prev:any) => ({
               ...prev,
               alpha: value,
             }))
@@ -51,7 +60,7 @@ function Effects({
             <button
               key={index}
               onClick={() =>
-                setColormapSettings((prev) => ({
+                setColormapSettings((prev:any) => ({
                   ...prev,
                   alpha: value,
                 }))
@@ -80,7 +89,7 @@ function Effects({
             max={1}
             step={0.01}
             onValueChange={([value]) =>
-              setColormapSettings((prev) => ({
+              setColormapSettings((prev:any) => ({
                 ...prev,
                 brightness: value,
               }))
@@ -91,15 +100,15 @@ function Effects({
         <div className="space-y-2">
           <span className="text-sm font-medium flex justify-between w-full">
             <label>Contrast</label>
-            <span>{Math.round(colormapSettings.contrast * 100)}%</span>
+            <span>{Math.round(colormapSettings.contrast * 200 - 100)}%</span>
           </span>
           <Slider
             value={[colormapSettings.contrast]}
-            min={-1}
+            min={0}
             max={1}
             step={0.01}
             onValueChange={([value]) =>
-              setColormapSettings((prev) => ({
+              setColormapSettings((prev:any) => ({
                 ...prev,
                 contrast: value,
               }))
@@ -110,15 +119,15 @@ function Effects({
         <div className="space-y-2">
           <span className="text-sm font-medium flex justify-between w-full">
             <label>Saturation</label>
-            <span>{Math.round(colormapSettings.saturation * 100)}%</span>
+            <span>{Math.round(colormapSettings.saturation * 200 - 100)}%</span>
           </span>
           <Slider
             value={[colormapSettings.saturation]}
-            min={-1}
+            min={0}
             max={1}
             step={0.01}
             onValueChange={([value]) =>
-              setColormapSettings((prev) => ({
+              setColormapSettings((prev:any) => ({
                 ...prev,
                 saturation: value,
               }))
@@ -129,20 +138,30 @@ function Effects({
         <div className="space-y-2">
           <span className="text-sm font-medium flex justify-between w-full">
             <label>Exposure</label>
-            <span>{Math.round(colormapSettings.exposure * 100)}%</span>
+            <span>{Math.round(colormapSettings.exposure * 200 - 100)}%</span>
           </span>
           <Slider
             value={[colormapSettings.exposure]}
-            min={-1}
+            min={0}
             max={1}
             step={0.01}
             onValueChange={([value]) =>
-              setColormapSettings((prev) => ({
+              setColormapSettings((prev:any) => ({
                 ...prev,
                 exposure: value,
               }))
             }
           />
+        </div>
+
+        <div className="space-y-2">
+          <span className="text-sm font-medium flex justify-between w-full">
+            <label>Hue Shift</label>
+          </span>
+          <ColorWheel outerRadius={75} innerRadius={50}  onChange={handleColourWheelChange}>
+            <ColorThumb className={'h-6 w-6 rounded-full z-[100] border-4 border-white'}/>
+            <ColorWheelTrack />
+          </ColorWheel>
         </div>
       </div>
     </div>

@@ -48,24 +48,20 @@ const GeoTIFFMap = () => {
         max: 1,
         steps: 10,
         reverse: true,
-        alpha: 0.7,
+        alpha: 0.75,
         brightness: 0,
-        contrast: 0,
-        saturation: 0,
-        exposure: 0
+        contrast: 0.5,
+        saturation: 0.5,
+        exposure: 0.5,
+        hueshift: 0
     });
     const [tiffLayer, setTiffLayer] = useState<TileLayer | null>(null);
-    const [basemapLayer, setBasemapLayer] = useState<TileLayer<any>>(mapSources[1].layer);
+    const [basemapLayer, setBasemapLayer] = useState<any>(mapSources[1].layer);
     const [selectedIndex, setSelectedIndex] = useState("ndvi");
     const [selectedColormap, setSelectedColormap] = useState("viridis");
 
     function getColorStops(
-        name: string,
-        min: number,
-        max: number,
-        steps: number,
-        reverse: boolean,
-        alpha: number
+        name: string, min: number, max: number, steps: number, reverse: boolean, alpha: number, brightness: number, contrast: number, saturation: number, exposure: number, hueshift: number
     ) {
         if (name === "none") {
             return [];
@@ -78,9 +74,18 @@ const GeoTIFFMap = () => {
             format: "rgba",
             alpha: alpha,
         });
+
         if (reverse) {
             colors.reverse();
         }
+
+        // Apply brightness, contrast, saturation, and exposure adjustments
+        colors = colors.map(color => {
+            const [r, g, b, a] = color;
+            const adjustedColor = adjustColor([r, g, b], brightness, contrast, saturation, exposure, hueshift);
+            return [adjustedColor[0], adjustedColor[1], adjustedColor[2], a];
+        });
+
         // Manually add a transparent stop for NoData values
         stops[0] = min;
         stops[1] = "rgba(0,0,0,0)";
@@ -89,6 +94,55 @@ const GeoTIFFMap = () => {
             stops[i * 2 + 1] = colors[i];
         }
         return stops;
+    }
+
+
+    function adjustColor([r, g, b]: number[], brightness: number, contrast: number, saturation: number, exposure: number, hueShift: number): number[] {
+        // Apply brightness
+        r = r + brightness * 255;
+        g = g + brightness * 255;
+        b = b + brightness * 255;
+
+        // Apply contrast
+        r = ((r - 128) * contrast * 2 + 128);
+        g = ((g - 128) * contrast * 2 + 128);
+        b = ((b - 128) * contrast * 2 + 128);
+
+        // Apply saturation
+        const gray = 0.3 * r + 0.59 * g + 0.11 * b;
+        r = gray + (r - gray) * saturation * 2;
+        g = gray + (g - gray) * saturation * 2;
+        b = gray + (b - gray) * saturation * 2;
+
+        // Apply exposure
+        r = r * Math.pow(2, exposure);
+        g = g * Math.pow(2, exposure);
+        b = b * Math.pow(2, exposure);
+
+        // Apply hue shift
+        [r, g, b] = applyHueShift(r, g, b, hueShift);
+
+        // Clamp values to [0, 255]
+        r = Math.min(255, Math.max(0, r));
+        g = Math.min(255, Math.max(0, g));
+        b = Math.min(255, Math.max(0, b));
+
+        return [r, g, b];
+    }
+
+    function applyHueShift(r: number, g: number, b: number, hueShift: number): number[] {
+        const u = Math.cos(hueShift * Math.PI / 180);
+        const w = Math.sin(hueShift * Math.PI / 180);
+
+        const newR = 0.299 + 0.701 * u + 0.168 * w;
+        const newG = 0.587 - 0.587 * u + 0.330 * w;
+        const newB = 0.114 - 0.114 * u - 0.497 * w;
+
+        return [
+            r * newR + g * newG + b * newB,
+            r * newG + g * newR + b * newB,
+            r * newB + g * newG + b * newR
+        ];
     }
 
     const setProjection = (
@@ -179,7 +233,7 @@ const GeoTIFFMap = () => {
                             'interpolate',
                             ['linear'],
                             getBandArithmeticExpression(selectedIndex),
-                            ...getColorStops(colormapSettings.type, min, max, colormapSettings.steps, colormapSettings.reverse, colormapSettings.alpha),
+                            ...getColorStops(colormapSettings.type, min, max, colormapSettings.steps, colormapSettings.reverse, colormapSettings.alpha, colormapSettings.brightness, colormapSettings.contrast, colormapSettings.saturation, colormapSettings.exposure, colormapSettings.hueshift),
                         ],
                         [0, 0, 0, 0]
                     ]
@@ -395,8 +449,8 @@ const GeoTIFFMap = () => {
             <div className="absolute inset-0 pointer-events-none">
                 {/* Sidebar */}
                 <MapSideBar
-                    colormapSettings={colormapSettings}
                     setColormapSettings={setColormapSettings}
+                    colormapSettings={colormapSettings}
                     setBasemapLayer={setBasemapLayer}
                     selectedIndex={selectedIndex}
                     setSelectedIndex={setSelectedIndex}
