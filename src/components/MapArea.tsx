@@ -27,11 +27,13 @@ import MapSideBar from "./Sidebar/MapSideBar";
 import { citiesData } from "@/../constants/consts";
 import { mapSources } from "@/utils/mapSourcces";
 import { useGeoData } from "../../contexts/GeoDataProvider";
-import { set } from "ol/transform";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useAppContext } from "../../contexts/AppContext";
+import MapUserPopup from "./MapUserPropup";
+
 
 const GeoTIFFMap = () => {
-    const { boundingBox, setSelectedAOI, setBoundingBox } = useGeoData();
+    const {isLoggedIn} = useAppContext();
+    const { setBoundingBox } = useGeoData();
     const tiffUrls = {
         VIS: "https://final-cog.s3.ap-south-1.amazonaws.com/VIS.tif",
         TIR1: "https://final-cog.s3.ap-south-1.amazonaws.com/TIR1.tif"
@@ -53,7 +55,7 @@ const GeoTIFFMap = () => {
         exposure: 0
     });
     const [tiffLayer, setTiffLayer] = useState<TileLayer | null>(null);
-    const [basemapLayer, setBasemapLayer] = useState<TileLayer>(mapSources[1].layer);
+    const [basemapLayer, setBasemapLayer] = useState<TileLayer<any>>(mapSources[1].layer);
     const [selectedIndex, setSelectedIndex] = useState("ndvi");
     const [selectedColormap, setSelectedColormap] = useState("viridis");
 
@@ -435,6 +437,7 @@ const GeoTIFFMap = () => {
 
             </div>
             <div ref={mapRef} className="absolute inset-0 w-full h-full" />
+                <MapUserPopup isLoggedIn={isLoggedIn} />
         </div>
     );
 };
