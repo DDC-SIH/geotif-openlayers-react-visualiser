@@ -86,13 +86,26 @@ const GeoTIFFMap = () => {
             return [adjustedColor[0], adjustedColor[1], adjustedColor[2], a];
         });
 
-        // Manually add a transparent stop for NoData values
+        // Add initial transparent stop for values below min
         stops[0] = min;
         stops[1] = "rgba(0,0,0,0)";
+
+        // Add color stops within the min-max range
         for (let i = 1; i < steps; i++) {
-            stops[i * 2] = min + i * delta;
-            stops[i * 2 + 1] = colors[i];
+            const value = min + i * delta;
+            if (value >= colormapSettings.min && value <= colormapSettings.max) {
+                stops[i * 2] = value;
+                stops[i * 2 + 1] = colors[i];
+            } else {
+                stops[i * 2] = value;
+                stops[i * 2 + 1] = "rgba(0,0,0,0)";
+            }
         }
+
+        // Add final transparent stop for values above max
+        stops[steps * 2 - 2] = max;
+        stops[steps * 2 - 1] = "rgba(0,0,0,0)";
+
         return stops;
     }
 
