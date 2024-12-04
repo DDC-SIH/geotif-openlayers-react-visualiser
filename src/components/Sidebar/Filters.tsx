@@ -91,8 +91,8 @@ function Filters({
           </span>
           <Slider
             value={[colormapSettings.min]}
-            min={-2}
-            max={2}
+            min={-1}
+            max={1}
             step={0.1}
             onValueChange={([value]) =>
               setColormapSettings((prev) => ({
@@ -102,8 +102,8 @@ function Filters({
             }
           />
           <div className="flex justify-between text-xs">
-            <span>-2</span>
-            <span>2</span>
+            <span>-1</span>
+            <span>1</span>
           </div>
         </div>
 
@@ -113,8 +113,8 @@ function Filters({
           </span>{" "}
           <Slider
             value={[colormapSettings.max]}
-            min={-2}
-            max={2}
+            min={-1}
+            max={1}
             step={0.1}
             onValueChange={([value]) =>
               setColormapSettings((prev) => ({
@@ -124,8 +124,8 @@ function Filters({
             }
           />
           <div className="flex justify-between text-xs">
-            <span>-2</span>
-            <span>2</span>
+            <span>-1</span>
+            <span>1</span>
           </div>
         </div>
 
@@ -135,7 +135,7 @@ function Filters({
           </span>{" "}
           <Slider
             value={[colormapSettings.steps]}
-            min={5}
+            min={10}
             max={20}
             step={1}
             onValueChange={([value]) =>
@@ -146,7 +146,7 @@ function Filters({
             }
           />
           <div className="flex justify-between text-xs">
-            <span>5</span>
+            <span>10</span>
             <span>20</span>
           </div>
         </div>

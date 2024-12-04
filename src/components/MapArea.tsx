@@ -123,14 +123,14 @@ const GeoTIFFMap = () => {
 
         // Apply saturation
         const gray = 0.3 * r + 0.59 * g + 0.11 * b;
-        r = gray + (r - gray) * saturation * 2;
-        g = gray + (g - gray) * saturation * 2;
-        b = gray + (b - gray) * saturation * 2;
+        r = gray + (r - gray) * saturation * 1.33;
+        g = gray + (g - gray) * saturation * 1.33;
+        b = gray + (b - gray) * saturation * 1.33;
 
         // Apply exposure
-        r = r * Math.pow(2, exposure);
-        g = g * Math.pow(2, exposure);
-        b = b * Math.pow(2, exposure);
+        r = r * Math.pow(1.33, exposure);
+        g = g * Math.pow(1.33, exposure);
+        b = b * Math.pow(1.33, exposure);
 
         // Apply hue shift
         [r, g, b] = applyHueShift(r, g, b, hueShift);
