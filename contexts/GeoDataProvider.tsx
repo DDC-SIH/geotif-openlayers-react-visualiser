@@ -3,17 +3,18 @@ import { ColorMap, FileFormat, GeoJSON, GeoJSONError } from "../types/geojson.ts
 import { GeoJSONEndpoint } from '../constants/consts.ts';
 
 
+type tiffType = {
+    url: string,
+    min: number,
+    max: number
+}
 type tiffUrls = {
-    VIS: {
-        url: string;
-        min: number;
-        max: number;
-    };
-    TIR1: {
-        url: string;
-        min: number;
-        max: number;
-    };
+    MIR: tiffType,
+    SWIR: tiffType,
+    TIR1: tiffType,
+    TIR2: tiffType,
+    VIS: tiffType,
+    WV: tiffType
 };
 
 type LayerInstance = {
@@ -64,17 +65,37 @@ export const GeoDataProvider: React.FC<GeoDataProviderProps> = ({ children }) =>
     const [selectedAOI, setSelectedAOI] = useState<boolean>(false);
     const [boundingBox, setBoundingBox] = useState<number[] | null>(null);
     const [tiffUrls, setTiffUrls] = useState({
-        VIS: {
-            url: "https://final-cog.s3.ap-south-1.amazonaws.com/VIS.tif",
-            min: 16,
-            max: 216,
+        MIR: {
+            url: "https://somehowgetsplotted.s3.ap-south-1.amazonaws.com/somehowgetsplotted/IMG_MIR_optimized.tif",
+            min: 302,
+            max: 996,
+        },
+        SWIR: {
+            url: "https://somehowgetsplotted.s3.ap-south-1.amazonaws.com/somehowgetsplotted/IMG_SWIR_optimized.tif",
+            min: 11,
+            max: 551,
         },
         TIR1: {
-            url: "https://final-cog.s3.ap-south-1.amazonaws.com/TIR1.tif",
-            min: 496,
-            max: 942,
+            url: "https://somehowgetsplotted.s3.ap-south-1.amazonaws.com/somehowgetsplotted/IMG_TIR1_optimized.tif",
+            min: 238,
+            max: 961,
+        },
+        TIR2: {
+            url: "https://somehowgetsplotted.s3.ap-south-1.amazonaws.com/somehowgetsplotted/IMG_TIR2_optimized.tif",
+            min: 283,
+            max: 945,
+        }, VIS: {
+            url: "https://somehowgetsplotted.s3.ap-south-1.amazonaws.com/somehowgetsplotted/IMG_VIS_optimized.tif",
+            min: 35,
+            max: 493,
+
+        }, WV: {
+            url: "https://somehowgetsplotted.s3.ap-south-1.amazonaws.com/somehowgetsplotted/IMG_WV_optimized.tif",
+            min: 776,
+            max: 998,
         }
-    });
+    }
+    );
     const [renderArray, setRenderArray] = useState<LayerInstance[]>([
         { id: generateUniqueId(), key: 'VIS' },
         { id: generateUniqueId(), key: 'VIS' },

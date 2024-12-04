@@ -1,5 +1,6 @@
 import { useGeoData } from "../../../contexts/GeoDataProvider";
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
+import { Plus } from 'lucide-react';
 
 export default function LayersSection() {
     const { setBoundingBox, tiffUrls, renderArray, setRenderArray } = useGeoData();
@@ -21,22 +22,27 @@ export default function LayersSection() {
         setRenderArray(reordered);
     };
 
+    const availableLayers = Object.keys(tiffUrls) as (keyof typeof tiffUrls)[];
+
     return (
         <div>
             <h3 className="font-semibold mb-4">Information</h3>
             <p className="my-2">Render Meta Data Here</p>
-            <button
-                className="mb-4 px-4 py-2 bg-blue-500 text-white rounded"
-                onClick={() => toggleLayer('VIS')}
-            >
-                Add VIS Layer
-            </button>
-            <button
-                className="mb-4 px-4 py-2 bg-blue-500 text-white rounded"
-                onClick={() => toggleLayer('TIR1')}
-            >
-                Add TIR1 Layer
-            </button>
+            
+            {/* Available Layers List */}
+            <div className="mb-4">
+                <h4 className="text-sm font-medium mb-2">Available Layers</h4>
+                {availableLayers.map((layerKey) => (
+                    <div key={layerKey} 
+                         className="flex items-center justify-between p-2 hover:bg-gray-100 rounded cursor-pointer"
+                         onClick={() => toggleLayer(layerKey)}>
+                        <span>{layerKey}</span>
+                        <Plus size={18} className="text-blue-500" />
+                    </div>
+                ))}
+            </div>
+
+            {/* Active Layers List */}
             <DragDropContext onDragEnd={onDragEnd}>
                 <Droppable droppableId="layers">
                     {(provided) => (
