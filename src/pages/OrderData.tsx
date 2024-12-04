@@ -32,10 +32,8 @@ const navigate = useNavigate();
         fetchData();
     }, []);
 
-    const handleOrderButtonClick = (groupName: string, startDateTime: string, endDateTime: string, version:string) => {
-        const formattedStartDateTime = new Date(startDateTime).toISOString().replace(/[-:.]/g, '').slice(0, -5);
-        const formattedEndDateTime = new Date(endDateTime).toISOString().replace(/[-:.]/g, '').slice(0, -5);
-        navigate(`/preview/?p=${groupName}&st=${formattedStartDateTime}&ed=${formattedEndDateTime}&v=${version}`);
+    const handleOrderButtonClick = (groupName: string,version:string) => {
+        navigate(`/preview/?p=${groupName}&v=${version}`);
     };
 
     if (loading) return <div>Loading...</div>;
@@ -70,7 +68,7 @@ const navigate = useNavigate();
                                 </select>
                             </td>
                             <td className="border px-4 py-2">
-                                <Button className="w-full px-4 py-2 rounded" onClick={() => handleOrderButtonClick(item.GroupName, item.StartDateTime, item.EndDateTime, (document.querySelector(`#version-select-${index}`) as HTMLSelectElement).value)}>Order</Button>
+                                <Button className="w-full px-4 py-2 rounded" onClick={() => handleOrderButtonClick(item.GroupName, (document.querySelector(`#version-select-${index}`) as HTMLSelectElement).value)}>Order</Button>
                             </td>
                         
                         </tr>
