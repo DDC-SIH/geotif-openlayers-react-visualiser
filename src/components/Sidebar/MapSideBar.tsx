@@ -1,7 +1,7 @@
 import { Info, Filter, Sparkles, MapIcon, DownloadCloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { SetStateAction, useState } from "react";
+import { useState } from "react";
 import Information from "./Information";
 import Filters from "./Filters";
 import Effects from "./Effects";
@@ -20,6 +20,7 @@ interface ColormapSettings {
   contrast: number;
   saturation: number;
   exposure: number;
+  hueshift: number;
 }
 
 function MapSideBar({
@@ -30,7 +31,7 @@ function MapSideBar({
   setSelectedIndex,
 }: {
   colormapSettings: ColormapSettings;
-  setColormapSettings: React.Dispatch<SetStateAction<ColormapSettings>>;
+  setColormapSettings: any;
   setBasemapLayer: (layer: TileLayer) => void;
   selectedIndex: string;
   setSelectedIndex: (value: string) => void;

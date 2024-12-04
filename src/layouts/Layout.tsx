@@ -8,7 +8,7 @@ const Layout = ({children}: Props) => {
     return (
         <div className="flex flex-col">
             <Header/>
-            <div className="flex-1">
+            <div className="flex-1 max-w-screen-lg mx-auto w-full">
                 {children}
             </div>
         </div>

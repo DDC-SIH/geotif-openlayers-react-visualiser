@@ -4,6 +4,10 @@ import MapView from './pages/MapView';
 import SignIn from "./pages/SignIn";
 import Register from "./pages/Register";
 import Layout from './layouts/Layout';
+import OrderData from './pages/OrderData';
+import PreviewData from './pages/PreviewData';
+import Home from './pages/Home';
+import About from './pages/About';
 
 
 
@@ -12,9 +16,18 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<MapView />} />
+        
         <Route path="/sign-in" element={<Layout><SignIn /></Layout>} />
         <Route path="/register" element={<Layout><Register /></Layout>} />
-        <Route path="/test" element={<h1>Test</h1>} />
+
+        <Route path="/home" element={<Layout><Home /></Layout>} />
+        <Route path="/order" element={<Layout><OrderData /></Layout>} />
+        <Route path="/preview" element={<Layout><PreviewData /></Layout>} />
+        <Route path="/map" element={<MapView />} />
+
+        <Route path="/about" element={<About />} />
+
+        <Route path="*" element={<h1>Not Found</h1>} />
       </Routes>
     </Router>
   )
