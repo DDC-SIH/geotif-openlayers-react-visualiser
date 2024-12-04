@@ -1,4 +1,4 @@
-import { Info, Filter, Sparkles, MapIcon, DownloadCloud } from "lucide-react";
+import { Info, Filter, Sparkles, MapIcon, DownloadCloud, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -8,6 +8,7 @@ import Effects from "./Effects";
 import { mapSources } from "@/utils/mapSourcces";
 import TileLayer from "ol/layer/Tile";
 import Export from "./Export";
+import LayersSection from "./Layers";
 
 interface ColormapSettings {
   type: string;
@@ -68,6 +69,16 @@ function MapSideBar({
         </Button>
         <Button
           size="icon"
+          variant={activeSidebar === "layers" ? "default" : "ghost"}
+          className="rounded-full"
+          onClick={() =>
+            setActiveSidebar(activeSidebar === "layers" ? null : "layers")
+          }
+        >
+          <Layers className="h-4 w-4" />
+        </Button>
+        <Button
+          size="icon"
           variant={activeSidebar === "basemap" ? "default" : "ghost"}
           className="rounded-full"
           onClick={() =>
@@ -86,6 +97,7 @@ function MapSideBar({
         >
           <Filter className="h-4 w-4" />
         </Button>
+
         <Button
           size="icon"
           variant={activeSidebar === "effects" ? "default" : "ghost"}
@@ -155,6 +167,9 @@ function MapSideBar({
               selectedIndex={selectedIndex}
               setSelectedIndex={setSelectedIndex}
             />
+          )}
+          {activeSidebar === "layers" && (
+            <LayersSection />
           )}
           {activeSidebar === "info" && (
             <Information />

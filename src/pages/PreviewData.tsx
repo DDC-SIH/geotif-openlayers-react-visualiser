@@ -29,7 +29,7 @@ function PreviewData() {
                 })
                 .catch(error => console.error('Error fetching data:', error));
         }
-    }, [query]);
+    }, []);
 
 
     const handleDetailedPreview = (groupName: string, startDateTime: string, endDateTime: string, version:string) => {
