@@ -79,4 +79,62 @@ export const register = async (formData: RegisterFormData) => {
     }
   };
 
+
+
+  export const fetchFiles = async () => {
+    const response = await fetch(`${API_BASE_URL}/api/files`, {
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error("Could not load items");
+    }
+
+    return response.json();
+  };
+
+  export const fetchFileById = async (id: string) => {
+    const response = await fetch(`${API_BASE_URL}/api/files/${id}`, {
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error("Item not found");
+      }
+      throw new Error("Could not load item");
+    }
+
+    return response.json();
+  };
+
+  export const fetchGroupedFiles = async () => {
+    const response = await fetch(`${API_BASE_URL}/api/files/grouped`, {
+      method: "POST",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error("Could not load grouped items");
+    }
+
+    return response.json();
+  };
+
+  export const searchFiles = async (searchParams: { prefix: string; dataProcessingLevel: string; standard: string; version: string }) => {
+    const response = await fetch(`${API_BASE_URL}/api/files/search`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(searchParams),
+    });
+
+    if (!response.ok) {
+      throw new Error("Could not search items");
+    }
+
+    return response.json();
+  };
   
