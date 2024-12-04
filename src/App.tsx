@@ -20,9 +20,9 @@ function App() {
         <Route path="/sign-in" element={<Layout><SignIn /></Layout>} />
         <Route path="/register" element={<Layout><Register /></Layout>} />
 
-        <Route path="/home" element={<Home />} />
-        <Route path="/order" element={<OrderData />} />
-        <Route path="/preview" element={<PreviewData />} />
+        <Route path="/home" element={<Layout><Home /></Layout>} />
+        <Route path="/order" element={<Layout><OrderData /></Layout>} />
+        <Route path="/preview" element={<Layout><PreviewData /></Layout>} />
         <Route path="/map" element={<MapView />} />
 
         <Route path="/about" element={<About />} />
