@@ -138,3 +138,21 @@ export const register = async (formData: RegisterFormData) => {
     return response.json();
   };
   
+
+
+  export const deepSearchFiles = async (searchParams: { prefix: string; dataProcessingLevel: string; standard: string; version: string; startDate: string; endDate: string }) => {
+    const response = await fetch(`${API_BASE_URL}/api/files/deep-search`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(searchParams),
+    });
+
+    if (!response.ok) {
+      throw new Error("Could not perform deep search");
+    }
+
+    return response.json();
+  };
