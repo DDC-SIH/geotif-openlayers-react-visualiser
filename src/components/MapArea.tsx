@@ -115,9 +115,9 @@ const GeoTIFFMap = () => {
         b = b + brightness * 255;
 
         // Apply contrast
-        r = ((r - 128) * contrast * 5 + 128);
-        g = ((g - 128) * contrast * 5 + 128);
-        b = ((b - 128) * contrast * 5 + 128);
+        r = ((r - 128) * contrast * 2 + 128);
+        g = ((g - 128) * contrast * 2 + 128);
+        b = ((b - 128) * contrast * 2 + 128);
 
         // Apply saturation
         const gray = 0.3 * r + 0.59 * g + 0.11 * b;
