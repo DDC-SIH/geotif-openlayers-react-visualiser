@@ -29,15 +29,13 @@ import { mapSources } from "@/utils/mapSourcces";
 import { useGeoData } from "../../contexts/GeoDataProvider";
 import { useAppContext } from "../../contexts/AppContext";
 import MapUserPopup from "./MapUserPropup";
+import { v4 as uuidv4 } from 'uuid'; // Install uuid package if not already
 
 
 const GeoTIFFMap = () => {
-    const {isLoggedIn} = useAppContext();
-    const { setBoundingBox } = useGeoData();
-    const tiffUrls = {
-        VIS: "https://final-cog.s3.ap-south-1.amazonaws.com/VIS.tif",
-        TIR1: "https://final-cog.s3.ap-south-1.amazonaws.com/TIR1.tif"
-    };
+    const { isLoggedIn } = useAppContext();
+    const { setBoundingBox, tiffUrls, renderArray } = useGeoData();
+
     const mapRef = useRef<HTMLDivElement>(null); // Reference to the map container
     const mapInstanceRef = useRef<Map | null>(null); // New ref for map instance
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -231,7 +229,7 @@ const GeoTIFFMap = () => {
     });
 
     const updateColormap = () => {
-        if (tiffLayer) {
+        if (tiffLayer && renderArray.length >= 3) {
             const { min, max } = getIndexMinMax(selectedIndex);
             if (selectedIndex !== "none") {
                 tiffLayer.setStyle({
@@ -252,6 +250,7 @@ const GeoTIFFMap = () => {
                     ]
                 });
             } else {
+                setSelectedIndex("none");
                 tiffLayer.setStyle({});
             }
 
@@ -278,7 +277,7 @@ const GeoTIFFMap = () => {
         if (tiffLayer) {
             updateColormap();
         }
-    }, [selectedColormap, selectedIndex, tiffLayer]);
+    }, [selectedColormap, selectedIndex, tiffLayer, colormapSettings]);
 
     const addDragBoxInteraction = (map: Map) => {
         const dragBox = new DragBox({
@@ -357,37 +356,31 @@ const GeoTIFFMap = () => {
     };
 
     const fetchGeoTIFF = async () => {
+        // Remove existing tiffLayer if any
+        if (tiffLayer) {
+            mapInstanceRef.current?.removeLayer(tiffLayer);
+        }
+
+        // Create sources based on renderArray
+        const sources = renderArray.map(layer => ({
+            url: tiffUrls[layer.key].url,
+            bands: [1],
+            min: tiffUrls[layer.key].min,
+            max: tiffUrls[layer.key].max,
+        }));
+        console.log(sources)
         const geoTIFFSource = new GeoTIFF({
-            sources: [
-                {
-                    url: tiffUrls.VIS,
-                    bands: [1],
-                    min: 16,
-                    max: 216,
-                },
-                {
-                    url: tiffUrls.VIS,
-                    bands: [1],
-                    min: 16,
-                    max: 216,
-                },
-                {
-                    url: tiffUrls.TIR1,
-                    bands: [1],
-                    min: 496,
-                    max: 942,
-                },
-            ],
+            sources: sources,
         });
 
         const layer = new TileLayer({
             className: "tiff",
             source: geoTIFFSource,
-
-
         });
 
         setTiffLayer(layer);
+
+
 
         const openLayersMap = new Map({
             target: mapRef.current as HTMLElement,
@@ -433,7 +426,9 @@ const GeoTIFFMap = () => {
                 mapInstanceRef.current = null;
             }
         };
-    }, []);
+    }, [renderArray]);
+
+
 
     return (
         <div className="w-screen h-screen relative overflow-hidden">
@@ -504,7 +499,7 @@ const GeoTIFFMap = () => {
 
             </div>
             <div ref={mapRef} className="absolute inset-0 w-full h-full" />
-                <MapUserPopup isLoggedIn={isLoggedIn} />
+            <MapUserPopup isLoggedIn={isLoggedIn} />
         </div>
     );
 };

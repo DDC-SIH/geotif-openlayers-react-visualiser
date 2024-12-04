@@ -2,6 +2,25 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { ColorMap, FileFormat, GeoJSON, GeoJSONError } from "../types/geojson.ts";
 import { GeoJSONEndpoint } from '../constants/consts.ts';
 
+
+type tiffUrls = {
+    VIS: {
+        url: string;
+        min: number;
+        max: number;
+    };
+    TIR1: {
+        url: string;
+        min: number;
+        max: number;
+    };
+};
+
+type LayerInstance = {
+    id: string;
+    key: keyof tiffUrls;
+};
+
 interface GeoDataContextType {
     geoData: GeoJSON | GeoJSONError | null;
     url: string;
@@ -12,6 +31,10 @@ interface GeoDataContextType {
     setSelectedAOI: React.Dispatch<React.SetStateAction<boolean>>;
     boundingBox: number[] | null;
     setBoundingBox: React.Dispatch<React.SetStateAction<number[] | null>>;
+    tiffUrls: tiffUrls;
+    setTiffUrls: React.Dispatch<React.SetStateAction<tiffUrls>>;
+    renderArray: LayerInstance[];
+    setRenderArray: React.Dispatch<React.SetStateAction<LayerInstance[]>>;
 
 }
 
@@ -27,6 +50,9 @@ interface RequestInfo {
     colormap_name?: ColorMap;
 }
 
+// Utility function to generate unique IDs
+const generateUniqueId = () => `layer-${Math.random().toString(36).substr(2, 9)}`;
+
 export const GeoDataProvider: React.FC<GeoDataProviderProps> = ({ children }) => {
     const [url, setUrl] = useState<string>("https://final-cog.s3.ap-south-1.amazonaws.com/test_cog.tif");
     const [geoData, setGeoData] = useState<GeoJSON | null>(null);
@@ -37,6 +63,23 @@ export const GeoDataProvider: React.FC<GeoDataProviderProps> = ({ children }) =>
     const [loading, setLoading] = useState<boolean>(false);
     const [selectedAOI, setSelectedAOI] = useState<boolean>(false);
     const [boundingBox, setBoundingBox] = useState<number[] | null>(null);
+    const [tiffUrls, setTiffUrls] = useState({
+        VIS: {
+            url: "https://final-cog.s3.ap-south-1.amazonaws.com/VIS.tif",
+            min: 16,
+            max: 216,
+        },
+        TIR1: {
+            url: "https://final-cog.s3.ap-south-1.amazonaws.com/TIR1.tif",
+            min: 496,
+            max: 942,
+        }
+    });
+    const [renderArray, setRenderArray] = useState<LayerInstance[]>([
+        { id: generateUniqueId(), key: 'VIS' },
+        { id: generateUniqueId(), key: 'VIS' },
+        { id: generateUniqueId(), key: 'TIR1' }
+    ]); // Initialize with all layers active
     // Fetch the GeoJSON data when the URL changes
     useEffect(() => {
         const fetchGeoData = async () => {
@@ -59,8 +102,7 @@ export const GeoDataProvider: React.FC<GeoDataProviderProps> = ({ children }) =>
     }, [url]);
 
     return (
-        <GeoDataContext.Provider value={{ geoData, url, setUrl, loading, setLoading, selectedAOI, setSelectedAOI, boundingBox, setBoundingBox }}>
-            {children}
+        <GeoDataContext.Provider value={{ geoData, url, setUrl, loading, setLoading, selectedAOI, setSelectedAOI, boundingBox, setBoundingBox, tiffUrls, setTiffUrls, renderArray, setRenderArray }}>            {children}
         </GeoDataContext.Provider>
     );
 };

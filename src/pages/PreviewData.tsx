@@ -9,7 +9,7 @@ import {
 import { CalendarIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { format, set } from "date-fns";
+import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import type { TimePickerProps } from "antd";
 import { TimePicker } from "antd";
@@ -98,7 +98,7 @@ function PreviewData() {
       .catch((error) => console.error("Error performing deep search:", error));
   };
 
-  const onStartTimeChange: TimePickerProps["onChange"] = (time, timeString) => {
+  const onStartTimeChange: TimePickerProps["onChange"] = (_time, timeString) => {
     if (startDate) {
       const updatedDate = new Date(startDate);
       const [hours, minutes] = (timeString as string).split(":").map(Number);
@@ -106,7 +106,7 @@ function PreviewData() {
       setStartDate(updatedDate);
     }
   };
-  const onEndTimeChange: TimePickerProps["onChange"] = (time, timeString) => {
+  const onEndTimeChange: TimePickerProps["onChange"] = (_time, timeString) => {
     if (endDate) {
       const updatedDate = new Date(endDate);
       const [hours, minutes] = (timeString as string).split(":").map(Number);
