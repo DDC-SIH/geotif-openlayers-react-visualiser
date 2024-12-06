@@ -33,8 +33,8 @@ import { v4 as uuidv4 } from 'uuid'; // Install uuid package if not already
 
 
 const GeoTIFFMap = () => {
-    const { isLoggedIn } = useAppContext();
     const { setBoundingBox, tiffUrls, renderArray } = useGeoData();
+    const { isLoggedIn } = useAppContext();
 
     const mapRef = useRef<HTMLDivElement>(null); // Reference to the map container
     const mapInstanceRef = useRef<Map | null>(null); // New ref for map instance
@@ -444,6 +444,8 @@ const GeoTIFFMap = () => {
             </style>
 
             {/* UI Layer */}
+            <MapUserPopup isLoggedIn={isLoggedIn} />
+
             <div className="absolute inset-0 pointer-events-none">
                 {/* Sidebar */}
                 <MapSideBar
@@ -506,8 +508,8 @@ const GeoTIFFMap = () => {
                 </div>
 
             </div>
+
             <div ref={mapRef} className="absolute inset-0 w-full h-full" />
-            <MapUserPopup isLoggedIn={isLoggedIn} />
         </div>
     );
 };
