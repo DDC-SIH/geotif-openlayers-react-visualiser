@@ -12,10 +12,8 @@ const Header = () => {
           <nav className="flex items-center justify-between h-16 lg:h-20 bg-white border-b border-gray-200">
             <div className="flex-shrink-0">
               <Link to="/" title="" className="flex items-center">
-                <span className="ml-2 text-xl md:text-xl lg:text-3xl font-bold">
-                  Dekhega <span className="text-orange-600">Bh</span>
-                  <span className="text-blue-900">ar</span>
-                  <span className="text-green-600">at</span>
+                <span className="ml-2 text-xl md:text-xl lg:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-zinc-800 to-zinc-500">
+                Vistaar
                 </span>
               </Link>
             </div>
