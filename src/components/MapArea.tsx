@@ -385,8 +385,9 @@ const GeoTIFFMap = () => {
         const openLayersMap = new Map({
             target: mapRef.current as HTMLElement,
             layers: [basemapLayer, layer], // Use the selected basemap layer
-            controls: defaultControls().extend([
-                new Zoom(),
+            controls: defaultControls({
+                zoom: false // Disable default zoom controls
+            }).extend([
                 new ZoomToExtent({
                     extent: [
                         68.1766,
@@ -434,23 +435,12 @@ const GeoTIFFMap = () => {
         <div className="w-screen h-screen relative overflow-hidden">
             <style>
                 {`
-        .ol-zoom {
-          top: 4em;
-          left: 0.5em;
-        }
-        .ol-control button {
-          background-color: rgba(255, 255, 255, 0.8);
-          color: #666;
-        }
-        .ol-control button:hover {
-          background-color: rgba(255, 255, 255, 1);
-        }
-        html,
-        body {
-          overscroll-behavior-y: none;
-          touch-action: none;
-        }
-        `}
+            html,
+            body {
+              overscroll-behavior-y: none;
+              touch-action: none;
+            }
+            `}
             </style>
 
             {/* UI Layer */}
@@ -464,9 +454,27 @@ const GeoTIFFMap = () => {
                     setSelectedIndex={setSelectedIndex}
                 />
 
-                {/* Search Bar */}
-                <div className="fixed left-4 top-4 pointer-events-auto z-50">
-                    <div className="flex items-center bg-white backdrop-blur-md rounded-full p-2 shadow-lg overflow-hidden">
+                {/* Search Bar and Controls Container */}
+                <div className="fixed right-4 bottom-4 flex gap-2 items-center pointer-events-auto z-50 flex-col">
+                    <div className="flex flex-col">
+                        <Button
+                            size="icon"
+                            variant="ghost"
+                            className="rounded-none h-9 bg-white"
+                            onClick={() => mapInstanceRef.current?.getView().setZoom(mapInstanceRef.current.getView().getZoom()! + 1)}
+                        >
+                            <span className="text-lg">+</span>
+                        </Button>
+                        <Button
+                            size="icon"
+                            variant="ghost"
+                            className="rounded-none h-9 bg-white"
+                            onClick={() => mapInstanceRef.current?.getView().setZoom(mapInstanceRef.current.getView().getZoom()! - 1)}
+                        >
+                            <span className="text-lg">−</span>
+                        </Button>
+                    </div>
+                    <div className="flex items-center bg-white shadow-lg overflow-hidden">
                         <div
                             className={cn(
                                 "transition-all duration-300 ease-in-out",
@@ -489,7 +497,7 @@ const GeoTIFFMap = () => {
                         <Button
                             size="icon"
                             variant="ghost"
-                            className="rounded-full"
+                            className="rounded-none h-9"
                             onClick={() => setIsSearchOpen(!isSearchOpen)}
                         >
                             <Search className="h-4 w-4" />
