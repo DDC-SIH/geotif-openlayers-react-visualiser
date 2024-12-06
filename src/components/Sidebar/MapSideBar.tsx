@@ -41,68 +41,68 @@ function MapSideBar({
   const [selectedMap, setSelectedMap] = useState(mapSources[1].name);
 
   return (
-    <div className="fixed left-0 top-0 flex h-full pointer-events-auto z-[2] bg-black ">
+    <div className="fixed left-0 top-0 flex h-full pointer-events-auto z-[2] bg-neutral-900 ">
       {/* Icons Bar */}
       <div className=" flex flex-col   z-[2]">
         <Button
           size="icon"
           variant={activeSidebar === "info" ? "secondary" : "ghost"}
-          className="rounded-none p-5"
+          className={`rounded-none p-8 ${activeSidebar === "info" ? "hover:bg-neutral-300" : "hover:bg-neutral-800"}` }
           onClick={() =>
             setActiveSidebar(activeSidebar === "info" ? null : "info")
           }
         >
-          <Info className={`h-6 w-6 ${activeSidebar === "info" ? "text-black" : "text-white"}`} />
+          <Info className={`h-8 w-8 ${activeSidebar === "info" ? "text-black" : "text-white"}`} />
         </Button>
         <Button
           size="icon"
           variant={activeSidebar === "layers" ? "secondary" : "ghost"}
-          className="rounded-none p-5"
+          className={`rounded-none p-8 ${activeSidebar === "layers" ? "hover:bg-neutral-300" : "hover:bg-neutral-800"}` }
           onClick={() =>
             setActiveSidebar(activeSidebar === "layers" ? null : "layers")
           }
         >
-          <Layers className={`h-6 w-6 ${activeSidebar === "layers" ? "text-black" : "text-white"}`} />
+          <Layers className={`h-8 w-8 ${activeSidebar === "layers" ? "text-black" : "text-white"}`} />
         </Button>
         <Button
           size="icon"
           variant={activeSidebar === "basemap" ? "secondary" : "ghost"}
-          className="rounded-none p-5"
+          className={`rounded-none p-8 ${activeSidebar === "basemap" ? "hover:bg-neutral-300" : "hover:bg-neutral-800"}` }
           onClick={() =>
             setActiveSidebar(activeSidebar === "basemap" ? null : "basemap")
           }
         >
-          <MapIcon className={`h-6 w-6 ${activeSidebar === "basemap" ? "text-black" : "text-white"}`} />
+          <MapIcon className={`h-8 w-8 ${activeSidebar === "basemap" ? "text-black" : "text-white"}`} />
         </Button>
         <Button
           size="icon"
           variant={activeSidebar === "filters" ? "secondary" : "ghost"}
-          className="rounded-none p-5"
+          className={`rounded-none p-8 ${activeSidebar === "filters" ? "hover:bg-neutral-300" : "hover:bg-neutral-800"}` }
           onClick={() =>
             setActiveSidebar(activeSidebar === "filters" ? null : "filters")
           }
         >
-          <Filter className={`h-6 w-6 ${activeSidebar === "filters" ? "text-black" : "text-white"}`} />
+          <Filter className={`h-8 w-8 ${activeSidebar === "filters" ? "text-black" : "text-white"}`} />
         </Button>
         <Button
           size="icon"
           variant={activeSidebar === "effects" ? "secondary" : "ghost"}
-          className="rounded-none p-5"
+          className={`rounded-none p-8 ${activeSidebar === "effects" ? "hover:bg-neutral-300" : "hover:bg-neutral-800"}` }
           onClick={() =>
             setActiveSidebar(activeSidebar === "effects" ? null : "effects")
           }
         >
-          <Sparkles className={`h-6 w-6 ${activeSidebar === "effects" ? "text-black" : "text-white"}`} />
+          <Sparkles className={`h-8 w-8 ${activeSidebar === "effects" ? "text-black" : "text-white"}`} />
         </Button>
         <Button
           size="icon"
           variant={activeSidebar === "export" ? "secondary" : "ghost"}
-          className="rounded-none p-5"
+          className={`rounded-none p-8 ${activeSidebar === "export" ? "hover:bg-neutral-300" : "hover:bg-neutral-800"}` }
           onClick={() =>
             setActiveSidebar(activeSidebar === "export" ? null : "export")
           }
         >
-          <DownloadCloud className={`h-6 w-6 ${activeSidebar === "export" ? "text-black" : "text-white"}`} />
+          <DownloadCloud className={`h-8 w-8 ${activeSidebar === "export" ? "text-black" : "text-white"}`} />
         </Button>
 
       </div>
@@ -110,7 +110,7 @@ function MapSideBar({
       {/* Expandable Section */}
       <div
         className={cn(
-          "h-full bg-white border-r border-gray-200 transition-all duration-200 ease-out z-[9998]",
+          "h-full bg-white  transition-all duration-200 ease-out z-[9998]",
           activeSidebar ? "w-[300px]" : "w-0 overflow-hidden"
         )}
       >

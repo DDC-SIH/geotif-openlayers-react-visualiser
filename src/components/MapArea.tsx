@@ -19,7 +19,7 @@ import VectorLayer from "ol/layer/Vector";
 import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { defaults as defaultControls, ZoomToExtent, Zoom } from "ol/control";
+import { defaults as defaultControls, ZoomToExtent } from "ol/control";
 import { defaults as defaultInteractions } from "ol/interaction";
 import { DragBox } from 'ol/interaction';
 import { platformModifierKeyOnly } from 'ol/events/condition';
@@ -29,7 +29,6 @@ import { mapSources } from "@/utils/mapSourcces";
 import { useGeoData } from "../../contexts/GeoDataProvider";
 import { useAppContext } from "../../contexts/AppContext";
 import MapUserPopup from "./MapUserPropup";
-import { v4 as uuidv4 } from 'uuid'; // Install uuid package if not already
 
 
 const GeoTIFFMap = () => {
