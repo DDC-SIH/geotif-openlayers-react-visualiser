@@ -7,6 +7,22 @@ import { Calendar } from "./ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
+function convertToTime(value: number): string {
+    // Ensure the value is within the valid range
+    if (value < 0 || value > 23.5) {
+      throw new Error("Value must be between 0 and 23.5");
+    }
+  
+    // Extract hours and minutes
+    const hours = Math.floor(value); // Integer part is hours
+    const minutes = value % 1 === 0.5 ? 30 : 0; // Fractional part determines minutes
+  
+    // Format hours and minutes as a time string (HH:mm)
+    const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  
+    return formattedTime;
+  }
+
 function TimeLineSlider() {
   const [value, setValue] = React.useState<number>(50);
   const [date, setDate] = React.useState<Date>();
@@ -50,12 +66,13 @@ function TimeLineSlider() {
           dots
           step={0.5}
           min={0}
-          max={24}
+          max={23.5}
           className="flex-1"
           classNames={{
             rail: "bg-black border-2 border-black",
             track: "bg-zinc-900 border-4  border-zinc-900",
           }}
+          tooltip={{ open: true, formatter: (value) => value !== undefined ? `${convertToTime(value)}` : '' }}
         />
       </div>
     </div>
