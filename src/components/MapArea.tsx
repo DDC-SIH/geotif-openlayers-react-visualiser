@@ -456,7 +456,7 @@ const GeoTIFFMap = () => {
                 />
 
                 {/* Search Bar and Controls Container */}
-                <div className="fixed right-4 bottom-4 flex gap-2 items-center pointer-events-auto z-50 flex-col">
+                <div className="fixed right-4 bottom-4 flex gap-2 items-end pointer-events-auto z-50 flex-col justify-end">
                     <div className="flex flex-col">
                         <Button
                             size="icon"
