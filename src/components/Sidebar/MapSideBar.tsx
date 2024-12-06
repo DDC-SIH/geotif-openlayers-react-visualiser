@@ -114,7 +114,12 @@ function MapSideBar({
           activeSidebar ? "w-[300px]" : "w-0 overflow-hidden"
         )}
       >
-        <div className="w-[300px] h-full p-4">
+        <div 
+          className={cn(
+            "w-[300px] h-full p-4",
+            activeSidebar ? "opacity-100 transition-opacity duration-200 delay-150" : "opacity-0"
+          )}
+        >
           {activeSidebar === "basemap" && (
             <div>
               <h3 className="font-semibold mb-4">Map Basemap</h3>
