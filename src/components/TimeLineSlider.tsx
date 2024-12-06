@@ -32,7 +32,10 @@ function TimeLineSlider() {
               {date ? format(date, "PPP") : <span>Pick a date</span>}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0 bg-zinc-900 border-0 text-white" align="start">
+          <PopoverContent
+            className="w-auto p-0 bg-zinc-900 border-0 text-white"
+            align="start"
+          >
             <Calendar
               mode="single"
               selected={date}
@@ -43,7 +46,17 @@ function TimeLineSlider() {
           </PopoverContent>
         </Popover>
 
-        <Slider dots step={0.5} min={0} max={24} className="flex-1" />
+        <Slider
+          dots
+          step={0.5}
+          min={0}
+          max={24}
+          className="flex-1"
+          classNames={{
+            rail: "bg-black border-2 border-black",
+            track: "bg-zinc-900 border-4  border-zinc-900",
+          }}
+        />
       </div>
     </div>
   );
