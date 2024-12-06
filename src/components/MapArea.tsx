@@ -155,70 +155,41 @@ const GeoTIFFMap = () => {
         ];
     }
 
-    const setProjection = (
-        code: string | null,
-        name: string | null,
-        proj4def: string | null,
-        bbox: number[] | null
-    ) => {
-        if (code === null || name === null || proj4def === null || bbox === null) {
-            alert("No results found, using default projection (EPSG:3857)");
-            mapInstanceRef.current?.setView(
-                new View({
-                    projection: "EPSG:3857",
-                    center: [0, 0],
-                    zoom: 2,
-                })
-            );
-            return;
-        }
-
-        proj4.defs(code, proj4def);
-        register(proj4);
-        const newProj = getProjection(code);
-        if (!newProj) {
-            alert("No results found, using default projection (EPSG:3857)");
-            mapInstanceRef.current?.setView(
-                new View({
-                    projection: "EPSG:3857",
-                    center: [0, 0],
-                    zoom: 2,
-                })
-            );
-            return;
-        }
-        const fromLonLat = getTransform("EPSG:4326", newProj);
-        newProj.setWorldExtent(bbox);
-
-        if (bbox[0] > bbox[2]) {
-            bbox[2] += 360; // Handle world extent across the dateline
-        }
-
-        const extent = applyTransform(bbox, fromLonLat, undefined, 8);
-        newProj.setExtent(extent);
-        const newView = new View({
-            projection: newProj,
+    const cropToExtent = (bbox: number[]) => {
+        if (!tiffLayer || !mapInstanceRef.current) return;
+    
+        // Convert bbox coordinates to map projection
+        const [minLon, minLat, maxLon, maxLat] = bbox;
+        const extent = [
+            fromLonLat([minLon, minLat]),
+            fromLonLat([maxLon, maxLat])
+        ].flat();
+    
+        // Set the crop extent on the layer
+        tiffLayer.setExtent(extent);
+    
+        // Animate view to the new extent
+        mapInstanceRef.current.getView().fit(extent, {
+            duration: 1000,
+            padding: [50, 50, 50, 50]
         });
-        mapInstanceRef.current?.setView(newView);
-        newView.fit(extent);
     };
-
+    
     const search = (query: string) => {
-        // Find the city or country from the predefined array
         const result = citiesData.find(
             (item) => item.name.toLowerCase() === query.toLowerCase()
         );
-
+    
         if (result) {
-            const { name, code, proj4def, bbox } = result;
-
-            if (code && proj4def && bbox && bbox.length === 4) {
-                setProjection(code, name, proj4def, bbox);
+            const { bbox } = result;
+            if (bbox && bbox.length === 4) {
+                cropToExtent(bbox);
             }
         } else {
             alert("No results found");
         }
     };
+    
     const clipLayer = new VectorLayer({
         style: null,
         source: new VectorSource({
