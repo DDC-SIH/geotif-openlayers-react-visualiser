@@ -56,6 +56,7 @@ const GeoTIFFMap = () => {
     const [basemapLayer, setBasemapLayer] = useState<any>(mapSources[1].layer);
     const [selectedIndex, setSelectedIndex] = useState("ndvi");
     const [selectedColormap, setSelectedColormap] = useState("viridis");
+    const [isModifierKeyPressed, setIsModifierKeyPressed] = useState(false);
 
     function getColorStops(
         name: string, min: number, max: number, steps: number, reverse: boolean, alpha: number, brightness: number, contrast: number, saturation: number, exposure: number, hueshift: number
@@ -249,15 +250,50 @@ const GeoTIFFMap = () => {
         }
     }, [selectedColormap, selectedIndex, tiffLayer, colormapSettings]);
 
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.ctrlKey || e.metaKey) {
+                setIsModifierKeyPressed(true);
+                if (mapRef.current) {
+                    mapRef.current.style.cursor = 'crosshair';
+                }
+            }
+        };
+
+        const handleKeyUp = () => {
+            setIsModifierKeyPressed(false);
+            if (mapRef.current) {
+                mapRef.current.style.cursor = 'default';
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+        };
+    }, []);
+
     const addDragBoxInteraction = (map: Map) => {
         const dragBox = new DragBox({
-            condition: platformModifierKeyOnly
+            condition: platformModifierKeyOnly,
+            className: 'dragbox-style' // Add this line
+        });
+
+        dragBox.on('boxstart', () => {
+            if (mapRef.current) {
+                mapRef.current.style.cursor = 'crosshair';
+            }
         });
 
         dragBox.on('boxend', () => {
-            const extent = dragBox.getGeometry().getExtent();
+            if (mapRef.current) {
+                mapRef.current.style.cursor = isModifierKeyPressed ? 'crosshair' : 'default';
+            }
 
-            // Convert to geographic coordinates (EPSG:4326 - lat/long)
+            const extent = dragBox.getGeometry().getExtent();
             const bottomLeft = transform(
                 [extent[0], extent[1]],
                 map.getView().getProjection(),
@@ -270,15 +306,13 @@ const GeoTIFFMap = () => {
             );
 
             const bbox = [
-                Number(bottomLeft[0].toFixed(4)), // minLon
-                Number(bottomLeft[1].toFixed(4)), // minLat
-                Number(topRight[0].toFixed(4)),   // maxLon
-                Number(topRight[1].toFixed(4))    // maxLat
+                Number(bottomLeft[0].toFixed(4)),
+                Number(bottomLeft[1].toFixed(4)),
+                Number(topRight[0].toFixed(4)),
+                Number(topRight[1].toFixed(4))
             ];
 
             setBoundingBox(bbox);
-            console.log(bbox);
-
         });
 
         map.addInteraction(dragBox);
@@ -409,6 +443,10 @@ const GeoTIFFMap = () => {
             body {
               overscroll-behavior-y: none;
               touch-action: none;
+            }
+            .dragbox-style {
+                border: 2px solid #1a73e8;
+                background-color: rgba(26, 115, 232, 0.2);
             }
             `}
             </style>
