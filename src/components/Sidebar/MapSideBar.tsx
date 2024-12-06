@@ -41,95 +41,85 @@ function MapSideBar({
   const [selectedMap, setSelectedMap] = useState(mapSources[1].name);
 
   return (
-    <div className="fixed right-4 top-4 flex flex-col gap-2 pointer-events-auto z-50">
+    <div className="fixed left-0 top-0 flex h-full pointer-events-auto z-[2] bg-black ">
       {/* Icons Bar */}
-      <div
-        className={`bg-white z-50  shadow-lg rounded-lg p-3 flex flex-col gap-3 ${activeSidebar ? "shadow-lg" : "shadow-none"
-          }`}
-      >
-        {/* <Button
-          size="icon"
-          variant={activeSidebar MapIcon" ? "default" : "ghost"}
-          className="rounded-full"
-          onClick={() =>
-            setActiveSidebar(activeSidebar MapIcon" ? nulMapIcon")
-          }
-        >
-  MapIcon className="h-4 w-4" />
-        </Button> */}
+      <div className=" flex flex-col   z-[2]">
         <Button
           size="icon"
-          variant={activeSidebar === "info" ? "default" : "ghost"}
-          className="rounded-full"
+          variant={activeSidebar === "info" ? "secondary" : "ghost"}
+          className="rounded-none p-5"
           onClick={() =>
             setActiveSidebar(activeSidebar === "info" ? null : "info")
           }
         >
-          <Info className="h-4 w-4" />
+          <Info className={`h-6 w-6 ${activeSidebar === "info" ? "text-black" : "text-white"}`} />
         </Button>
         <Button
           size="icon"
-          variant={activeSidebar === "layers" ? "default" : "ghost"}
-          className="rounded-full"
+          variant={activeSidebar === "layers" ? "secondary" : "ghost"}
+          className="rounded-none p-5"
           onClick={() =>
             setActiveSidebar(activeSidebar === "layers" ? null : "layers")
           }
         >
-          <Layers className="h-4 w-4" />
+          <Layers className={`h-6 w-6 ${activeSidebar === "layers" ? "text-black" : "text-white"}`} />
         </Button>
         <Button
           size="icon"
-          variant={activeSidebar === "basemap" ? "default" : "ghost"}
-          className="rounded-full"
+          variant={activeSidebar === "basemap" ? "secondary" : "ghost"}
+          className="rounded-none p-5"
           onClick={() =>
             setActiveSidebar(activeSidebar === "basemap" ? null : "basemap")
           }
         >
-          <MapIcon className="h-4 w-4" />
+          <MapIcon className={`h-6 w-6 ${activeSidebar === "basemap" ? "text-black" : "text-white"}`} />
         </Button>
         <Button
           size="icon"
-          variant={activeSidebar === "filters" ? "default" : "ghost"}
-          className="rounded-full"
+          variant={activeSidebar === "filters" ? "secondary" : "ghost"}
+          className="rounded-none p-5"
           onClick={() =>
             setActiveSidebar(activeSidebar === "filters" ? null : "filters")
           }
         >
-          <Filter className="h-4 w-4" />
+          <Filter className={`h-6 w-6 ${activeSidebar === "filters" ? "text-black" : "text-white"}`} />
         </Button>
-
         <Button
           size="icon"
-          variant={activeSidebar === "effects" ? "default" : "ghost"}
-          className="rounded-full"
+          variant={activeSidebar === "effects" ? "secondary" : "ghost"}
+          className="rounded-none p-5"
           onClick={() =>
             setActiveSidebar(activeSidebar === "effects" ? null : "effects")
           }
         >
-          <Sparkles className="h-4 w-4" />
+          <Sparkles className={`h-6 w-6 ${activeSidebar === "effects" ? "text-black" : "text-white"}`} />
         </Button>
         <Button
           size="icon"
-          variant={activeSidebar === "export" ? "default" : "ghost"}
-          className="rounded-full"
+          variant={activeSidebar === "export" ? "secondary" : "ghost"}
+          className="rounded-none p-5"
           onClick={() =>
             setActiveSidebar(activeSidebar === "export" ? null : "export")
           }
         >
-          <DownloadCloud className="h-4 w-4" />
+          <DownloadCloud className={`h-6 w-6 ${activeSidebar === "export" ? "text-black" : "text-white"}`} />
         </Button>
+
       </div>
 
       {/* Expandable Section */}
       <div
         className={cn(
-          "fixed right-[65px] top-0 h-[-webkit-fill-available] m-4 bg-white rounded-lg shadow-lg transition-transform duration-200 ease-out pointer-events-auto z-40",
-          activeSidebar
-            ? "translate-x-0 w-[300px]"
-            : "translate-x-full w-[70px]"
+          "h-full bg-white border-r border-gray-200 transition-all duration-200 ease-out z-[9998]",
+          activeSidebar ? "w-[300px]" : "w-0 overflow-hidden"
         )}
       >
-        <div className="w-[300px] h-full p-4">
+        <div 
+          className={cn(
+            "w-[300px] h-full p-4",
+            activeSidebar ? "opacity-100 transition-opacity duration-200 delay-150" : "opacity-0"
+          )}
+        >
           {activeSidebar === "basemap" && (
             <div>
               <h3 className="font-semibold mb-4">Map Basemap</h3>

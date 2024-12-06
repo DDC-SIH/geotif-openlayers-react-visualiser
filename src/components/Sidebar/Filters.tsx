@@ -1,11 +1,11 @@
-import { Slider } from "@/components/ui/slider";
+import { Slider } from "../ui/slider";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "../ui/select";
 import { Button } from "../ui/button";
 
 
