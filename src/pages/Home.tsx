@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useAppContext } from "../../contexts/AppContext";
 import { useNavigate } from "react-router-dom";
 import { Fingerprint, MessageCircleQuestionIcon } from "lucide-react";
+import MiniMap from "@/components/MiniMap";
 
 function Home() {
   const navigate = useNavigate();
@@ -54,6 +55,7 @@ function Home() {
           Powerful Features at Your <span className="bg-clip-text text-transparent bg-gradient-to-l from-zinc-700 to-zinc-500">Fingertips</span>{" "}
           <Fingerprint className="inline" />
         </h1>
+        <MiniMap geotiffUrl="https://somehowgetsplotted.s3.ap-south-1.amazonaws.com/somehowgetsplotted/IMG_VIS_optimized.tif" />
         <div className="grid grid-cols-3 gap-4">
           <div className="p-4 rounded-2xl border text-center flex flex-col justify-center  items-center hover:bg-zinc-50 transition-all duration-100">
             <p className="my-2 rounded-full border w-12 h-12 font-bold text-center items-center flex justify-center text-2xl">
@@ -116,7 +118,7 @@ function Home() {
       </div>
 
       <div className="flex flex-col justify-center items-center w-full my-12">
-        <h2 className="text-3xl font-bold mb-6">How to Get Started <MessageCircleQuestionIcon className="inline size-8"/></h2>
+        <h2 className="text-3xl font-bold mb-6">How to Get Started <MessageCircleQuestionIcon className="inline size-8" /></h2>
         <div className="flex flex-col gap-6 mx-auto">
           <div className="flex gap-4 max-w-5xl">
             <p className=" font-bold text-6xl">1</p>
@@ -167,13 +169,13 @@ function Home() {
       </div>
 
       <footer className=" py-8 mt-16">
-      {/* Copyright Section */}
-      <div className="text-center mt-4">
-        <p className="text-sm text-gray-400">
-          © 2024 Vistaar. All rights reserved.
-        </p>
-      </div>
-    </footer>
+        {/* Copyright Section */}
+        <div className="text-center mt-4">
+          <p className="text-sm text-gray-400">
+            © 2024 Vistaar. All rights reserved.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
