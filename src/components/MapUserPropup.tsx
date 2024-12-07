@@ -63,7 +63,7 @@ const MapUserPopup = ({ isLoggedIn }: Props) => {
       )}
       <button
         onClick={togglePopup}
-        className="flex gap-2 items-center text-3xl px-2 lg:py-2 rounded-sm bg-white shadow-lg hover:text-blue-700"
+        className="flex gap-2 items-center text-3xl px-2 lg:py-2 rounded-sm bg-white shadow-lg hover:text-orange-700"
       >
         <User className="h-6 w-6" />
       </button>

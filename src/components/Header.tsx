@@ -7,12 +7,17 @@ const Header = () => {
 
   return (
     <>
-      <header className="pb-6 bg-white lg:pb-0">
+      <header className="pb-6 bg-zinc-900 lg:pb-0">
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 ">
-          <nav className="flex items-center justify-between h-16 lg:h-20 bg-white border-b border-gray-200">
+          <nav className="flex items-center justify-between h-16 lg:h-20 bg-zinc-900 ">
             <div className="flex-shrink-0">
               <Link to="/" title="" className="flex items-center">
-                <span className="ml-2 text-xl md:text-xl lg:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-zinc-800 to-zinc-500">
+                <img
+                  className="h-12 w-auto mr-2"
+                  src="/isro.png"
+                  alt="Vistaar"
+                />
+                <span className="ml-2 text-xl md:text-xl lg:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-blue-200">
                 Vistaar
                 </span>
               </Link>
@@ -23,13 +28,13 @@ const Header = () => {
               {!isLoggedIn ? (
                 <div className="flex items-center space-x-6 ">
                   <Link
-                    className="text-base font-medium text-black transition duration-200 hover:text-blue-600 hidden lg:block "
+                    className="text-base font-medium text-white transition duration-200 hover:text-orange-600 hidden lg:block "
                     to="/register"
                   >
                     Sign up
                   </Link>
                   <Link
-                    className="text-base font-medium text-black transition duration-200 landscape:hover:text-blue-600 portrait:bg-blue-600 portrait:text-white rounded portrait:px-4 portrait:py-2 "
+                    className="text-base font-medium text-white transition duration-200 landscape:hover:text-orange-600 portrait:bg-blue-600 portrait:text-white rounded portrait:px-4 portrait:py-2 "
                     to="/sign-in"
                   >
                     Sign in

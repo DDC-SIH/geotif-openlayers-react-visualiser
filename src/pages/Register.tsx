@@ -115,7 +115,7 @@ const Register = () => {
       <span>
         <button
           type="submit"
-          className="bg-blue-600 text-white py-2 px-4 rounded-md font-bold hover:bg-blue-700 text-xl"
+          className="bg-orange-600 text-white py-2 px-4 rounded-md font-bold hover:bg-orange-700 text-xl"
         >
           Create Account
         </button>

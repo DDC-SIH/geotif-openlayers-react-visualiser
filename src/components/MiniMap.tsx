@@ -11,11 +11,12 @@ interface MiniMapProps {
     geotiffUrl: string;
     minValue?: number;
     maxValue?: number;
+    mapHeight?: string;
     zoomOut?: boolean; // New prop to enable the most zoomed-out view
     zoomedToTheBounding?: boolean; // New prop to enable zooming to layer's bounding box
 }
 
-export default function MiniMap({ geotiffUrl, minValue = 35, maxValue = 493, zoomOut = false, zoomedToTheBounding = false }: MiniMapProps) {
+export default function MiniMap({ geotiffUrl, minValue = 35, maxValue = 493, zoomOut = false, zoomedToTheBounding = false, mapHeight='438px' }: MiniMapProps) {
     const mapRef = useRef<HTMLDivElement>(null);
     const mapInstanceRef = useRef<Map | null>(null);
 
@@ -64,13 +65,19 @@ export default function MiniMap({ geotiffUrl, minValue = 35, maxValue = 493, zoo
         if (zoomOut) {
             mapView.animate({ zoom: 2, duration: 1000 }); // Add animation for zoomOut
         }
-
         if (zoomedToTheBounding) {
             geoTiffSource.on('change', () => {
                 if (geoTiffSource.getState() === 'ready') {
                     const extent = geoTiffSource.getTileGrid()?.getExtent();
                     if (extent) {
-                        mapView.fit(extent, { duration: 1000 });
+                        const padding = 0.1; // Add 10% padding around the bounding box
+                        const expandedExtent = [
+                            extent[0] - (extent[2] - extent[0]) * padding,
+                            extent[1] - (extent[3] - extent[1]) * padding,
+                            extent[2] + (extent[2] - extent[0]) * padding,
+                            extent[3] + (extent[3] - extent[1]) * padding,
+                        ];
+                        mapView.fit(expandedExtent, { duration: 1500 });
                     }
                 }
             });
@@ -85,7 +92,7 @@ export default function MiniMap({ geotiffUrl, minValue = 35, maxValue = 493, zoo
     }, [geotiffUrl, zoomOut, zoomedToTheBounding]); // Reinitialize map if props change
 
     return (
-        <div className="relative w-full h-[438px] rounded-lg" style={{ zIndex: 0 }}>
+        <div className={`relative w-full h-[${mapHeight}] rounded-lg`} style={{ zIndex: 0 }}>
             <div 
                 ref={mapRef} 
                 className="absolute inset-0 rounded-lg"

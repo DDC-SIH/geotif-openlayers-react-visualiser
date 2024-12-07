@@ -32,7 +32,7 @@ const PopupMenu = ({ isLoggedIn }: Props) => {
     <div className="relative inline-block popup-profile">
       <button
         onClick={togglePopup}
-        className="flex gap-2 items-center  text-3xl  px-2 lg:py-2 rounded-full hover:text-blue-700"
+        className="flex gap-2 items-center  text-3xl  px-2 lg:py-2 text-white rounded-full hover:text-orange-700"
       >
         <User />
 

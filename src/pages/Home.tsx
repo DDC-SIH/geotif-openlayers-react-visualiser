@@ -10,8 +10,8 @@ function Home() {
   const { isLoggedIn } = useAppContext();
   return (
     <div className="grid grid-cols-1 gap-6 my-6">
-      <div className=" grid-cols-2 grid gap-4">
-        <div>
+      <div className=" grid-cols-2 grid gap-8">
+        <div className="mt-20">
           <p className="text-sm text-neutral-500 font-bold mb-1">
             Effortlessly Optimize, Visualize, and Download GeoTIFF & HDF5 Files
           </p>
@@ -47,7 +47,7 @@ function Home() {
             </Button>
           </div>
         </div>
-        <GlobeDemo />
+        <MiniMap geotiffUrl="https://somehowgetsplotted.s3.ap-south-1.amazonaws.com/somehowgetsplotted/IMG_VIS_optimized.tif" zoomOut zoomedToTheBounding mapHeight="400px" />
       </div>
 
       <div className="flex flex-col justify-center items-center w-full">
@@ -55,7 +55,6 @@ function Home() {
           Powerful Features at Your <span className="bg-clip-text text-transparent bg-gradient-to-l from-zinc-700 to-zinc-500">Fingertips</span>{" "}
           <Fingerprint className="inline" />
         </h1>
-        <MiniMap geotiffUrl="https://somehowgetsplotted.s3.ap-south-1.amazonaws.com/somehowgetsplotted/IMG_VIS_optimized.tif" zoomOut zoomedToTheBounding />
         <div className="grid grid-cols-3 gap-4 mt-4">
           <div className="p-4 rounded-2xl border text-center flex flex-col justify-center  items-center hover:bg-zinc-50 transition-all duration-100">
             <p className="my-2 rounded-full border w-12 h-12 font-bold text-center items-center flex justify-center text-2xl">
@@ -155,7 +154,8 @@ function Home() {
         </div>
       </div>
 
-      <div className="w-1/2">
+      <div className="grid grid-cols-2 gap-3">
+      <div >
         <p className="text-4xl font-bold mb-2">
           Say goodbye to the hassle of downloading massive files just to access
           a small portion of the data.{" "}
@@ -166,6 +166,8 @@ function Home() {
           on what matters most — uncovering the story behind the data.
           Experience the future of geospatial data management today.
         </p>
+      </div>
+<GlobeDemo />
       </div>
 
       <footer className=" py-8 mt-16">
