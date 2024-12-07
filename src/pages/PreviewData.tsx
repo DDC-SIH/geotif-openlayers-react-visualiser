@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useGeoData } from "../../contexts/GeoDataProvider";
+import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
 
 dayjs.extend(customParseFormat);
 
@@ -255,55 +256,63 @@ function PreviewData() {
         <div>No data available for the selected range</div>
       )}
       {isDataAvailable && (
-        <div>
-          <Button
-            onClick={() =>
-              handleDetailedPreview(
-                processingLevel || "",
-                startDate ? startDate.toISOString() : "",
-                endDate ? endDate.toISOString() : ""
-              )
-            }
-          >
-            Detailed Preview
-          </Button>
-        </div>
-      )}
+        <div className="grid grid-cols-2">
+          <p className="text-4xl font-bold">Quick Preview</p>
 
-      <div className="rounded-lg border w-fit p-2 my-4">
-        {Object.keys(items).map((date) => (
-          <div key={date}>
-            <h2 className="text font-bold">{date}</h2>
-            {/* Sorting the time keys in ascending order */}
-            {Object.keys(items[date])
-              .sort() // Sort the time strings in ascending order
-              .map((time) => (
-                <div key={time} className="mb-2">
-                  <h3 className="text-sm">
-                    Available Bands at {time.slice(0, 2)}:{time.slice(2, 4)} :
-                  </h3>
-                  <div>
-                    {Object.keys(items[date][time].bands).map((bandName) => (
-                      <div key={bandName}>
-                        <Button
-                          variant={"outline"}
-                          className="w-60 text-start justify-start"
-                          onClick={() =>
-                            handleBandClick(
-                              items[date][time].bands[bandName].url
+<div>
+          <div className="rounded-lg border w-fit p-2 my-4 h-96 overflow-y-scroll  no-visible-scrollbar">
+            {Object.keys(items)
+              .sort()
+              .map((date) => (
+                <div key={date}>
+                  <h2 className="text font-bold">{date}</h2>
+                  {Object.keys(items[date])
+                    .sort()
+                    .map((time) => (
+                      <div key={time} className="mb-2">
+                        <h3 className="text-sm">
+                          Available Bands at {time.slice(0, 2)}:
+                          {time.slice(2, 4)} :
+                        </h3>
+                        <div className="grid grid-cols-6 w-full gap-2">
+                          {Object.keys(items[date][time].bands).map(
+                            (bandName) => (
+                              <Button
+                                key={bandName}
+                                variant={"outline"}
+                                className="justify-start mb-1"
+                                onClick={() =>
+                                  handleBandClick(
+                                    items[date][time].bands[bandName].url
+                                  )
+                                }
+                              >
+                                {bandName}
+                              </Button>
                             )
-                          }
-                        >
-                          {bandName}
-                        </Button>
+                          )}
+                        </div>
                       </div>
                     ))}
-                  </div>
                 </div>
               ))}
           </div>
-        ))}
-      </div>
+          <div>
+            <Button
+              onClick={() =>
+                handleDetailedPreview(
+                  processingLevel || "",
+                  startDate ? startDate.toISOString() : "",
+                  endDate ? endDate.toISOString() : ""
+                )
+              }
+            >
+              Open in Editor <OpenInNewWindowIcon />
+            </Button>
+          </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
