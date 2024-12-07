@@ -42,7 +42,7 @@ export default function Export() {
     };
 
     return (
-        <div className="space-y-6 p-2">
+        <div className="space-y-6">
             <h3 className="font-semibold ">Export Options</h3>
             <div className='flex flex-col'>
                 <div className='flex justify-between'>

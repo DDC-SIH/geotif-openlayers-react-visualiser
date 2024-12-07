@@ -26,12 +26,10 @@ export default function LayersSection() {
 
     return (
         <div>
-            <h3 className="font-semibold mb-4">Information</h3>
-            <p className="my-2">Render Meta Data Here</p>
-            
+
             {/* Available Layers List */}
             <div className="mb-4">
-                <h4 className="text-sm font-medium mb-2">Available Layers</h4>
+                <h4 className=" font-medium mb-2">Available Layers</h4>
                 {availableLayers.map((layerKey) => (
                     <div key={layerKey} 
                          className="flex items-center justify-between p-2 hover:bg-gray-100 rounded cursor-pointer"

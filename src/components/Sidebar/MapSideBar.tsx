@@ -1,4 +1,13 @@
-import { Info, Filter, Sparkles, MapIcon, DownloadCloud, Layers, User } from "lucide-react";
+import {
+  Info,
+  Filter,
+  Sparkles,
+  MapIcon,
+  DownloadCloud,
+  Layers,
+  LayoutTemplateIcon,
+  LayoutTemplate,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -11,6 +20,7 @@ import Export from "./Export";
 import LayersSection from "./Layers";
 import MapUserPopup from "../MapUserPropup";
 import { useAppContext } from "../../../contexts/AppContext";
+import ProcessingTemplates from "./processingTemplates";
 
 interface ColormapSettings {
   type: string;
@@ -39,80 +49,152 @@ function MapSideBar({
   selectedIndex: string;
   setSelectedIndex: (value: string) => void;
 }) {
-  const {isLoggedIn} = useAppContext();
+  const { isLoggedIn } = useAppContext();
   const [activeSidebar, setActiveSidebar] = useState<string | null>(null);
   const [selectedMap, setSelectedMap] = useState(mapSources[1].name);
-  
 
   return (
     <div className="fixed left-0 top-0 flex h-full pointer-events-auto z-[2] bg-neutral-900 ">
       {/* Icons Bar */}
       <div className=" flex flex-col justify-between  z-[2]">
         <div className="flex flex-col">
+          <Button
+            size="icon"
+            variant={activeSidebar === "info" ? "secondary" : "ghost"}
+            className={`rounded-none p-8 ${
+              activeSidebar === "info"
+                ? "hover:bg-neutral-300"
+                : "hover:bg-neutral-800"
+            }`}
+            onClick={() =>
+              setActiveSidebar(activeSidebar === "info" ? null : "info")
+            }
+          >
+            <Info
+              className={`h-8 w-8 ${
+                activeSidebar === "info" ? "text-black" : "text-white"
+              }`}
+            />
+          </Button>
+          <Button
+            size="icon"
+            variant={activeSidebar === "layers" ? "secondary" : "ghost"}
+            className={`rounded-none p-8 ${
+              activeSidebar === "layers"
+                ? "hover:bg-neutral-300"
+                : "hover:bg-neutral-800"
+            }`}
+            onClick={() =>
+              setActiveSidebar(activeSidebar === "layers" ? null : "layers")
+            }
+          >
+            <Layers
+              className={`h-8 w-8 ${
+                activeSidebar === "layers" ? "text-black" : "text-white"
+              }`}
+            />
+          </Button>
+          <Button
+            size="icon"
+            variant={activeSidebar === "basemap" ? "secondary" : "ghost"}
+            className={`rounded-none p-8 ${
+              activeSidebar === "basemap"
+                ? "hover:bg-neutral-300"
+                : "hover:bg-neutral-800"
+            }`}
+            onClick={() =>
+              setActiveSidebar(activeSidebar === "basemap" ? null : "basemap")
+            }
+          >
+            <MapIcon
+              className={`h-8 w-8 ${
+                activeSidebar === "basemap" ? "text-black" : "text-white"
+              }`}
+            />
+          </Button>
+          <Button
+            size="icon"
+            variant={activeSidebar === "filters" ? "secondary" : "ghost"}
+            className={`rounded-none p-8 ${
+              activeSidebar === "filters"
+                ? "hover:bg-neutral-300"
+                : "hover:bg-neutral-800"
+            }`}
+            onClick={() =>
+              setActiveSidebar(activeSidebar === "filters" ? null : "filters")
+            }
+          >
+            <Filter
+              className={`h-8 w-8 ${
+                activeSidebar === "filters" ? "text-black" : "text-white"
+              }`}
+            />
+          </Button>
+          <Button
+            size="icon"
+            variant={activeSidebar === "effects" ? "secondary" : "ghost"}
+            className={`rounded-none p-8 ${
+              activeSidebar === "effects"
+                ? "hover:bg-neutral-300"
+                : "hover:bg-neutral-800"
+            }`}
+            onClick={() =>
+              setActiveSidebar(activeSidebar === "effects" ? null : "effects")
+            }
+          >
+            <Sparkles
+              className={`h-8 w-8 ${
+                activeSidebar === "effects" ? "text-black" : "text-white"
+              }`}
+            />
+          </Button>
+          <Button
+            size="icon"
+            variant={
+              activeSidebar === "ProcessingTemplates" ? "secondary" : "ghost"
+            }
+            className={`rounded-none p-8 ${
+              activeSidebar === "ProcessingTemplates"
+                ? "hover:bg-neutral-300"
+                : "hover:bg-neutral-800"
+            }`}
+            onClick={() =>
+              setActiveSidebar(
+                activeSidebar === "ProcessingTemplates"
+                  ? null
+                  : "ProcessingTemplates"
+              )
+            }
+          >
+            <LayoutTemplate
+              className={`h-8 w-8 ${
+                activeSidebar === "ProcessingTemplates"
+                  ? "text-black"
+                  : "text-white"
+              }`}
+            />
+          </Button>
 
-        <Button
-          size="icon"
-          variant={activeSidebar === "info" ? "secondary" : "ghost"}
-          className={`rounded-none p-8 ${activeSidebar === "info" ? "hover:bg-neutral-300" : "hover:bg-neutral-800"}` }
-          onClick={() =>
-            setActiveSidebar(activeSidebar === "info" ? null : "info")
-          }
+          <Button
+            size="icon"
+            variant={activeSidebar === "export" ? "secondary" : "ghost"}
+            className={`rounded-none p-8 ${
+              activeSidebar === "export"
+                ? "hover:bg-neutral-300"
+                : "hover:bg-neutral-800"
+            }`}
+            onClick={() =>
+              setActiveSidebar(activeSidebar === "export" ? null : "export")
+            }
           >
-          <Info className={`h-8 w-8 ${activeSidebar === "info" ? "text-black" : "text-white"}`} />
-        </Button>
-        <Button
-          size="icon"
-          variant={activeSidebar === "layers" ? "secondary" : "ghost"}
-          className={`rounded-none p-8 ${activeSidebar === "layers" ? "hover:bg-neutral-300" : "hover:bg-neutral-800"}` }
-          onClick={() =>
-            setActiveSidebar(activeSidebar === "layers" ? null : "layers")
-          }
-          >
-          <Layers className={`h-8 w-8 ${activeSidebar === "layers" ? "text-black" : "text-white"}`} />
-        </Button>
-        <Button
-          size="icon"
-          variant={activeSidebar === "basemap" ? "secondary" : "ghost"}
-          className={`rounded-none p-8 ${activeSidebar === "basemap" ? "hover:bg-neutral-300" : "hover:bg-neutral-800"}` }
-          onClick={() =>
-            setActiveSidebar(activeSidebar === "basemap" ? null : "basemap")
-          }
-          >
-          <MapIcon className={`h-8 w-8 ${activeSidebar === "basemap" ? "text-black" : "text-white"}`} />
-        </Button>
-        <Button
-          size="icon"
-          variant={activeSidebar === "filters" ? "secondary" : "ghost"}
-          className={`rounded-none p-8 ${activeSidebar === "filters" ? "hover:bg-neutral-300" : "hover:bg-neutral-800"}` }
-          onClick={() =>
-            setActiveSidebar(activeSidebar === "filters" ? null : "filters")
-          }
-          >
-          <Filter className={`h-8 w-8 ${activeSidebar === "filters" ? "text-black" : "text-white"}`} />
-        </Button>
-        <Button
-          size="icon"
-          variant={activeSidebar === "effects" ? "secondary" : "ghost"}
-          className={`rounded-none p-8 ${activeSidebar === "effects" ? "hover:bg-neutral-300" : "hover:bg-neutral-800"}` }
-          onClick={() =>
-            setActiveSidebar(activeSidebar === "effects" ? null : "effects")
-          }
-          >
-          <Sparkles className={`h-8 w-8 ${activeSidebar === "effects" ? "text-black" : "text-white"}`} />
-        </Button>
-        <Button
-          size="icon"
-          variant={activeSidebar === "export" ? "secondary" : "ghost"}
-          className={`rounded-none p-8 ${activeSidebar === "export" ? "hover:bg-neutral-300" : "hover:bg-neutral-800"}` }
-          onClick={() =>
-            setActiveSidebar(activeSidebar === "export" ? null : "export")
-          }
-          >
-          <DownloadCloud className={`h-8 w-8 ${activeSidebar === "export" ? "text-black" : "text-white"}`} />
-        </Button>
-          </div>
+            <DownloadCloud
+              className={`h-8 w-8 ${
+                activeSidebar === "export" ? "text-black" : "text-white"
+              }`}
+            />
+          </Button>
+        </div>
         <MapUserPopup isLoggedIn={isLoggedIn} />
-
       </div>
 
       {/* Expandable Section */}
@@ -122,12 +204,15 @@ function MapSideBar({
           activeSidebar ? "w-[300px]" : "w-0 overflow-hidden"
         )}
       >
-        <div 
+        <div
           className={cn(
             "w-[300px] h-full p-4",
-            activeSidebar ? "opacity-100 transition-opacity duration-200 delay-150" : "opacity-0"
+            activeSidebar
+              ? "opacity-100 transition-opacity duration-200 delay-150"
+              : "opacity-0"
           )}
         >
+          {activeSidebar === "ProcessingTemplates" && <ProcessingTemplates />}
           {activeSidebar === "basemap" && (
             <div>
               <h3 className="font-semibold mb-4">Map Basemap</h3>
@@ -137,7 +222,9 @@ function MapSideBar({
                     key={source.name}
                     className={cn(
                       "flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors",
-                      selectedMap === source.name ? "bg-gray-100 ring-2 ring-blue-500" : ""
+                      selectedMap === source.name
+                        ? "bg-gray-100 ring-2 ring-blue-500"
+                        : ""
                     )}
                     onClick={() => {
                       setSelectedMap(source.name);
@@ -166,21 +253,15 @@ function MapSideBar({
               setSelectedIndex={setSelectedIndex}
             />
           )}
-          {activeSidebar === "layers" && (
-            <LayersSection />
-          )}
-          {activeSidebar === "info" && (
-            <Information />
-          )}
+          {activeSidebar === "layers" && <LayersSection />}
+          {activeSidebar === "info" && <Information />}
           {activeSidebar === "effects" && (
             <Effects
               colormapSettings={colormapSettings}
               setColormapSettings={setColormapSettings}
             />
           )}
-          {activeSidebar === "export" && (
-            <Export />
-          )}
+          {activeSidebar === "export" && <Export />}
         </div>
       </div>
     </div>
