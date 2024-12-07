@@ -9,7 +9,7 @@ import {
 import { CalendarIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { format } from "date-fns";
+import { format, set } from "date-fns";
 import { cn } from "@/lib/utils";
 import type { TimePickerProps } from "antd";
 import { TimePicker } from "antd";
@@ -22,13 +22,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useGeoData } from "../../contexts/GeoDataProvider";
 
 dayjs.extend(customParseFormat);
-function useQuery() {
-  return new URLSearchParams(useLocation().search);
-}
 
 function PreviewData() {
+  const { setStartDateTime, setEndDateTime, setProcessingLevel } = useGeoData();
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [isDataAvailable, setIsDataAvailable] = useState(false);
@@ -37,19 +36,24 @@ function PreviewData() {
 
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
-  const [processingLevel, setProcessingLevel] = useState<string>();
+  const [processingLevel, setProcessingLevelLayer] = useState<string>();
 
   const handleDetailedPreview = (
     processingLevel: string,
     startDateTime: string,
-    endDateTime: string,
+    endDateTime: string
   ) => {
-    const formattedStartDateTime = dayjs(startDateTime).format("YYYYMMMDD HHmm");
+    const formattedStartDateTime =
+      dayjs(startDateTime).format("YYYYMMMDD HHmm");
     const formattedEndDateTime = dayjs(endDateTime).format("YYYYMMMDD HHmm");
-    console.log(new Date(startDateTime).toISOString(), new Date(endDateTime).toISOString())
-    navigate(
-      `/map/?p=${processingLevel}&st=${encodeURIComponent(formattedStartDateTime)}&ed=${encodeURIComponent(formattedEndDateTime)}`
+    setStartDateTime(formattedStartDateTime);
+    setEndDateTime(formattedEndDateTime);
+    setProcessingLevel(processingLevel);
+    console.log(
+      new Date(startDateTime).toISOString(),
+      new Date(endDateTime).toISOString()
     );
+    navigate(`/map`);
   };
 
   const handleDateTimeInput = async () => {
@@ -63,16 +67,15 @@ function PreviewData() {
         endDate: endDate?.toISOString() || "",
         processingLevel: processingLevel || "",
       };
-      console.log(searchParams)
+      console.log(searchParams);
       const data = await searchFilesWithTime(searchParams);
-      console.log(data)
+      console.log(data);
       if (data && Object.keys(data).length > 0) {
         setItems(data);
         setIsDataAvailable(true);
       } else {
         setIsDataNotAvailable(true);
       }
-      
     } catch (error) {
       console.error("Error searching files:", error);
       setIsDataNotAvailable(true);
@@ -175,7 +178,7 @@ function PreviewData() {
           </PopoverContent>
         </Popover>
 
-        <Select onValueChange={setProcessingLevel}>
+        <Select onValueChange={setProcessingLevelLayer}>
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder="Choose Processing Level" />
           </SelectTrigger>
@@ -187,13 +190,7 @@ function PreviewData() {
           </SelectContent>
         </Select>
 
-        <Button
-          onClick={() =>
-            handleDateTimeInput()
-          }
-        >
-          Submit
-        </Button>
+        <Button onClick={() => handleDateTimeInput()}>Submit</Button>
       </div>
       {isLoading && <div>Loading...</div>}
       {isDataNotAvailable && (
@@ -206,7 +203,7 @@ function PreviewData() {
               handleDetailedPreview(
                 processingLevel || "",
                 startDate ? startDate.toISOString() : "",
-                endDate ? endDate.toISOString() : "",
+                endDate ? endDate.toISOString() : ""
               )
             }
           >
