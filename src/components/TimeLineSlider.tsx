@@ -7,6 +7,7 @@ import { Calendar } from "./ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { useGeoData } from "../../contexts/GeoDataProvider";
+import { getItem } from "@/api-client";
 
 function convertToTime(value: number): string {
   // Ensure the value is within the valid range
@@ -33,13 +34,7 @@ function TimeLineSlider() {
   const handleChange = (newValue: any) => {
     setValue(newValue as number);
   };
-
-  const handleApplyClick = () => {
-    console.log(
-      "Apply button clicked",processingLevel,
-      convertToDateTime(date, convertToTime(value))
-    );
-  };
+  
   const convertToDateTime = (date: Date | undefined, time: string): string => {
     if (!date) {
       throw new Error("Date is not selected");
@@ -50,6 +45,15 @@ function TimeLineSlider() {
     return newDate.toISOString();
   };
 
+  const handleApplyClick = async () => {
+    try {
+      const dateTime = convertToDateTime(date, convertToTime(value));
+      const result = await getItem(processingLevel?processingLevel:'L1C', dateTime);
+      console.log("API response:", result);
+    } catch (error) {
+      console.error("Error fetching item:", error);
+    }
+  };
 
   return (
     <div className="w-full fixed bottom-0 flex justify-center items-center py-6 px-32">

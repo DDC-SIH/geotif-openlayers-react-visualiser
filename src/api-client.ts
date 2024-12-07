@@ -232,3 +232,24 @@ export const register = async (formData: RegisterFormData) => {
 
     return response.json();
   };
+
+
+  export const getItem = async (processingLevel: string, dateTime: string) => {
+    const response = await fetch(`${API_BASE_URL}/api/get-files/getItem`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ processingLevel, dateTime }),
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error("Item or time entry not found");
+      }
+      throw new Error("Could not load item");
+    }
+
+    return response.json();
+  };
