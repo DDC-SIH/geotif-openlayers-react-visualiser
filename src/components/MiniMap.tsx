@@ -62,10 +62,10 @@ export default function MiniMap({ geotiffUrl }: MiniMapProps) {
     }, [geotiffUrl]);
 
     return (
-        <div className="relative w-full h-[400px]" style={{ zIndex: 0 }}>
+        <div className="relative w-full h-[438px] rounded-lg" style={{ zIndex: 0 }}>
             <div 
                 ref={mapRef} 
-                className="absolute inset-0"
+                className="absolute inset-0 rounded-lg"
                 style={{ 
                     height: '100%', 
                     width: '100%',

@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select";
 import { useGeoData } from "../../contexts/GeoDataProvider";
 import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
+import MiniMap from "@/components/MiniMap";
 
 dayjs.extend(customParseFormat);
 
@@ -256,60 +257,60 @@ function PreviewData() {
         <div>No data available for the selected range</div>
       )}
       {isDataAvailable && (
-        <div className="grid grid-cols-2">
-          <p className="text-4xl font-bold">Quick Preview</p>
-
-<div>
-          <div className="rounded-lg border w-fit p-2 my-4 h-96 overflow-y-scroll  no-visible-scrollbar">
-            {Object.keys(items)
-              .sort()
-              .map((date) => (
-                <div key={date}>
-                  <h2 className="text font-bold">{date}</h2>
-                  {Object.keys(items[date])
-                    .sort()
-                    .map((time) => (
-                      <div key={time} className="mb-2">
-                        <h3 className="text-sm">
-                          Available Bands at {time.slice(0, 2)}:
-                          {time.slice(2, 4)} :
-                        </h3>
-                        <div className="grid grid-cols-6 w-full gap-2">
-                          {Object.keys(items[date][time].bands).map(
-                            (bandName) => (
-                              <Button
-                                key={bandName}
-                                variant={"outline"}
-                                className="justify-start mb-1"
-                                onClick={() =>
-                                  handleBandClick(
-                                    items[date][time].bands[bandName].url
-                                  )
-                                }
-                              >
-                                {bandName}
-                              </Button>
-                            )
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              ))}
-          </div>
+        <div className="grid grid-cols-2 gap-4">
+          <p className="text-4xl font-bold col-span-2">Quick Preview</p>
+          <MiniMap geotiffUrl={"https://somehowgetsplotted.s3.ap-south-1.amazonaws.com/somehowgetsplotted/IMG_VIS_optimized.tif"}/>
           <div>
-            <Button
-              onClick={() =>
-                handleDetailedPreview(
-                  processingLevel || "",
-                  startDate ? startDate.toISOString() : "",
-                  endDate ? endDate.toISOString() : ""
-                )
-              }
-            >
-              Open in Editor <OpenInNewWindowIcon />
-            </Button>
-          </div>
+            <div className="rounded-lg border w-fit p-2 h-96 overflow-y-scroll  no-visible-scrollbar">
+              {Object.keys(items)
+                .sort()
+                .map((date) => (
+                  <div key={date}>
+                    <h2 className="text font-bold">{date}</h2>
+                    {Object.keys(items[date])
+                      .sort()
+                      .map((time) => (
+                        <div key={time} className="mb-2">
+                          <h3 className="text-sm">
+                            Available Bands at {time.slice(0, 2)}:
+                            {time.slice(2, 4)} :
+                          </h3>
+                          <div className="grid grid-cols-6 w-full gap-2">
+                            {Object.keys(items[date][time].bands).map(
+                              (bandName) => (
+                                <Button
+                                  key={bandName}
+                                  variant={"outline"}
+                                  className=" mb-1"
+                                  onClick={() =>
+                                    handleBandClick(
+                                      items[date][time].bands[bandName].url
+                                    )
+                                  }
+                                >
+                                  {bandName}
+                                </Button>
+                              )
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                ))}
+            </div>
+            <div className="mt-4">
+              <Button
+                onClick={() =>
+                  handleDetailedPreview(
+                    processingLevel || "",
+                    startDate ? startDate.toISOString() : "",
+                    endDate ? endDate.toISOString() : ""
+                  )
+                }
+              >
+                Open in Editor <OpenInNewWindowIcon />
+              </Button>
+            </div>
           </div>
         </div>
       )}
