@@ -28,8 +28,8 @@ function Home() {
             decisions — all in real-time.
           </p>
           <div className="flex gap-2">
-            {!isLoggedIn ? (
-              <Button onClick={() => navigate("/order")} className="w-fit">
+            {isLoggedIn ? (
+              <Button onClick={() => navigate("/preview")} className="w-fit">
                 Start
               </Button>
             ) : (
@@ -51,12 +51,12 @@ function Home() {
       </div>
 
       <div className="flex flex-col justify-center items-center w-full">
-        <h1 className="text-4xl font-bold my-8">
+        <h1 className="text-4xl font-bold mt-8 mb-6">
           Powerful Features at Your <span className="bg-clip-text text-transparent bg-gradient-to-l from-zinc-700 to-zinc-500">Fingertips</span>{" "}
           <Fingerprint className="inline" />
         </h1>
-        <MiniMap geotiffUrl="https://somehowgetsplotted.s3.ap-south-1.amazonaws.com/somehowgetsplotted/IMG_VIS_optimized.tif" />
-        <div className="grid grid-cols-3 gap-4">
+        <MiniMap geotiffUrl="https://somehowgetsplotted.s3.ap-south-1.amazonaws.com/somehowgetsplotted/IMG_VIS_optimized.tif" zoomOut zoomedToTheBounding />
+        <div className="grid grid-cols-3 gap-4 mt-4">
           <div className="p-4 rounded-2xl border text-center flex flex-col justify-center  items-center hover:bg-zinc-50 transition-all duration-100">
             <p className="my-2 rounded-full border w-12 h-12 font-bold text-center items-center flex justify-center text-2xl">
               1

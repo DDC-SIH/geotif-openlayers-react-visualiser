@@ -11,9 +11,11 @@ interface MiniMapProps {
     geotiffUrl: string;
     minValue?: number;
     maxValue?: number;
+    zoomOut?: boolean; // New prop to enable the most zoomed-out view
+    zoomedToTheBounding?: boolean; // New prop to enable zooming to layer's bounding box
 }
 
-export default function MiniMap({ geotiffUrl,minValue=35,maxValue=493 }: MiniMapProps) {
+export default function MiniMap({ geotiffUrl, minValue = 35, maxValue = 493, zoomOut = false, zoomedToTheBounding = false }: MiniMapProps) {
     const mapRef = useRef<HTMLDivElement>(null);
     const mapInstanceRef = useRef<Map | null>(null);
 
@@ -24,36 +26,55 @@ export default function MiniMap({ geotiffUrl,minValue=35,maxValue=493 }: MiniMap
             source: new XYZ({
                 url: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
                 maxZoom: 20,
-                attributions: '© Google'
-            })
+                attributions: '© Google',
+            }),
         });
 
         const geoTiffSource = new GeoTIFF({
-            sources: [{
-                url: geotiffUrl,
-                bands: [1],
-                min: minValue,
-                max: maxValue,
-            }]
+            sources: [
+                {
+                    url: geotiffUrl,
+                    bands: [1],
+                    min: minValue,
+                    max: maxValue,
+                },
+            ],
         });
 
         const tiffLayer = new TileLayer({
             className: 'tiff',
-            source: geoTiffSource
+            source: geoTiffSource,
+        });
+
+        const mapView = new View({
+            center: fromLonLat([78.9629, 20.5937]),
+            zoom: zoomOut ? 2 : 5, // Adjust zoom based on the zoomOut prop
+            maxZoom: 19,
+            minZoom: 2,
         });
 
         const map = new Map({
             target: mapRef.current,
             layers: [satelliteLayer, tiffLayer],
-            view: new View({
-                center: fromLonLat([78.9629, 20.5937]),
-                zoom: 5,
-                maxZoom: 19,
-                minZoom: 2,
-            })
+            view: mapView,
         });
 
         mapInstanceRef.current = map;
+
+        if (zoomOut) {
+            mapView.animate({ zoom: 2, duration: 1000 }); // Add animation for zoomOut
+        }
+
+        if (zoomedToTheBounding) {
+            geoTiffSource.on('change', () => {
+                if (geoTiffSource.getState() === 'ready') {
+                    const extent = geoTiffSource.getTileGrid()?.getExtent();
+                    if (extent) {
+                        mapView.fit(extent, { duration: 1000 });
+                    }
+                }
+            });
+        }
 
         return () => {
             if (mapInstanceRef.current) {
@@ -61,7 +82,7 @@ export default function MiniMap({ geotiffUrl,minValue=35,maxValue=493 }: MiniMap
                 mapInstanceRef.current = null;
             }
         };
-    }, [geotiffUrl]);
+    }, [geotiffUrl, zoomOut, zoomedToTheBounding]); // Reinitialize map if props change
 
     return (
         <div className="relative w-full h-[438px] rounded-lg" style={{ zIndex: 0 }}>
@@ -72,7 +93,7 @@ export default function MiniMap({ geotiffUrl,minValue=35,maxValue=493 }: MiniMap
                     height: '100%', 
                     width: '100%',
                     position: 'relative',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
                 }} 
             />
         </div>

@@ -285,7 +285,7 @@ function PreviewData() {
       {isDataAvailable && (
         <div className="grid grid-cols-2 gap-4">
           <p className="text-4xl font-bold col-span-2">Quick Preview</p>
-          <MiniMap geotiffUrl={tiffPreviewUrl}/>
+          <MiniMap geotiffUrl={tiffPreviewUrl} zoomedToTheBounding/>
           <div>
             <div className="rounded-lg border w-fit p-2 h-96 overflow-y-scroll  no-visible-scrollbar">
               {Object.keys(items)
