@@ -526,7 +526,7 @@ const GeoTIFFMap = () => {
             }),
             view: new View({
                 center: fromLonLat([78.9629, 20.5937]), // India center coordinates
-                zoom: 5,
+                zoom: 4,
                 maxZoom: 19,
                 minZoom: 2,
             }),
