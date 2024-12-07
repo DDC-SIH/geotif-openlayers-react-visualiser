@@ -93,6 +93,31 @@ function PreviewData() {
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
   const [processingLevel, setProcessingLevelLayer] = useState<string>();
+  const [tiffPreviewUrl, setTiffPreviewUrl] = useState<string>("");
+
+  // Function to find the first URL
+  const initializeTiffPreviewUrl = () => {
+    const dates = Object.keys(items).sort(); // Sort dates in ascending order
+    for (const date of dates) {
+      const times = Object.keys(items[date]).sort(); // Sort times in ascending order
+      for (const time of times) {
+        const bands = Object.keys(items[date][time].bands).sort();
+        if (bands.length > 0) {
+          const firstBand = bands[0];
+          return items[date][time].bands[firstBand].url; // Return the first URL
+        }
+      }
+    }
+    return ""; // Fallback if no URL is found
+  };
+
+
+    // Initialize state on component mount
+    useEffect(() => {
+      const defaultUrl = initializeTiffPreviewUrl();
+      setTiffPreviewUrl(defaultUrl);
+      console.log("Default TIFF URL:", defaultUrl); // Log the default URL
+    }, [items]);
 
   const handleDetailedPreview = (
     processingLevel: string,
@@ -162,6 +187,7 @@ function PreviewData() {
 
   const handleBandClick = (url: string) => {
     console.log("Band URL:", url);
+    setTiffPreviewUrl(url);
   };
 
   return (
@@ -259,7 +285,7 @@ function PreviewData() {
       {isDataAvailable && (
         <div className="grid grid-cols-2 gap-4">
           <p className="text-4xl font-bold col-span-2">Quick Preview</p>
-          <MiniMap geotiffUrl={"https://somehowgetsplotted.s3.ap-south-1.amazonaws.com/somehowgetsplotted/IMG_VIS_optimized.tif"}/>
+          <MiniMap geotiffUrl={tiffPreviewUrl}/>
           <div>
             <div className="rounded-lg border w-fit p-2 h-96 overflow-y-scroll  no-visible-scrollbar">
               {Object.keys(items)
