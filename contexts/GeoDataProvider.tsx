@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { ColorMap, FileFormat, GeoJSON, GeoJSONError } from "../types/geojson.ts";
 import { GeoJSONEndpoint } from '../constants/consts.ts';
+import { GeoJSONGeometry, GeoJSONGeometryCollection } from 'ol/format/GeoJSON';
 
 
 type tiffType = {
@@ -36,7 +37,10 @@ interface GeoDataContextType {
     setTiffUrls: React.Dispatch<React.SetStateAction<tiffUrls>>;
     renderArray: LayerInstance[];
     setRenderArray: React.Dispatch<React.SetStateAction<LayerInstance[]>>;
-
+    selectedPolygon: GeoJSONGeometry | GeoJSONGeometryCollection | null;
+    setSelectedPolygon: React.Dispatch<React.SetStateAction<GeoJSONGeometry | GeoJSONGeometryCollection | null>>;
+    isPolygonSelectionEnabled: boolean;
+    setIsPolygonSelectionEnabled: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const GeoDataContext = createContext<GeoDataContextType | undefined>(undefined);
@@ -64,6 +68,7 @@ export const GeoDataProvider: React.FC<GeoDataProviderProps> = ({ children }) =>
     const [loading, setLoading] = useState<boolean>(false);
     const [selectedAOI, setSelectedAOI] = useState<boolean>(false);
     const [boundingBox, setBoundingBox] = useState<number[] | null>(null);
+    const [selectedPolygon, setSelectedPolygon] = useState<GeoJSONGeometry | GeoJSONGeometryCollection | null>(null);
     const [tiffUrls, setTiffUrls] = useState({
         MIR: {
             url: "https://somehowgetsplotted.s3.ap-south-1.amazonaws.com/somehowgetsplotted/IMG_MIR_optimized.tif",
@@ -96,6 +101,8 @@ export const GeoDataProvider: React.FC<GeoDataProviderProps> = ({ children }) =>
         }
     }
     );
+    const [isPolygonSelectionEnabled, setIsPolygonSelectionEnabled] = useState(false);
+
     const [renderArray, setRenderArray] = useState<LayerInstance[]>([
         { id: generateUniqueId(), key: 'VIS' },
         { id: generateUniqueId(), key: 'VIS' },
@@ -123,7 +130,8 @@ export const GeoDataProvider: React.FC<GeoDataProviderProps> = ({ children }) =>
     }, [url]);
 
     return (
-        <GeoDataContext.Provider value={{ geoData, url, setUrl, loading, setLoading, selectedAOI, setSelectedAOI, boundingBox, setBoundingBox, tiffUrls, setTiffUrls, renderArray, setRenderArray }}>            {children}
+        <GeoDataContext.Provider value={{ geoData, url, setUrl, loading, setLoading, selectedAOI, setSelectedAOI, boundingBox, setBoundingBox, tiffUrls, setTiffUrls, renderArray, setRenderArray, selectedPolygon, setSelectedPolygon, isPolygonSelectionEnabled, setIsPolygonSelectionEnabled }}>
+            {children}
         </GeoDataContext.Provider>
     );
 };

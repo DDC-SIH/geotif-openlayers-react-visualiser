@@ -4,12 +4,14 @@ import { useGeoData } from '../../../contexts/GeoDataProvider';
 import { Switch } from "../ui/switch";
 
 export default function Export() {
-    const { boundingBox, setSelectedAOI, selectedAOI } = useGeoData();
+    const { boundingBox, setSelectedAOI, selectedAOI, selectedPolygon, setSelectedPolygon, isPolygonSelectionEnabled, setIsPolygonSelectionEnabled } = useGeoData();
     const [selected, setSelected] = useState({
         aoi: false,
         effects: false,
+        polygon: false
     });
-    const handleClick = (type: 'aoi' | 'effects') => {
+
+    const handleClick = (type: 'aoi' | 'effects' | 'polygon') => {
         setSelected(prev => ({
             ...prev,
             [type]: !prev[type]
@@ -22,6 +24,21 @@ export default function Export() {
 
     const handleSendAOI = () => {
         // Logic to send AOI
+    };
+
+    const downloadPolygon = () => {
+        if (!selectedPolygon) {
+            alert("No polygon selected");
+            return;
+        }
+
+        const blob = new Blob([JSON.stringify(selectedPolygon)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "polygon.geojson";
+        a.click();
+        URL.revokeObjectURL(url);
     };
 
     return (
@@ -54,6 +71,28 @@ export default function Export() {
                         onCheckedChange={() => handleClick('effects')}
                     />
                 </div>
+                <div className='flex justify-between mt-5'>
+                    <div className='font-semibold'>Send Polygon</div>
+                    <Switch
+                        checked={selected.polygon}
+                        onCheckedChange={() => {
+                            handleClick('polygon');
+                            setIsPolygonSelectionEnabled(!isPolygonSelectionEnabled)
+                        }}
+                    />
+                </div>
+                {selectedPolygon && selected.polygon && (
+                    <div className="mt-4 rounded flex flex-col">
+                        Polygon is selected
+                        <Button
+                            className="px-4 py-2 mt-2"
+                            onClick={downloadPolygon}
+                        >
+                            Download Polygon
+                        </Button>
+
+                    </div>
+                )}
                 <Button
                     className="px-4 py-2 mt-4"
                     onClick={handleExport}

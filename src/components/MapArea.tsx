@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { defaults as defaultControls, ZoomToExtent } from "ol/control";
 import { defaults as defaultInteractions } from "ol/interaction";
-import { DragBox } from 'ol/interaction';
+import { DragBox, Draw, Modify, Snap } from 'ol/interaction';
 import { platformModifierKeyOnly } from 'ol/events/condition';
 import MapSideBar from "./Sidebar/MapSideBar";
 import { citiesData } from "@/../constants/consts";
@@ -29,10 +29,11 @@ import { mapSources } from "@/utils/mapSourcces";
 import { useGeoData } from "../../contexts/GeoDataProvider";
 import { useAppContext } from "../../contexts/AppContext";
 import MapUserPopup from "./MapUserPropup";
-
+import { Fill, Stroke, Style, Circle as CircleStyle } from 'ol/style';
+import ImageTile from 'ol/source/ImageTile.js';
 
 const GeoTIFFMap = () => {
-    const { setBoundingBox, tiffUrls, renderArray } = useGeoData();
+    const { setBoundingBox, tiffUrls, renderArray, selectedPolygon, setSelectedPolygon, isPolygonSelectionEnabled, setIsPolygonSelectionEnabled } = useGeoData();
     const { isLoggedIn } = useAppContext();
 
     const mapRef = useRef<HTMLDivElement>(null); // Reference to the map container
@@ -57,6 +58,19 @@ const GeoTIFFMap = () => {
     const [selectedIndex, setSelectedIndex] = useState("ndvi");
     const [selectedColormap, setSelectedColormap] = useState("viridis");
     const [isModifierKeyPressed, setIsModifierKeyPressed] = useState(false);
+    const [draw, setDraw] = useState<Draw | null>(null);
+    const [polygonLayer, setPolygonLayer] = useState<VectorLayer | null>(null);
+    const [snapInteraction, setSnapInteraction] = useState<Snap | null>(null);
+
+    // Create a dedicated vector layer for drawn features
+    const drawVector = new VectorLayer({
+        source: new VectorSource(),
+        style: {
+            'stroke-color': 'rgba(100, 255, 0, 1)',
+            'stroke-width': 2,
+            'fill-color': 'rgba(100, 255, 0, 0.3)',
+        },
+    });
 
     function getColorStops(
         name: string, min: number, max: number, steps: number, reverse: boolean, alpha: number, brightness: number, contrast: number, saturation: number, exposure: number, hueshift: number
@@ -158,29 +172,29 @@ const GeoTIFFMap = () => {
 
     const cropToExtent = (bbox: number[]) => {
         if (!tiffLayer || !mapInstanceRef.current) return;
-    
+
         // Convert bbox coordinates to map projection
         const [minLon, minLat, maxLon, maxLat] = bbox;
         const extent = [
             fromLonLat([minLon, minLat]),
             fromLonLat([maxLon, maxLat])
         ].flat();
-    
+
         // Set the crop extent on the layer
         tiffLayer.setExtent(extent);
-    
+
         // Animate view to the new extent
         mapInstanceRef.current.getView().fit(extent, {
             duration: 1000,
             padding: [50, 50, 50, 50]
         });
     };
-    
+
     const search = (query: string) => {
         const result = citiesData.find(
             (item) => item.name.toLowerCase() === query.toLowerCase()
         );
-    
+
         if (result) {
             const { bbox } = result;
             if (bbox && bbox.length === 4) {
@@ -190,7 +204,7 @@ const GeoTIFFMap = () => {
             alert("No results found");
         }
     };
-    
+
     const clipLayer = new VectorLayer({
         style: null,
         source: new VectorSource({
@@ -300,7 +314,7 @@ const GeoTIFFMap = () => {
                 'EPSG:4326'
             );
             const topRight = transform(
-                [extent[2], extent[3]],
+                [extent[2], [extent[3]]],
                 map.getView().getProjection(),
                 'EPSG:4326'
             );
@@ -317,6 +331,103 @@ const GeoTIFFMap = () => {
 
         map.addInteraction(dragBox);
     };
+
+    const applyPolygonClipping = (polygon) => {
+        if (!tiffLayer) return;
+
+        const coordinates = polygon.getCoordinates()[0];
+        const { min, max } = getIndexMinMax(selectedIndex);
+
+        const expression = getBandArithmeticExpression(selectedIndex);
+        tiffLayer.setStyle({
+            color: [
+                'interpolate',
+                ['linear'],
+                expression,
+                ...getColorStops(colormapSettings.type, min, max, colormapSettings.steps, colormapSettings.reverse, colormapSettings.alpha, colormapSettings.brightness, colormapSettings.contrast, colormapSettings.saturation, colormapSettings.exposure, colormapSettings.hueshift),
+            ],
+            geometry: {
+                type: 'Polygon',
+                coordinates: [coordinates]
+            }
+        });
+    };
+
+    const addPolygonInteraction = (map: Map) => {
+        const source = new VectorSource();
+        const vectorLayer = new VectorLayer({
+            source: source,
+            style: new Style({
+                fill: new Fill({
+                    color: 'rgba(0, 255, 0, 0.2)',
+                }),
+                stroke: new Stroke({
+                    color: '#00ff00',
+                    width: 2,
+                }),
+            }),
+        });
+
+        map.addLayer(vectorLayer);
+        setPolygonLayer(vectorLayer);
+
+        const drawInteraction = new Draw({
+            source: source,
+            type: 'Polygon',
+            style: new Style({
+                stroke: new Stroke({
+                    color: 'rgba(255, 255, 100, 0.5)',
+                    width: 1.5,
+                }),
+                fill: new Fill({
+                    color: 'rgba(255, 255, 100, 0.25)',
+                }),
+            }),
+        });
+
+        drawInteraction.on('drawend', (event) => {
+            const polygon = event.feature.getGeometry();
+            // Keep the feature in the vector layer
+            vectorLayer?.getSource().clear();
+            vectorLayer?.getSource().addFeature(event.feature);
+
+            applyPolygonClipping(polygon);
+
+            // Log polygon data
+            const coordinates = polygon?.getCoordinates()[0];
+            const polygonExtent = polygon?.getExtent();
+            console.log('Polygon Coordinates:', coordinates);
+            console.log('Polygon Extent:', polygonExtent);
+            console.log('Polygon Area:', polygon?.getArea());
+
+            // Convert to GeoJSON for easy sharing/storage
+            if (!polygon) return;
+            const geojson = new GeoJSON().writeGeometryObject(polygon);
+            console.log('Polygon GeoJSON:', geojson);
+            setSelectedPolygon(geojson);
+            map.removeInteraction(drawInteraction);
+        });
+
+        map.addInteraction(drawInteraction);
+        setDraw(drawInteraction);
+    };
+
+    useEffect(() => {
+        if (mapInstanceRef.current && isPolygonSelectionEnabled) {
+            addPolygonInteraction(mapInstanceRef.current);
+        } else if (mapInstanceRef.current && !isPolygonSelectionEnabled) {
+            if (draw) {
+                mapInstanceRef.current.removeInteraction(draw);
+                setDraw(null);
+            }
+            if (snapInteraction) {
+                mapInstanceRef.current.removeInteraction(snapInteraction);
+                setSnapInteraction(null);
+            }
+            // Remove draw vector layer when disabling
+            mapInstanceRef.current.removeLayer(drawVector);
+        }
+    }, [isPolygonSelectionEnabled, mapInstanceRef.current]);
 
     const getBandArithmeticExpression = (type: string) => {
         switch (type) {
@@ -416,6 +527,7 @@ const GeoTIFFMap = () => {
 
         mapInstanceRef.current = openLayersMap;
         addDragBoxInteraction(openLayersMap);
+        addPolygonInteraction(openLayersMap);
         // Apply initial colormap
         updateColormap();
     };
@@ -433,7 +545,20 @@ const GeoTIFFMap = () => {
         };
     }, [renderArray]);
 
+    const downloadPolygon = () => {
+        if (!selectedPolygon) {
+            alert("No polygon selected");
+            return;
+        }
 
+        const blob = new Blob([JSON.stringify(selectedPolygon)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "polygon.geojson";
+        a.click();
+        URL.revokeObjectURL(url);
+    };
 
     return (
         <div className="w-screen h-screen relative overflow-hidden">
@@ -513,8 +638,9 @@ const GeoTIFFMap = () => {
                             <Search className="h-4 w-4" />
                         </Button>
                     </div>
-                </div>
+                 
 
+                </div>
             </div>
 
             <div ref={mapRef} className="absolute inset-0 w-full h-full" />
