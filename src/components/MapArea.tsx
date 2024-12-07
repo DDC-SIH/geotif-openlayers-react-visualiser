@@ -346,10 +346,7 @@ const GeoTIFFMap = () => {
                 expression,
                 ...getColorStops(colormapSettings.type, min, max, colormapSettings.steps, colormapSettings.reverse, colormapSettings.alpha, colormapSettings.brightness, colormapSettings.contrast, colormapSettings.saturation, colormapSettings.exposure, colormapSettings.hueshift),
             ],
-            geometry: {
-                type: 'Polygon',
-                coordinates: [coordinates]
-            }
+
         });
     };
 
@@ -367,6 +364,10 @@ const GeoTIFFMap = () => {
                 }),
             }),
         });
+        if (!isPolygonSelectionEnabled) {
+            map.removeLayer(vectorLayer);
+            return
+        }
 
         map.addLayer(vectorLayer);
         setPolygonLayer(vectorLayer);
@@ -425,7 +426,10 @@ const GeoTIFFMap = () => {
                 setSnapInteraction(null);
             }
             // Remove draw vector layer when disabling
-            mapInstanceRef.current.removeLayer(drawVector);
+            if (polygonLayer) {
+                mapInstanceRef.current.removeLayer(polygonLayer);
+                setPolygonLayer(null);
+            }
         }
     }, [isPolygonSelectionEnabled, mapInstanceRef.current]);
 
@@ -638,7 +642,7 @@ const GeoTIFFMap = () => {
                             <Search className="h-4 w-4" />
                         </Button>
                     </div>
-                 
+
 
                 </div>
             </div>
