@@ -9,9 +9,11 @@ import { fromLonLat } from 'ol/proj';
 
 interface MiniMapProps {
     geotiffUrl: string;
+    minValue?: number;
+    maxValue?: number;
 }
 
-export default function MiniMap({ geotiffUrl }: MiniMapProps) {
+export default function MiniMap({ geotiffUrl,minValue=35,maxValue=493 }: MiniMapProps) {
     const mapRef = useRef<HTMLDivElement>(null);
     const mapInstanceRef = useRef<Map | null>(null);
 
@@ -30,8 +32,8 @@ export default function MiniMap({ geotiffUrl }: MiniMapProps) {
             sources: [{
                 url: geotiffUrl,
                 bands: [1],
-                min: 35,
-                max: 493,
+                min: minValue,
+                max: maxValue,
             }]
         });
 

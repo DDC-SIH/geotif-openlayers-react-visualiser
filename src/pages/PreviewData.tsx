@@ -276,12 +276,11 @@ function PreviewData() {
                             {time.slice(2, 4)} :
                           </h3>
                           <div className="grid grid-cols-6 w-full gap-2">
-                            {Object.keys(items[date][time].bands).map(
+                            {Object.keys(items[date][time].bands).sort().map(
                               (bandName) => (
                                 <Button
                                   key={bandName}
                                   variant={"outline"}
-                                  className=" mb-1"
                                   onClick={() =>
                                     handleBandClick(
                                       items[date][time].bands[bandName].url
