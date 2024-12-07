@@ -1,4 +1,4 @@
-import { Info, Filter, Sparkles, MapIcon, DownloadCloud, Layers } from "lucide-react";
+import { Info, Filter, Sparkles, MapIcon, DownloadCloud, Layers, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -9,6 +9,8 @@ import { mapSources } from "@/utils/mapSourcces";
 import TileLayer from "ol/layer/Tile";
 import Export from "./Export";
 import LayersSection from "./Layers";
+import MapUserPopup from "../MapUserPropup";
+import { useAppContext } from "../../../contexts/AppContext";
 
 interface ColormapSettings {
   type: string;
@@ -37,13 +39,17 @@ function MapSideBar({
   selectedIndex: string;
   setSelectedIndex: (value: string) => void;
 }) {
+  const {isLoggedIn} = useAppContext();
   const [activeSidebar, setActiveSidebar] = useState<string | null>(null);
   const [selectedMap, setSelectedMap] = useState(mapSources[1].name);
+  
 
   return (
     <div className="fixed left-0 top-0 flex h-full pointer-events-auto z-[2] bg-neutral-900 ">
       {/* Icons Bar */}
-      <div className=" flex flex-col   z-[2]">
+      <div className=" flex flex-col justify-between  z-[2]">
+        <div className="flex flex-col">
+
         <Button
           size="icon"
           variant={activeSidebar === "info" ? "secondary" : "ghost"}
@@ -51,7 +57,7 @@ function MapSideBar({
           onClick={() =>
             setActiveSidebar(activeSidebar === "info" ? null : "info")
           }
-        >
+          >
           <Info className={`h-8 w-8 ${activeSidebar === "info" ? "text-black" : "text-white"}`} />
         </Button>
         <Button
@@ -61,7 +67,7 @@ function MapSideBar({
           onClick={() =>
             setActiveSidebar(activeSidebar === "layers" ? null : "layers")
           }
-        >
+          >
           <Layers className={`h-8 w-8 ${activeSidebar === "layers" ? "text-black" : "text-white"}`} />
         </Button>
         <Button
@@ -71,7 +77,7 @@ function MapSideBar({
           onClick={() =>
             setActiveSidebar(activeSidebar === "basemap" ? null : "basemap")
           }
-        >
+          >
           <MapIcon className={`h-8 w-8 ${activeSidebar === "basemap" ? "text-black" : "text-white"}`} />
         </Button>
         <Button
@@ -81,7 +87,7 @@ function MapSideBar({
           onClick={() =>
             setActiveSidebar(activeSidebar === "filters" ? null : "filters")
           }
-        >
+          >
           <Filter className={`h-8 w-8 ${activeSidebar === "filters" ? "text-black" : "text-white"}`} />
         </Button>
         <Button
@@ -91,7 +97,7 @@ function MapSideBar({
           onClick={() =>
             setActiveSidebar(activeSidebar === "effects" ? null : "effects")
           }
-        >
+          >
           <Sparkles className={`h-8 w-8 ${activeSidebar === "effects" ? "text-black" : "text-white"}`} />
         </Button>
         <Button
@@ -101,9 +107,11 @@ function MapSideBar({
           onClick={() =>
             setActiveSidebar(activeSidebar === "export" ? null : "export")
           }
-        >
+          >
           <DownloadCloud className={`h-8 w-8 ${activeSidebar === "export" ? "text-black" : "text-white"}`} />
         </Button>
+          </div>
+        <MapUserPopup isLoggedIn={isLoggedIn} />
 
       </div>
 

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import SignOutButton from "./SignOutButton";
 import { User } from "lucide-react";
+import { Button } from "./ui/button";
 
 interface Props {
   isLoggedIn: boolean;
@@ -28,21 +29,21 @@ const MapUserPopup = ({ isLoggedIn }: Props) => {
   };
 
   return (
-    <div ref={popupRef} className="fixed top-3 right-3 inline-block popup-profile z-[9999]">
+    <div ref={popupRef} className="relative">
       {isOpen && (
-        <div className="absolute right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg min-w-[160px]">
+        <div className="absolute left-full bottom-0  bg-neutral-800  border border-neutral-900  min-w-[160px]">
           {isLoggedIn ? (
-            <ul className="divide-y divide-gray-200">
+            <ul className="divide-y divide-neutral-900 text-white">
               <li>
                 <SignOutButton />
               </li>
             </ul>
           ) : (
-            <ul className="divide-y divide-gray-200">
+            <ul className="divide-y divide-neutral-900 text-white">
               <li>
                 <Link
                   to="/sign-in"
-                  className="block py-2 px-4 hover:bg-gray-100"
+                  className="block py-2 px-4 hover:bg-neutral-900 text-white"
                   onClick={() => setIsOpen(false)}
                 >
                   Sign in
@@ -51,7 +52,7 @@ const MapUserPopup = ({ isLoggedIn }: Props) => {
               <li>
                 <Link
                   to="/register"
-                  className="block py-2 px-4 hover:bg-gray-100"
+                  className="block py-2 px-4 hover:bg-neutral-900 text-white"
                   onClick={() => setIsOpen(false)}
                 >
                   Register
@@ -61,12 +62,14 @@ const MapUserPopup = ({ isLoggedIn }: Props) => {
           )}
         </div>
       )}
-      <button
+      <Button
+      size="icon"
+      variant={"ghost"}
         onClick={togglePopup}
-        className="flex gap-2 items-center text-3xl px-2 lg:py-2 rounded-sm bg-white shadow-lg hover:text-orange-700"
+        className="rounded-none p-8  hover:bg-neutral-800"
       >
-        <User className="h-6 w-6" />
-      </button>
+        <User className="h-8 w-8 text-white " />
+      </Button>
     </div>
   );
 };

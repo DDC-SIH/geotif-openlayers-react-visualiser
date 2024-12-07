@@ -584,7 +584,6 @@ const GeoTIFFMap = () => {
             </style>
 
             {/* UI Layer */}
-            <MapUserPopup isLoggedIn={isLoggedIn} />
 
             <div className="absolute inset-0 pointer-events-none">
                 {/* Sidebar */}

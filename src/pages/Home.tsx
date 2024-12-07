@@ -13,7 +13,7 @@ function Home() {
       <div className=" grid-cols-2 grid gap-8">
         <div className="mt-20">
           <p className="text-sm text-neutral-500 font-bold mb-1">
-            Effortlessly Optimize, Visualize, and Download GeoTIFF & HDF5 Files
+          Effortlessly Optimize, Visualize, and Download Geospatial Files
           </p>
           <p className=" mb-2 text-2xl font-bold">
             Leverage the power of cloud-optimized tools for seamless processing
