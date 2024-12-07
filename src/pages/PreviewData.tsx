@@ -1,4 +1,4 @@
-import { deepSearchFiles, searchFiles, searchFilesWithTime } from "@/api-client";
+import { searchFilesWithTime } from "@/api-client";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -30,7 +30,6 @@ function useQuery() {
 
 function PreviewData() {
   const navigate = useNavigate();
-  const query = useQuery();
   const [items, setItems] = useState([]);
   const [isDataAvailable, setIsDataAvailable] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -41,21 +40,15 @@ function PreviewData() {
   const [processingLevel, setProcessingLevel] = useState<string>();
 
   const handleDetailedPreview = (
-    groupName: string,
+    processingLevel: string,
     startDateTime: string,
     endDateTime: string,
-    version: string
   ) => {
-    const formattedStartDateTime = new Date(startDateTime)
-      .toISOString()
-      .replace(/[-:.]/g, "")
-      .slice(0, -5);
-    const formattedEndDateTime = new Date(endDateTime)
-      .toISOString()
-      .replace(/[-:.]/g, "")
-      .slice(0, -5);
+    const formattedStartDateTime = dayjs(startDateTime).format("YYYYMMMDD HHmm");
+    const formattedEndDateTime = dayjs(endDateTime).format("YYYYMMMDD HHmm");
+    console.log(new Date(startDateTime).toISOString(), new Date(endDateTime).toISOString())
     navigate(
-      `/map/?p=${groupName}&st=${formattedStartDateTime}&ed=${formattedEndDateTime}&v=${version}`
+      `/map/?p=${processingLevel}&st=${encodeURIComponent(formattedStartDateTime)}&ed=${encodeURIComponent(formattedEndDateTime)}`
     );
   };
 
@@ -73,12 +66,13 @@ function PreviewData() {
       console.log(searchParams)
       const data = await searchFilesWithTime(searchParams);
       console.log(data)
-      if (data.length > 0) {
+      if (data && Object.keys(data).length > 0) {
         setItems(data);
         setIsDataAvailable(true);
       } else {
         setIsDataNotAvailable(true);
       }
+      
     } catch (error) {
       console.error("Error searching files:", error);
       setIsDataNotAvailable(true);
@@ -210,10 +204,9 @@ function PreviewData() {
           <Button
             onClick={() =>
               handleDetailedPreview(
-                query.get("p") || "",
+                processingLevel || "",
                 startDate ? startDate.toISOString() : "",
                 endDate ? endDate.toISOString() : "",
-                query.get("v") || ""
               )
             }
           >
