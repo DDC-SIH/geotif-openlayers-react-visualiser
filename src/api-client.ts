@@ -156,3 +156,79 @@ export const register = async (formData: RegisterFormData) => {
 
     return response.json();
   };
+
+
+
+
+  export const fetchAllFiles = async () => {
+    const response = await fetch(`${API_BASE_URL}/api/get-files/all`, {
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error("Could not load items");
+    }
+
+    return response.json();
+  };
+
+  export const fetchFilesByTable = async (table: string) => {
+    const response = await fetch(`${API_BASE_URL}/api/get-files/table/${table}`, {
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error("Could not load items");
+    }
+
+    return response.json();
+  };
+
+  export const fetchFileByTableAndDate = async (table: string, date: string) => {
+    const response = await fetch(`${API_BASE_URL}/api/get-files/table/${table}/${date}`, {
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error("Item not found");
+      }
+      throw new Error("Could not load item");
+    }
+
+    return response.json();
+  };
+
+  export const searchFilesByDateRange = async (searchParams: { startDate: string; endDate: string; processingLevel: string }) => {
+    const response = await fetch(`${API_BASE_URL}/api/get-files/search`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(searchParams),
+    });
+
+    if (!response.ok) {
+      throw new Error("Could not search items");
+    }
+
+    return response.json();
+  };
+
+  export const searchFilesWithTime = async (searchParams: { startDate: string; endDate: string; processingLevel: string }) => {
+    const response = await fetch(`${API_BASE_URL}/api/get-files/searchWithTime`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(searchParams),
+    });
+
+    if (!response.ok) {
+      throw new Error("Could not search items");
+    }
+
+    return response.json();
+  };

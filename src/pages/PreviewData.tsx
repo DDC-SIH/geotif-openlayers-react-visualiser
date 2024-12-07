@@ -1,4 +1,4 @@
-import { deepSearchFiles, searchFiles } from "@/api-client";
+import { deepSearchFiles, searchFiles, searchFilesWithTime } from "@/api-client";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -15,6 +15,13 @@ import type { TimePickerProps } from "antd";
 import { TimePicker } from "antd";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 dayjs.extend(customParseFormat);
 function useQuery() {
@@ -25,31 +32,13 @@ function PreviewData() {
   const navigate = useNavigate();
   const query = useQuery();
   const [items, setItems] = useState([]);
-  const [commonData, setCommonData] = useState([]);
   const [isDataAvailable, setIsDataAvailable] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isDataNotAvailable, setIsDataNotAvailable] = useState(false);
 
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
-
-  useEffect(() => {
-    const product = query.get("p");
-    const prefix = product?.split("_")[0];
-    const dataProcessingLevel = product?.split("_")[1];
-    const standard = product?.split("_")[2];
-    const version = query.get("v");
-
-    if (prefix && dataProcessingLevel && standard && version) {
-      searchFiles({ prefix, dataProcessingLevel, standard, version })
-        .then((data) => {
-          console.log(data);
-          setItems(data.items);
-          setCommonData(data.commonAttributes);
-        })
-        .catch((error) => console.error("Error fetching data:", error));
-    }
-  }, []);
+  const [processingLevel, setProcessingLevel] = useState<string>();
 
   const handleDetailedPreview = (
     groupName: string,
@@ -70,35 +59,38 @@ function PreviewData() {
     );
   };
 
-  const handleDateTimeInput = async (groupName: string, version: string) => {
+  const handleDateTimeInput = async () => {
     setIsLoading(true);
     setIsDataAvailable(false);
     setIsDataNotAvailable(false);
 
-    await deepSearchFiles({
-      prefix: groupName.split("_")[0],
-      dataProcessingLevel: groupName.split("_")[1],
-      standard: groupName.split("_")[2],
-      version,
-      startDate: startDate ? startDate.toISOString() : "",
-      endDate: endDate ? endDate.toISOString() : "",
-    })
-      .then((data) => {
-        console.log("Deep search data:", data);
-        if (!data.items) {
-          setIsDataNotAvailable(true);
-          setIsDataAvailable(false);
-          setIsLoading(false);
-          return;
-        }
+    try {
+      const searchParams = {
+        startDate: startDate?.toISOString() || "",
+        endDate: endDate?.toISOString() || "",
+        processingLevel: processingLevel || "",
+      };
+      console.log(searchParams)
+      const data = await searchFilesWithTime(searchParams);
+      console.log(data)
+      if (data.length > 0) {
+        setItems(data);
         setIsDataAvailable(true);
-        setIsLoading(false);
-        setIsDataNotAvailable(false);
-      })
-      .catch((error) => console.error("Error performing deep search:", error));
+      } else {
+        setIsDataNotAvailable(true);
+      }
+    } catch (error) {
+      console.error("Error searching files:", error);
+      setIsDataNotAvailable(true);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const onStartTimeChange: TimePickerProps["onChange"] = (_time, timeString) => {
+  const onStartTimeChange: TimePickerProps["onChange"] = (
+    _time,
+    timeString
+  ) => {
     if (startDate) {
       const updatedDate = new Date(startDate);
       const [hours, minutes] = (timeString as string).split(":").map(Number);
@@ -117,7 +109,7 @@ function PreviewData() {
 
   return (
     <div className="p-3">
-      <h1 className="text-3xl font-bold">Preview Data</h1>
+      <h1 className="text-3xl font-bold">Order Data</h1>
       <div className="flex gap-2 my-4">
         <Popover>
           <PopoverTrigger asChild>
@@ -189,9 +181,21 @@ function PreviewData() {
           </PopoverContent>
         </Popover>
 
+        <Select onValueChange={setProcessingLevel}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Choose Processing Level" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="L1B">L1B</SelectItem>
+            <SelectItem value="L1C">L1C</SelectItem>
+            <SelectItem value="L2B">L2B</SelectItem>
+            <SelectItem value="L2C">L2C</SelectItem>
+          </SelectContent>
+        </Select>
+
         <Button
           onClick={() =>
-            handleDateTimeInput(query.get("p") || "", query.get("v") || "")
+            handleDateTimeInput()
           }
         >
           Submit
