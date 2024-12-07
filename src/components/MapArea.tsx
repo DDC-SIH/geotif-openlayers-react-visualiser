@@ -346,8 +346,11 @@ const GeoTIFFMap = () => {
                 expression,
                 ...getColorStops(colormapSettings.type, min, max, colormapSettings.steps, colormapSettings.reverse, colormapSettings.alpha, colormapSettings.brightness, colormapSettings.contrast, colormapSettings.saturation, colormapSettings.exposure, colormapSettings.hueshift),
             ],
-
         });
+
+        // Set the extent of the tiffLayer to the polygon's extent
+        const extent = polygon.getExtent();
+        tiffLayer.setExtent(extent);
     };
 
     const addPolygonInteraction = (map: Map) => {
