@@ -27,14 +27,29 @@ function convertToTime(value: number): string {
 }
 function TimeLineSlider() {
   const { startDateTime, endDateTime, processingLevel } = useGeoData();
-  console.log(startDateTime, endDateTime, processingLevel);
   const [value, setValue] = React.useState<number>(50);
   const [date, setDate] = React.useState<Date>();
 
   const handleChange = (newValue: any) => {
-    console.log(newValue);
     setValue(newValue as number);
   };
+
+  const handleApplyClick = () => {
+    console.log(
+      "Apply button clicked",processingLevel,
+      convertToDateTime(date, convertToTime(value))
+    );
+  };
+  const convertToDateTime = (date: Date | undefined, time: string): string => {
+    if (!date) {
+      throw new Error("Date is not selected");
+    }
+    const [hours, minutes] = time.split(":").map(Number);
+    const newDate = new Date(date);
+    newDate.setHours(hours, minutes, 0, 0);
+    return newDate.toISOString();
+  };
+
 
   return (
     <div className="w-full fixed bottom-0 flex justify-center items-center py-6 px-32">
@@ -57,7 +72,7 @@ function TimeLineSlider() {
             align="start"
           >
             <Calendar
-              fromDate={new Date((startDateTime) || "2024-01-01")}
+              fromDate={new Date(startDateTime || "2024-01-01")}
               toDate={new Date(endDateTime || "2024-12-31")}
               mode="single"
               selected={date}
@@ -73,6 +88,7 @@ function TimeLineSlider() {
           step={0.5}
           min={0}
           max={23.5}
+          onChange={handleChange}
           className="flex-1"
           classNames={{
             rail: "bg-black border-2 border-black",
@@ -84,6 +100,9 @@ function TimeLineSlider() {
               value !== undefined ? `${convertToTime(value)}` : "",
           }}
         />
+        <Button onClick={handleApplyClick}>
+          <span>Apply</span>
+        </Button>
       </div>
     </div>
   );

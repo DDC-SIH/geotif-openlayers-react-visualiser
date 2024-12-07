@@ -94,6 +94,7 @@ function PreviewData() {
   const [endDate, setEndDate] = useState<Date>();
   const [processingLevel, setProcessingLevelLayer] = useState<string>();
   const [tiffPreviewUrl, setTiffPreviewUrl] = useState<string>("");
+  const [selectedBandUrl, setSelectedBandUrl] = useState<string>("");
 
   // Function to find the first URL
   const initializeTiffPreviewUrl = () => {
@@ -116,6 +117,7 @@ function PreviewData() {
     useEffect(() => {
       const defaultUrl = initializeTiffPreviewUrl();
       setTiffPreviewUrl(defaultUrl);
+      setSelectedBandUrl(defaultUrl); 
       console.log("Default TIFF URL:", defaultUrl); // Log the default URL
     }, [items]);
 
@@ -188,6 +190,7 @@ function PreviewData() {
   const handleBandClick = (url: string) => {
     console.log("Band URL:", url);
     setTiffPreviewUrl(url);
+    setSelectedBandUrl(url); 
   };
 
   return (
@@ -303,19 +306,22 @@ function PreviewData() {
                           </h3>
                           <div className="grid grid-cols-6 w-full gap-2">
                             {Object.keys(items[date][time].bands).sort().map(
-                              (bandName) => (
-                                <Button
-                                  key={bandName}
-                                  variant={"outline"}
-                                  onClick={() =>
-                                    handleBandClick(
-                                      items[date][time].bands[bandName].url
-                                    )
-                                  }
-                                >
-                                  {bandName}
-                                </Button>
-                              )
+                              (bandName) => {
+                                const bandUrl =
+                                  items[date][time].bands[bandName].url || "";
+                                return (
+                                  <Button
+                                    key={bandName}
+                                    onClick={() => handleBandClick(bandUrl)}
+                                    variant={
+                                      selectedBandUrl === bandUrl ? "secondary" : "outline"
+                                    }
+                                    className="w-full"
+                                  >
+                                    {bandName}
+                                  </Button>
+                                );
+                              }
                             )}
                           </div>
                         </div>
