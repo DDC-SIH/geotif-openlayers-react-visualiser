@@ -26,10 +26,64 @@ import { useGeoData } from "../../contexts/GeoDataProvider";
 
 dayjs.extend(customParseFormat);
 
+interface BandMetadata {
+  wavelength: number;
+  bandwidth: number;
+  fill_value: number;
+  data_range: { max: number; min: number };
+  bits_per_pixel: number;
+  resolution: number;
+  dimensions: { width: number; height: number };
+}
+
+interface Band {
+  metadata: BandMetadata;
+  url: string;
+}
+
+interface ProductInfo {
+  creation_time: string;
+  title: string;
+  type: string;
+  level: string;
+  file_name: string;
+}
+
+interface DateData {
+  [date: string]: {
+    [time: string]: {
+      product_info: ProductInfo;
+      bands: {
+        [bandName: string]: Band;
+      };
+      satellite_info: {
+        name: string;
+        altitude: number;
+        sensor: {
+          name: string;
+          id: string;
+        };
+      };
+    };
+  };
+}
+
 function PreviewData() {
   const { setStartDateTime, setEndDateTime, setProcessingLevel } = useGeoData();
   const navigate = useNavigate();
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState<{
+    [date: string]: {
+      [time: string]: {
+        product_info: ProductInfo;
+        bands: { [bandName: string]: Band };
+        satellite_info: {
+          name: string;
+          altitude: number;
+          sensor: { name: string; id: string };
+        };
+      };
+    };
+  }>({});
   const [isDataAvailable, setIsDataAvailable] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isDataNotAvailable, setIsDataNotAvailable] = useState(false);
@@ -102,6 +156,10 @@ function PreviewData() {
       updatedDate.setHours(hours, minutes);
       setEndDate(updatedDate);
     }
+  };
+
+  const handleBandClick = (url: string) => {
+    console.log("Band URL:", url);
   };
 
   return (
@@ -211,6 +269,41 @@ function PreviewData() {
           </Button>
         </div>
       )}
+
+      <div className="rounded-lg border w-fit p-2 my-4">
+        {Object.keys(items).map((date) => (
+          <div key={date}>
+            <h2 className="text font-bold">{date}</h2>
+            {/* Sorting the time keys in ascending order */}
+            {Object.keys(items[date])
+              .sort() // Sort the time strings in ascending order
+              .map((time) => (
+                <div key={time} className="mb-2">
+                  <h3 className="text-sm">
+                    Available Bands at {time.slice(0, 2)}:{time.slice(2, 4)} :
+                  </h3>
+                  <div>
+                    {Object.keys(items[date][time].bands).map((bandName) => (
+                      <div key={bandName}>
+                        <Button
+                          variant={"outline"}
+                          className="w-60 text-start justify-start"
+                          onClick={() =>
+                            handleBandClick(
+                              items[date][time].bands[bandName].url
+                            )
+                          }
+                        >
+                          {bandName}
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
