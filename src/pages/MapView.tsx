@@ -1,16 +1,13 @@
-import TimeLineSlider from "@/components/TimeLineSlider"
-import { GeoDataProvider } from "../../contexts/GeoDataProvider"
-import MapComponent from '../components/MapArea'
+import TimeLineSlider from "@/components/TimeLineSlider";
+import MapComponent from "../components/MapArea";
 
 function MapView() {
   return (
-    <div className='relative flex'>
-      <GeoDataProvider>
-        <MapComponent />
-      </GeoDataProvider>
-      <TimeLineSlider/>
+    <div className="relative flex">
+      <MapComponent />
+      <TimeLineSlider />
     </div>
-  )
+  );
 }
 
-export default MapView
+export default MapView;

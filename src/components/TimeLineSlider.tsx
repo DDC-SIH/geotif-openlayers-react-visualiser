@@ -6,6 +6,7 @@ import { CalendarIcon } from "lucide-react";
 import { Calendar } from "./ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { useGeoData } from "../../contexts/GeoDataProvider";
 
 function convertToTime(value: number): string {
   // Ensure the value is within the valid range
@@ -24,8 +25,9 @@ function convertToTime(value: number): string {
 
   return formattedTime;
 }
-
 function TimeLineSlider() {
+  const { startDateTime, endDateTime, processingLevel } = useGeoData();
+  console.log(startDateTime, endDateTime, processingLevel);
   const [value, setValue] = React.useState<number>(50);
   const [date, setDate] = React.useState<Date>();
 
@@ -55,6 +57,8 @@ function TimeLineSlider() {
             align="start"
           >
             <Calendar
+              fromDate={new Date((startDateTime) || "2024-01-01")}
+              toDate={new Date(endDateTime || "2024-12-31")}
               mode="single"
               selected={date}
               onSelect={setDate}
