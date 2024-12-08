@@ -81,6 +81,7 @@ export const register = async (formData: RegisterFormData) => {
 
 
 
+
   export const fetchAllFiles = async () => {
     const response = await fetch(`${API_BASE_URL}/api/get-files/all`, {
       credentials: "include",

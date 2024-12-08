@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchGroupedFiles } from '../api-client';
+import { fetchAllFiles } from '../api-client';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
@@ -20,7 +20,7 @@ const navigate = useNavigate();
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const result = await fetchGroupedFiles();
+                const result = await fetchAllFiles();
                 setData(result);
             } catch (error:any) {
                 setError(error.message);

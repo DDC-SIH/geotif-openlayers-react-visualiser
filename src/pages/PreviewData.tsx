@@ -392,48 +392,45 @@ function PreviewData() {
                 {Object.keys(items)
                   .sort()
                   .map((date) => (
-                    <div key={date}>
-                      <h2 className="text font-bold">{date}</h2>
-                      {Object.keys(items[date])
+                  <div key={date}>
+                    <h2 className="text font-bold">{date}</h2>
+                    {Object.keys(items[date])
+                    .sort()
+                    .map((time) => (
+                      <div key={time} className="mb-2">
+                      <h3 className="text-sm">
+                        Available Bands at {time.slice(0, 2)}:
+                        {time.slice(2, 4)} :
+                      </h3>
+                      <div className="grid grid-cols-6 w-full gap-2">
+                        {Object.keys(items[date][time].bands)
                         .sort()
-                        .map((time) => (
-                          <div key={time} className="mb-2">
-                            <h3 className="text-sm">
-                              Available Bands at {time.slice(0, 2)}:
-                              {time.slice(2, 4)} :
-                            </h3>
-                            <div className="grid grid-cols-6 w-full gap-2">
-                              {Object.keys(items[date][time].bands)
-                                .sort()
-                                .map((bandName) => {
-                                  const bandUrl =
-                                    items[date][time].bands[bandName].url || "";
-                                  return (
-                                    <Button
-                                      key={bandName}
-                                      onClick={() =>
-                                        handleBandSelectorClick(
-                                          bandUrl,
-                                          date,
-                                          time,
-                                          bandName
-                                        )
-                                      }
-                                      variant={
-                                        selectedBandUrl === bandUrl
-                                          ? "secondary"
-                                          : "outline"
-                                      }
-                                      className="w-full"
-                                    >
-                                      {bandName}
-                                    </Button>
-                                  );
-                                })}
-                            </div>
-                          </div>
-                        ))}
-                    </div>
+                        .map((bandName) => {
+                          const bandUrl =
+                          items[date][time].bands[bandName].url || "";
+                          const isSelected = selectedBands[date]?.[time]?.[bandName] === bandUrl;
+                          return (
+                          <Button
+                            key={bandName}
+                            onClick={() =>
+                            handleBandSelectorClick(
+                              bandUrl,
+                              date,
+                              time,
+                              bandName
+                            )
+                            }
+                            variant={isSelected ? "default" : "outline"}
+                            className="w-full"
+                          >
+                            {bandName}
+                          </Button>
+                          );
+                        })}
+                      </div>
+                      </div>
+                    ))}
+                  </div>
                   ))}
               </div>
             </div>
