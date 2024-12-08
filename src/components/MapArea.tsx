@@ -568,23 +568,17 @@ const GeoTIFFMap = () => {
 
     drawInteraction.on("drawend", (event) => {
       const polygon = event.feature.getGeometry();
-      // Keep the feature in the vector layer
       vectorLayer?.getSource().clear();
       vectorLayer?.getSource().addFeature(event.feature);
 
       applyPolygonClipping(polygon);
 
-      // Log polygon data
-      const coordinates = polygon?.getCoordinates()[0];
-      const polygonExtent = polygon?.getExtent();
-      console.log("Polygon Coordinates:", coordinates);
-      console.log("Polygon Extent:", polygonExtent);
-      console.log("Polygon Area:", polygon?.getArea());
-
-      // Convert to GeoJSON for easy sharing/storage
-      if (!polygon) return;
-      const geojson = new GeoJSON().writeGeometryObject(polygon);
-      console.log("Polygon GeoJSON:", geojson);
+      // Transform the polygon to EPSG:4326 (longitude/latitude)
+      const polygonClone = polygon.clone();
+      polygonClone.transform(map.getView().getProjection(), 'EPSG:4326');
+      
+      // Create GeoJSON with transformed coordinates
+      const geojson = new GeoJSON().writeGeometryObject(polygonClone);
       setSelectedPolygon(geojson);
       map.removeInteraction(drawInteraction);
     });
