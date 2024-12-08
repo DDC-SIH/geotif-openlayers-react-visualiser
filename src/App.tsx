@@ -8,6 +8,7 @@ import OrderData from './pages/OrderData';
 import PreviewData from './pages/PreviewData';
 import Home from './pages/Home';
 import About from './pages/About';
+import ProfileOrders from './pages/ProfileOrders';
 
 
 
@@ -16,7 +17,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<MapView />} />
-        
+
         <Route path="/sign-in" element={<Layout><SignIn /></Layout>} />
         <Route path="/register" element={<Layout><Register /></Layout>} />
 
@@ -24,6 +25,10 @@ function App() {
         <Route path="/order" element={<Layout><OrderData /></Layout>} />
         <Route path="/preview" element={<Layout><PreviewData /></Layout>} />
         <Route path="/map" element={<MapView />} />
+        <Route path="/orders" element={<Layout>
+          <ProfileOrders />
+        </Layout>
+        } />
 
         <Route path="/about" element={<About />} />
 
