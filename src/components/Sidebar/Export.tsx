@@ -64,6 +64,33 @@ export default function Export() {
         }
     };
 
+    const downloadAOI = () => {
+        if (!boundingBox) {
+            alert("No AOI selected");
+            return;
+        }
+
+        const aoiJSON = {
+            north: boundingBox[0],
+            south: boundingBox[1],
+            east: boundingBox[2],
+            west: boundingBox[3],
+            created: new Date().toISOString(),
+            coordinateSystem: "EPSG:4326",
+            units: "degrees"
+        };
+
+        const blob = new Blob([JSON.stringify(aoiJSON, null, 2)], {
+            type: "application/json",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `aoi-bbox-${new Date().toISOString()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
     return (
         <div className="space-y-6">
             <h3 className="font-semibold ">Export Options</h3>
@@ -85,6 +112,13 @@ export default function Export() {
                         <p className="text-sm">South: {boundingBox[1]}</p>
                         <p className="text-sm">East: {boundingBox[2]}</p>
                         <p className="text-sm">West: {boundingBox[3]}</p>
+                        <Button
+                            variant="outline"
+                            className="w-full mt-2"
+                            onClick={downloadAOI}
+                        >
+                            Download AOI
+                        </Button>
                     </div>
                 )}
                 <div className='flex justify-between mt-5'>
