@@ -6,10 +6,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Download } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { format, set } from "date-fns";
+import { useNavigate } from "react-router-dom";
+import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import type { TimePickerProps } from "antd";
 import { TimePicker } from "antd";
@@ -95,6 +95,7 @@ function PreviewData() {
   const [processingLevel, setProcessingLevelLayer] = useState<string>();
   const [tiffPreviewUrl, setTiffPreviewUrl] = useState<string>("");
   const [selectedBandUrl, setSelectedBandUrl] = useState<string>("");
+  const [showDownloadPopup, setShowDownloadPopup] = useState(false);
 
   // Function to find the first URL
   const initializeTiffPreviewUrl = () => {
@@ -112,14 +113,13 @@ function PreviewData() {
     return ""; // Fallback if no URL is found
   };
 
-
-    // Initialize state on component mount
-    useEffect(() => {
-      const defaultUrl = initializeTiffPreviewUrl();
-      setTiffPreviewUrl(defaultUrl);
-      setSelectedBandUrl(defaultUrl); 
-      console.log("Default TIFF URL:", defaultUrl); // Log the default URL
-    }, [items]);
+  // Initialize state on component mount
+  useEffect(() => {
+    const defaultUrl = initializeTiffPreviewUrl();
+    setTiffPreviewUrl(defaultUrl);
+    setSelectedBandUrl(defaultUrl);
+    console.log("Default TIFF URL:", defaultUrl); // Log the default URL
+  }, [items]);
 
   const handleDetailedPreview = (
     processingLevel: string,
@@ -190,9 +190,38 @@ function PreviewData() {
   const handleBandClick = (url: string) => {
     console.log("Band URL:", url);
     setTiffPreviewUrl(url);
-    setSelectedBandUrl(url); 
+    setSelectedBandUrl(url);
+  };
+  const handleDownloadRawButtonClick = () => {
+    setShowDownloadPopup(true);
   };
 
+  {
+    /* Add this state to manage selected bands */
+  }
+  const [selectedBands, setSelectedBands] = useState<{
+    [date: string]: { [time: string]: { [bandName: string]: string } };
+  }>({});
+
+
+  const handleBandSelectorClick = (
+    url: string,
+    date: string,
+    time: string,
+    bandName: string
+  ) => {
+    console.log("Band URL:", url);
+    setSelectedBands((prevSelectedBands) => ({
+      ...prevSelectedBands,
+      [date]: {
+        ...prevSelectedBands[date],
+        [time]: {
+          ...(prevSelectedBands[date]?.[time] ?? {}),
+          [bandName]: url,
+        },
+      },
+    }));
+  };
   return (
     <div className="p-3">
       <h1 className="text-3xl font-bold">Order Data</h1>
@@ -288,7 +317,7 @@ function PreviewData() {
       {isDataAvailable && (
         <div className="grid grid-cols-2 gap-4">
           <p className="text-4xl font-bold col-span-2">Quick Preview</p>
-          <MiniMap geotiffUrl={tiffPreviewUrl} zoomedToTheBounding/>
+          <MiniMap geotiffUrl={tiffPreviewUrl} zoomedToTheBounding />
           <div>
             <div className="rounded-lg border w-fit p-2 h-96 overflow-y-scroll  no-visible-scrollbar">
               {Object.keys(items)
@@ -305,8 +334,9 @@ function PreviewData() {
                             {time.slice(2, 4)} :
                           </h3>
                           <div className="grid grid-cols-6 w-full gap-2">
-                            {Object.keys(items[date][time].bands).sort().map(
-                              (bandName) => {
+                            {Object.keys(items[date][time].bands)
+                              .sort()
+                              .map((bandName) => {
                                 const bandUrl =
                                   items[date][time].bands[bandName].url || "";
                                 return (
@@ -314,22 +344,23 @@ function PreviewData() {
                                     key={bandName}
                                     onClick={() => handleBandClick(bandUrl)}
                                     variant={
-                                      selectedBandUrl === bandUrl ? "secondary" : "outline"
+                                      selectedBandUrl === bandUrl
+                                        ? "secondary"
+                                        : "outline"
                                     }
                                     className="w-full"
                                   >
                                     {bandName}
                                   </Button>
                                 );
-                              }
-                            )}
+                              })}
                           </div>
                         </div>
                       ))}
                   </div>
                 ))}
             </div>
-            <div className="mt-4">
+            <div className="mt-4 flex gap-2">
               <Button
                 onClick={() =>
                   handleDetailedPreview(
@@ -341,7 +372,81 @@ function PreviewData() {
               >
                 Open in Editor <OpenInNewWindowIcon />
               </Button>
+              <Button
+                variant={"outline"}
+                onClick={handleDownloadRawButtonClick}
+              >
+                Download Raw <Download />
+              </Button>
             </div>
+          </div>
+        </div>
+      )}
+      {showDownloadPopup && (
+        <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-4 rounded-lg">
+            <h2 className="text-2xl font-bold">Download Raw Data</h2>
+            <div>
+              <div className="rounded-lg border w-fit p-2 h-96 overflow-y-scroll no-visible-scrollbar">
+                {/* Update the band button onClick to pass date, time, and bandName */}
+                {Object.keys(items)
+                  .sort()
+                  .map((date) => (
+                    <div key={date}>
+                      <h2 className="text font-bold">{date}</h2>
+                      {Object.keys(items[date])
+                        .sort()
+                        .map((time) => (
+                          <div key={time} className="mb-2">
+                            <h3 className="text-sm">
+                              Available Bands at {time.slice(0, 2)}:
+                              {time.slice(2, 4)} :
+                            </h3>
+                            <div className="grid grid-cols-6 w-full gap-2">
+                              {Object.keys(items[date][time].bands)
+                                .sort()
+                                .map((bandName) => {
+                                  const bandUrl =
+                                    items[date][time].bands[bandName].url || "";
+                                  return (
+                                    <Button
+                                      key={bandName}
+                                      onClick={() =>
+                                        handleBandSelectorClick(
+                                          bandUrl,
+                                          date,
+                                          time,
+                                          bandName
+                                        )
+                                      }
+                                      variant={
+                                        selectedBandUrl === bandUrl
+                                          ? "secondary"
+                                          : "outline"
+                                      }
+                                      className="w-full"
+                                    >
+                                      {bandName}
+                                    </Button>
+                                  );
+                                })}
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  ))}
+              </div>
+            </div>
+
+          <div className="flex justify-end w-full gap-2 mt-4">
+            <Button
+              onClick={() => setShowDownloadPopup(false)}
+              variant={"outline"}
+            >
+              Close
+            </Button>
+            <Button onClick={() => console.log(selectedBands)}>Download</Button>
+          </div>
           </div>
         </div>
       )}
