@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Button } from '../ui/button';
 import { useGeoData } from '../../../contexts/GeoDataProvider';
 import { Switch } from "../ui/switch";
+import { getArea } from 'ol/sphere';
+import GeoJSON from 'ol/format/GeoJSON';
 
 export default function Export() {
     const { boundingBox, setSelectedAOI, selectedAOI, selectedPolygon, setSelectedPolygon, isPolygonSelectionEnabled, setIsPolygonSelectionEnabled } = useGeoData();
@@ -32,13 +34,34 @@ export default function Export() {
             return;
         }
 
-        const blob = new Blob([JSON.stringify(selectedPolygon)], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "polygon.geojson";
-        a.click();
-        URL.revokeObjectURL(url);
+        try {
+            const geometry = new GeoJSON().readGeometry(selectedPolygon);
+            
+            // Create GeoJSON with metadata
+            const fullGeoJSON = {
+                type: "Feature",
+                geometry: selectedPolygon,
+                properties: {
+                    created: new Date().toISOString(),
+                    area: getArea(geometry), // Area in square meters
+                    coordinateSystem: "EPSG:4326",
+                    units: "degrees"
+                }
+            };
+
+            const blob = new Blob([JSON.stringify(fullGeoJSON, null, 2)], {
+                type: "application/json",
+            });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `polygon-${new Date().toISOString()}.geojson`;
+            a.click();
+            URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Error downloading polygon:", error);
+            alert("Error downloading polygon");
+        }
     };
 
     return (
@@ -83,14 +106,14 @@ export default function Export() {
                 </div>
                 {selectedPolygon && selected.polygon && (
                     <div className="mt-4 rounded flex flex-col">
-                        Polygon is selected
+                        <p className="text-sm mb-2">Polygon is selected</p>
                         <Button
-                            className="px-4 py-2 mt-2"
+                            variant="outline"
+                            className="w-full"
                             onClick={downloadPolygon}
                         >
                             Download Polygon
                         </Button>
-
                     </div>
                 )}
                 <Button
