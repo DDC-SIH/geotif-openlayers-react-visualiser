@@ -1,4 +1,4 @@
-import { searchFilesWithTime } from "@/api-client";
+import { addDownload, searchFilesWithTime } from "@/api-client";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -25,6 +25,7 @@ import {
 import { useGeoData } from "../../contexts/GeoDataProvider";
 import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
 import MiniMap from "@/components/MiniMap";
+import { useAppContext } from "../../contexts/AppContext";
 
 dayjs.extend(customParseFormat);
 
@@ -71,6 +72,8 @@ interface DateData {
 }
 
 function PreviewData() {
+  const { showToast } = useAppContext();
+
   const { setStartDateTime, setEndDateTime, setProcessingLevel } = useGeoData();
   const navigate = useNavigate();
   const [items, setItems] = useState<{
@@ -195,10 +198,23 @@ function PreviewData() {
   const handleDownloadRawButtonClick = () => {
     setShowDownloadPopup(true);
   };
+  const handleDownloadSelectedBands = async () => {
+    try {
+      console.log(selectedBands);
+      await addDownload({
+        startDate: startDate?.toISOString(),
+        endDate: endDate?.toISOString(),
+        processingLevel,
+        selectedBands
+      });
+      showToast({ message: "Ordered Successfully", type: "SUCCESS" });
+      setShowDownloadPopup(false);
+    } catch (error) {
+      console.error("Failed to add download:", error);
+      showToast({ message: "Failed to add order", type: "ERROR" });
+    }
+  };
 
-  {
-    /* Add this state to manage selected bands */
-  }
   const [selectedBands, setSelectedBands] = useState<{
     [date: string]: { [time: string]: { [bandName: string]: string } };
   }>({});
@@ -211,16 +227,37 @@ function PreviewData() {
     bandName: string
   ) => {
     console.log("Band URL:", url);
-    setSelectedBands((prevSelectedBands) => ({
-      ...prevSelectedBands,
-      [date]: {
-        ...prevSelectedBands[date],
-        [time]: {
-          ...(prevSelectedBands[date]?.[time] ?? {}),
-          [bandName]: url,
-        },
-      },
-    }));
+    setSelectedBands((prevSelectedBands) => {
+      const isCurrentlySelected = prevSelectedBands[date]?.[time]?.[bandName] === url;
+      
+      if (isCurrentlySelected) {
+        // Remove the band
+        const newSelectedBands = { ...prevSelectedBands };
+        delete newSelectedBands[date][time][bandName];
+        
+        // Clean up empty objects
+        if (Object.keys(newSelectedBands[date][time]).length === 0) {
+          delete newSelectedBands[date][time];
+        }
+        if (Object.keys(newSelectedBands[date]).length === 0) {
+          delete newSelectedBands[date];
+        }
+        
+        return newSelectedBands;
+      } else {
+        // Add the band
+        return {
+          ...prevSelectedBands,
+          [date]: {
+            ...prevSelectedBands[date],
+            [time]: {
+              ...(prevSelectedBands[date]?.[time] ?? {}),
+              [bandName]: url,
+            },
+          },
+        };
+      }
+    });
   };
   return (
     <div className="p-3">
@@ -442,7 +479,7 @@ function PreviewData() {
             >
               Close
             </Button>
-            <Button onClick={() => console.log(selectedBands)}>Download</Button>
+            <Button onClick={handleDownloadSelectedBands}>Download</Button>
           </div>
           </div>
         </div>

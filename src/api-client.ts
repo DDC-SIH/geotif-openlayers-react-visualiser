@@ -3,6 +3,8 @@ import { SignInFormData } from "./pages/SignIn";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+// FUNCTIONS REGARDING THE USER
+
 export const register = async (formData: RegisterFormData) => {
     const response = await fetch(`${API_BASE_URL}/api/users/register`, {
       method: "POST",
@@ -64,7 +66,6 @@ export const register = async (formData: RegisterFormData) => {
     return body;
   };
 
-
   export const signOut = async () => {
     // remove token from local storage
     localStorage.removeItem("token");
@@ -79,8 +80,28 @@ export const register = async (formData: RegisterFormData) => {
     }
   };
 
+  export const addDownload = async (downloadObject: any) => {
+    const response = await fetch(`${API_BASE_URL}/api/users/addDownload`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ downloadObject }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to add download");
+    }
+
+    return response.json();
+  };
 
 
+
+
+// for getting files from L1B,L1C,L2B,L2C
 
   export const fetchAllFiles = async () => {
     const response = await fetch(`${API_BASE_URL}/api/get-files/all`, {
@@ -155,7 +176,6 @@ export const register = async (formData: RegisterFormData) => {
     return response.json();
   };
 
-
   export const getItem = async (processingLevel: string, dateTime: string) => {
     const response = await fetch(`${API_BASE_URL}/api/get-files/getItem`, {
       method: "POST",
@@ -175,3 +195,6 @@ export const register = async (formData: RegisterFormData) => {
 
     return response.json();
   };
+
+
+
