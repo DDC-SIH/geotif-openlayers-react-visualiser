@@ -1,16 +1,15 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { FaUserCircle } from "react-icons/fa";
 import SignOutButton from "./SignOutButton";
 import { User } from "lucide-react";
+import { useAppContext } from "../../contexts/AppContext";
 
 interface Props {
   isLoggedIn: boolean;
 }
 
 const PopupMenu = ({ isLoggedIn }: Props) => {
-
-
+  const { isAdmin } = useAppContext();
   const [isOpen, setIsOpen] = useState(false);
   useEffect(() => {
     document.addEventListener("click", handleDocumentClick); // Add event listener on mount
@@ -35,13 +34,12 @@ const PopupMenu = ({ isLoggedIn }: Props) => {
         className="flex gap-2 items-center  text-3xl  px-2 lg:py-2 text-white rounded-full hover:text-orange-700"
       >
         <User />
-
       </button>
       {isOpen && (
         <div className="absolute right-0 z-[999] mt-2 bg-white border border-gray-300 rounded-lg shadow-lg min-w-max">
-          {isLoggedIn?(
+          {isLoggedIn ? (
             <ul className="divide-y divide-gray-200">
-            {/* <li
+              {/* <li
               onClick={() => {
                 setIsOpen(false);
               }}
@@ -53,41 +51,51 @@ const PopupMenu = ({ isLoggedIn }: Props) => {
                 Profile
               </Link>
             </li> */}
-            
-            <li
-              onClick={() => {
-                setIsOpen(false);
-              }}
-            >
-              <SignOutButton />
-            </li>
-          </ul>):(
+
+            {isAdmin && <Link
+                  to="/admin"
+                  className="block py-2 px-4  hover:bg-gray-100"
+                >
+                  Admin
+                </Link>
+                
+                }
+
+              <li
+                onClick={() => {
+                  setIsOpen(false);
+                }}
+              >
+                <SignOutButton />
+              </li>
+            </ul>
+          ) : (
             <ul className="divide-y divide-gray-200">
-            <li
-              onClick={() => {
-                setIsOpen(false);
-              }}
-            >
-              <Link
-                to="/sign-in"
-                className="block py-2 px-4 hover:bg-gray-100"
+              <li
+                onClick={() => {
+                  setIsOpen(false);
+                }}
               >
-                Sign in
-              </Link>
-            </li>
-            <li
-              onClick={() => {
-                setIsOpen(false);
-              }}
-            >
-              <Link
-                to="/register"
-                className="block py-2 px-4 hover:bg-gray-100"
+                <Link
+                  to="/sign-in"
+                  className="block py-2 px-4 hover:bg-gray-100"
+                >
+                  Sign in
+                </Link>
+              </li>
+              <li
+                onClick={() => {
+                  setIsOpen(false);
+                }}
               >
-                Register
-              </Link>
-            </li>
-          </ul>
+                <Link
+                  to="/register"
+                  className="block py-2 px-4 hover:bg-gray-100"
+                >
+                  Register
+                </Link>
+              </li>
+            </ul>
           )}
         </div>
       )}

@@ -4,7 +4,6 @@ import MapView from './pages/MapView';
 import SignIn from "./pages/SignIn";
 import Register from "./pages/Register";
 import Layout from './layouts/Layout';
-import OrderData from './pages/OrderData';
 import PreviewData from './pages/PreviewData';
 import Home from './pages/Home';
 import About from './pages/About';
@@ -12,6 +11,7 @@ import ProfileOrders from './pages/ProfileOrders';
 import { useAppContext } from '../contexts/AppContext';
 import AuthorizeYourself from './pages/AuthorizeYourself';
 import ViewAuthRequests from './pages/ViewAuthRequests';
+import AdminDashboard from './pages/AdminDashboard';
 
 
 
@@ -29,9 +29,6 @@ function App() {
       </>
       }
 
-      {isLoggedIn && !isAuthorized && <>
-      <Route path="/authorize-yourself" element={<Layout>< AuthorizeYourself/></Layout>} />
-      </>}
 
         <Route path="/home" element={<Layout><Home /></Layout>} />
 
@@ -41,7 +38,14 @@ function App() {
         <Route path="/orders" element={<Layout><ProfileOrders /></Layout>} />
         </>}
         
+      {isLoggedIn && !isAuthorized && <>
+      <Route path="/authorize-yourself" element={<Layout>< AuthorizeYourself/></Layout>} />
+      </>}
+
+
         {isAdmin && <> 
+
+        <Route path="/admin" element={<Layout><AdminDashboard /></Layout>} />
         <Route path="/admin/authorization-requests" element={<Layout><ViewAuthRequests /></Layout>} />
         </>}
 

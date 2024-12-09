@@ -212,6 +212,10 @@ export const submitRequest = async (formData:any, file:any) => {
     const response = await fetch(`${API_BASE_URL}/api/authorize/submit-request`, {
       method: 'POST',
       body: form,
+      credentials: "include",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
     });
 
     if (!response.ok) {
@@ -224,4 +228,49 @@ export const submitRequest = async (formData:any, file:any) => {
     console.error('Error submitting request:', error);
     throw error;
   }
+};
+
+
+// API function to fetch all requests
+export const fetchAllRequests = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/authorize/all`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      credentials: 'include',  
+    });
+
+    if (!response.ok) {
+      throw new Error('Error fetching all requests');
+    }
+
+    const data = await response.json();  
+    return data.items;  
+  } catch (error) {
+    console.error('Error fetching all requests:', error);
+    throw new Error('Error fetching all requests');
+  }
+};
+
+
+
+export const updateStatus = async (uniqueId: string, status: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/authorize/update-status/${uniqueId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    credentials: 'include',  // Ensure credentials are sent with the request
+    body: JSON.stringify({ status }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to update status');
+  }
+
+  return response.json();  // Returning the updated item data
 };
