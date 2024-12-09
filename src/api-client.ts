@@ -198,3 +198,30 @@ export const register = async (formData: RegisterFormData) => {
 
 
 
+// -------------authorization
+
+export const submitRequest = async (formData:any, file:any) => {
+  const form = new FormData();
+  form.append('file', file);
+  form.append('dataSource', formData.dataSource);
+  form.append('category', formData.category);
+  form.append('profileCategory', formData.profileCategory);
+  form.append('message', formData.message);
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/authorize/submit-request`, {
+      method: 'POST',
+      body: form,
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to submit request');
+    }
+
+    const data = await response.json();
+    return data;  // Contains fileUrl and success message
+  } catch (error) {
+    console.error('Error submitting request:', error);
+    throw error;
+  }
+};

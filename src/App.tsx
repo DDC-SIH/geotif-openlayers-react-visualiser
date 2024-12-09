@@ -9,26 +9,42 @@ import PreviewData from './pages/PreviewData';
 import Home from './pages/Home';
 import About from './pages/About';
 import ProfileOrders from './pages/ProfileOrders';
+import { useAppContext } from '../contexts/AppContext';
+import AuthorizeYourself from './pages/AuthorizeYourself';
+import ViewAuthRequests from './pages/ViewAuthRequests';
 
 
 
 function App() {
+  const {isAdmin, isAuthorized, isLoggedIn} = useAppContext();
+
   return (
     <Router>
       <Routes>
         <Route path="/" element={<MapView />} />
 
+      {!isLoggedIn && <>
         <Route path="/sign-in" element={<Layout><SignIn /></Layout>} />
         <Route path="/register" element={<Layout><Register /></Layout>} />
+      </>
+      }
+
+      {isLoggedIn && !isAuthorized && <>
+      <Route path="/authorize-yourself" element={<Layout>< AuthorizeYourself/></Layout>} />
+      </>}
 
         <Route path="/home" element={<Layout><Home /></Layout>} />
-        <Route path="/order" element={<Layout><OrderData /></Layout>} />
+
+        {isLoggedIn && isAuthorized && <>
         <Route path="/preview" element={<Layout><PreviewData /></Layout>} />
         <Route path="/map" element={<MapView />} />
-        <Route path="/orders" element={<Layout>
-          <ProfileOrders />
-        </Layout>
-        } />
+        <Route path="/orders" element={<Layout><ProfileOrders /></Layout>} />
+        </>}
+        
+        {isAdmin && <> 
+        <Route path="/admin/authorization-requests" element={<Layout><ViewAuthRequests /></Layout>} />
+        </>}
+
 
         <Route path="/about" element={<About />} />
 
