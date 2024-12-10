@@ -55,6 +55,8 @@ interface GeoDataContextType {
   setEndDateTime: React.Dispatch<React.SetStateAction<string>>;
   searchResponseData: any;
   setSearchResponseData: React.Dispatch<React.SetStateAction<any>>;
+  selectedIndex: string;
+  setSelectedIndex: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const GeoDataContext = createContext<GeoDataContextType | undefined>(undefined);
@@ -79,6 +81,8 @@ export const GeoDataProvider: React.FC<GeoDataProviderProps> = ({
   const [url, setUrl] = useState<string>(
     "https://final-cog.s3.ap-south-1.amazonaws.com/test_cog.tif"
   );
+  const [selectedIndex, setSelectedIndex] = useState("ndvi");
+
   const [geoData, setGeoData] = useState<GeoJSON | null>(null);
   const [reqInfo, setReqInfo] = useState<RequestInfo>({
     format: "png",
@@ -137,6 +141,53 @@ export const GeoDataProvider: React.FC<GeoDataProviderProps> = ({
   const [endDateTime, setEndDateTime] = useState<string>("");
   const [searchResponseData, setSearchResponseData] = useState<any>(null);
 
+  useEffect(() => {
+    const updateRenderArray = () => {
+      switch (selectedIndex) {
+        case "ndvi":
+        case "evi":
+        case "savi":
+        case "msavi":
+        case "ndsi":
+          setRenderArray([
+            { id: generateUniqueId(), key: "VIS" },
+            { id: generateUniqueId(), key: "SWIR" },
+          ]);
+          break;
+        case "ndwi":
+          setRenderArray([
+            { id: generateUniqueId(), key: "SWIR" },
+            { id: generateUniqueId(), key: "MIR" },
+          ]);
+          break;
+        case "btt":
+        case "olr":
+        case "cloudmask":
+          setRenderArray([
+            { id: generateUniqueId(), key: "TIR1" },
+            { id: generateUniqueId(), key: "TIR2" },
+          ]);
+          break;
+        case "uth":
+        case "amv":
+        case "wvc":
+          setRenderArray([
+            { id: generateUniqueId(), key: "WV" },
+            { id: generateUniqueId(), key: "TIR1" },
+          ]);
+          break;
+        default:
+          setRenderArray([
+            { id: generateUniqueId(), key: "VIS" },
+            { id: generateUniqueId(), key: "TIR1" },
+          ]);
+          break;
+      }
+    };
+
+    updateRenderArray();
+  }, [selectedIndex]);
+
   // Fetch the GeoJSON data when the URL changes
   useEffect(() => {
     const fetchGeoData = async () => {
@@ -185,7 +236,9 @@ export const GeoDataProvider: React.FC<GeoDataProviderProps> = ({
         endDateTime,
         setEndDateTime,
         searchResponseData,
-        setSearchResponseData
+        setSearchResponseData,
+        selectedIndex,
+        setSelectedIndex
       }}
     >
       {children}

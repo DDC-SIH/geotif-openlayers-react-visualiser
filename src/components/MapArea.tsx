@@ -43,6 +43,9 @@ const GeoTIFFMap = () => {
     setSelectedPolygon,
     isPolygonSelectionEnabled,
     setIsPolygonSelectionEnabled,
+    selectedIndex,
+    setSelectedIndex,
+    setRenderArray
   } = useGeoData();
   const { isLoggedIn } = useAppContext();
 
@@ -68,7 +71,6 @@ const GeoTIFFMap = () => {
   });
   const [tiffLayer, setTiffLayer] = useState<TileLayer | null>(null);
   const [basemapLayer, setBasemapLayer] = useState<any>(mapSources[1].layer);
-  const [selectedIndex, setSelectedIndex] = useState("ndvi");
   const [selectedColormap, setSelectedColormap] = useState("viridis");
   const [isModifierKeyPressed, setIsModifierKeyPressed] = useState(false);
   const [draw, setDraw] = useState<Draw | null>(null);
@@ -365,7 +367,7 @@ const GeoTIFFMap = () => {
   });
 
   const updateColormap = () => {
-    if (tiffLayer && renderArray.length >= 3) {
+    if (tiffLayer) {
       const { min, max } = getIndexMinMax(selectedIndex);
       if (selectedIndex !== "none") {
         tiffLayer.setStyle({
@@ -576,7 +578,7 @@ const GeoTIFFMap = () => {
       // Transform the polygon to EPSG:4326 (longitude/latitude)
       const polygonClone = polygon.clone();
       polygonClone.transform(map.getView().getProjection(), 'EPSG:4326');
-      
+
       // Create GeoJSON with transformed coordinates
       const geojson = new GeoJSON().writeGeometryObject(polygonClone);
       setSelectedPolygon(geojson);
@@ -614,8 +616,8 @@ const GeoTIFFMap = () => {
       case "ndvi":
         return [
           "/",
-          ["-", ["band", 3], ["band", 2]],
-          ["+", ["band", 3], ["band", 2]],
+          ["-", ["band", 2], ["band", 1]],
+          ["+", ["band", 2], ["band", 1]],
         ];
       case "evi":
         return [
@@ -639,15 +641,15 @@ const GeoTIFFMap = () => {
           1.5,
           [
             "/",
-            ["-", ["band", 3], ["band", 2]],
-            ["+", ["band", 3], ["band", 2], 0.5],
+            ["-", ["band", 2], ["band", 1]],
+            ["+", ["band", 2], ["band", 1], 0.5],
           ],
         ];
       case "nbr":
         return [
           "/",
-          ["-", ["band", 3], ["band", 1]],
-          ["+", ["band", 3], ["band", 1]],
+          ["-", ["band", 2], ["band", 1]],
+          ["+", ["band", 2], ["band", 1]],
         ];
       case "msavi":
         return [
@@ -819,6 +821,8 @@ const GeoTIFFMap = () => {
       }
     };
   }, [renderArray]);
+
+
 
   const downloadPolygon = () => {
     if (!selectedPolygon) {
