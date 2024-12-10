@@ -75,6 +75,8 @@ interface GeoDataContextType {
   setSelectedIndex: React.Dispatch<React.SetStateAction<string>>;
   colormapSettings: colormapSettings;
   setColormapSettings: React.Dispatch<React.SetStateAction<colormapSettings>>;
+  reqInfo:any;
+  setReqInfo:any;
 }
 
 const GeoDataContext = createContext<GeoDataContextType | undefined>(undefined);

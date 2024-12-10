@@ -14,7 +14,7 @@ export function SelectScrollableColorMap() {
     return (
         <Select onValueChange={(value) => {
             console.log(value)
-            setReqInfo((prev) => ({ ...prev, colormap_name: value as ColorMap | undefined }))
+            setReqInfo((prev:any) => ({ ...prev, colormap_name: value as ColorMap | undefined }))
         }}>
             <SelectTrigger className="min-w-full">
                 <SelectValue placeholder="Select a color map" />

@@ -5,8 +5,8 @@ import {
   MapIcon,
   DownloadCloud,
   Layers,
-  LayoutTemplateIcon,
   LayoutTemplate,
+  Settings2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -21,6 +21,7 @@ import LayersSection from "./Layers";
 import MapUserPopup from "../MapUserPropup";
 import { useAppContext } from "../../../contexts/AppContext";
 import ProcessingTemplates from "./processingTemplates";
+import MapTools from "./MapTools";
 
 interface ColormapSettings {
   type: string;
@@ -42,12 +43,20 @@ function MapSideBar({
   setBasemapLayer,
   selectedIndex,
   setSelectedIndex,
+  showCoordinates,
+  setShowCoordinates,
+  basemapCoordinates,
+  setBasemapCoordinates,
 }: {
   colormapSettings: ColormapSettings;
   setColormapSettings: any;
   setBasemapLayer: (layer: TileLayer) => void;
   selectedIndex: string;
   setSelectedIndex: (value: string) => void;
+  showCoordinates: boolean;
+  setShowCoordinates: (value: boolean) => void;
+  basemapCoordinates: boolean;
+  setBasemapCoordinates: (value: boolean) => void;
 }) {
   const { isLoggedIn } = useAppContext();
   const [activeSidebar, setActiveSidebar] = useState<string | null>(null);
@@ -174,6 +183,24 @@ function MapSideBar({
               }`}
             />
           </Button>
+          <Button
+            size="icon"
+            variant={activeSidebar === "maptools" ? "secondary" : "ghost"}
+            className={`rounded-none p-8 ${
+              activeSidebar === "maptools"
+                ? "hover:bg-neutral-300"
+                : "hover:bg-neutral-800"
+            }`}
+            onClick={() =>
+              setActiveSidebar(activeSidebar === "maptools" ? null : "maptools")
+            }
+          >
+            <Settings2
+              className={`h-8 w-8 ${
+                activeSidebar === "maptools" ? "text-black" : "text-white"
+              }`}
+            />
+          </Button>
 
           <Button
             size="icon"
@@ -254,6 +281,14 @@ function MapSideBar({
             />
           )}
           {activeSidebar === "layers" && <LayersSection />}
+          {activeSidebar === "maptools" && (
+            <MapTools
+              showCoordinates={showCoordinates}
+              setShowCoordinates={setShowCoordinates}
+              basemapCoordinates={basemapCoordinates}
+              setBasemapCoordinates={setBasemapCoordinates}
+            />
+          )}
           {activeSidebar === "info" && <Information />}
           {activeSidebar === "effects" && (
             <Effects
