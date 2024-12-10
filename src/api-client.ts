@@ -214,3 +214,135 @@ export const getDownloads = async () => {
 
 
 
+// -------------authorization
+
+export const submitRequest = async (formData:any, file:any) => {
+  const form = new FormData();
+  form.append('file', file);
+  form.append('dataSource', formData.dataSource);
+  form.append('category', formData.category);
+  form.append('profileCategory', formData.profileCategory);
+  form.append('message', formData.message);
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/authorize/submit-request`, {
+      method: 'POST',
+      body: form,
+      credentials: "include",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to submit request');
+    }
+
+    const data = await response.json();
+    return data;  // Contains fileUrl and success message
+  } catch (error) {
+    console.error('Error submitting request:', error);
+    throw error;
+  }
+};
+
+
+// API function to fetch all requests
+export const fetchAllRequests = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/authorize/all`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      credentials: 'include',  
+    });
+
+    if (!response.ok) {
+      throw new Error('Error fetching all requests');
+    }
+
+    const data = await response.json();  
+    return data.items;  
+  } catch (error) {
+    console.error('Error fetching all requests:', error);
+    throw new Error('Error fetching all requests');
+  }
+};
+
+
+
+export const updateStatus = async (uniqueId: string, status: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/authorize/update-status/${uniqueId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    credentials: 'include',  // Ensure credentials are sent with the request
+    body: JSON.stringify({ status }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to update status');
+  }
+
+  return response.json();  // Returning the updated item data
+};
+
+
+export const generateApiKey = async (apiName: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/keys/generate`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+    credentials: 'include', // Ensures cookies are included
+    body: JSON.stringify({ apiName }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to generate API key');
+  }
+
+  return response.json();
+};
+
+export const toggleApiKeyStatus = async (apiKey: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/keys/toggle`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+    credentials: 'include', // Ensures cookies are included
+    body: JSON.stringify({ apiKey }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to toggle API key status');
+  }
+
+  return response.json();
+};
+
+
+export const getAllApiKeys = async (): Promise<any> => {
+  const response = await fetch(`${API_BASE_URL}/api/keys/all`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch API keys');
+  }
+
+  return response.json();
+};

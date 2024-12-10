@@ -14,6 +14,7 @@ type AppContextType = {
   setLoggedIn: (loggedIn: boolean) => void; // Added setLoggedIn
   userId: string | undefined;
   isAdmin: boolean;
+  isAuthorized: boolean;
 };
 
 const AppContext = React.createContext<AppContextType | undefined>(undefined);
@@ -31,6 +32,7 @@ export const AppContextProvider = ({
 
   const userId = data?.userId;
   const isAdmin = data?.isAdmin;
+  const isAuthorized = data?.isAuthorized;
 
   // Update isLoggedIn based on the query result
   useEffect(() => {
@@ -47,6 +49,7 @@ export const AppContextProvider = ({
         setLoggedIn: setIsLoggedIn, // Provide setLoggedIn to context
         userId: userId,
         isAdmin: isAdmin,
+        isAuthorized:isAuthorized
       }}
     >
       <Toast />
