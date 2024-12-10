@@ -12,6 +12,8 @@ import { useAppContext } from '../contexts/AppContext';
 import AuthorizeYourself from './pages/AuthorizeYourself';
 import ViewAuthRequests from './pages/ViewAuthRequests';
 import AdminDashboard from './pages/AdminDashboard';
+import ApiPlayground from './pages/ApiPlayground';
+import NotFound from './pages/not-found';
 
 
 
@@ -36,6 +38,7 @@ function App() {
         <Route path="/preview" element={<Layout><PreviewData /></Layout>} />
         <Route path="/map" element={<MapView />} />
         <Route path="/orders" element={<Layout><ProfileOrders /></Layout>} />
+        <Route path="/api-playground" element={<Layout><ApiPlayground /></Layout>} />
         </>}
         
       {isLoggedIn && !isAuthorized && <>
@@ -50,9 +53,9 @@ function App() {
         </>}
 
 
-        <Route path="/about" element={<About />} />
+        <Route path="/about" element={<Layout><About /></Layout>} />
 
-        <Route path="*" element={<h1>Not Found</h1>} />
+        <Route path="*" element={<Layout><NotFound/></Layout>} />
       </Routes>
     </Router>
   )

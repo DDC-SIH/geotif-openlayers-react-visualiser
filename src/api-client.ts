@@ -274,3 +274,59 @@ export const updateStatus = async (uniqueId: string, status: string) => {
 
   return response.json();  // Returning the updated item data
 };
+
+
+export const generateApiKey = async (apiName: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/keys/generate`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+    credentials: 'include', // Ensures cookies are included
+    body: JSON.stringify({ apiName }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to generate API key');
+  }
+
+  return response.json();
+};
+
+export const toggleApiKeyStatus = async (apiKey: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/keys/toggle`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+    credentials: 'include', // Ensures cookies are included
+    body: JSON.stringify({ apiKey }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to toggle API key status');
+  }
+
+  return response.json();
+};
+
+
+export const getAllApiKeys = async (): Promise<any> => {
+  const response = await fetch(`${API_BASE_URL}/api/keys/all`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch API keys');
+  }
+
+  return response.json();
+};
