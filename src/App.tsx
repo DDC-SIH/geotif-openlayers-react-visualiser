@@ -14,6 +14,7 @@ import ViewAuthRequests from './pages/ViewAuthRequests';
 import AdminDashboard from './pages/AdminDashboard';
 import ApiPlayground from './pages/ApiPlayground';
 import NotFound from './pages/not-found';
+import HDF5Upload from './pages/hdf5Upload';
 
 
 
@@ -50,7 +51,9 @@ function App() {
 
         <Route path="/admin" element={<Layout><AdminDashboard /></Layout>} />
         <Route path="/admin/authorization-requests" element={<Layout><ViewAuthRequests /></Layout>} />
+        <Route path="/admin/upload-hdf5" element={<Layout><HDF5Upload /></Layout>} />
         </>}
+
 
 
         <Route path="/about" element={<Layout><About /></Layout>} />

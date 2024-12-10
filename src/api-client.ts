@@ -330,3 +330,71 @@ export const getAllApiKeys = async (): Promise<any> => {
 
   return response.json();
 };
+
+
+
+// ----------------------- hdf5 upload
+
+interface PresignedUrlResponse {
+  url: string;
+}
+
+interface UploadResponse {
+  message: string;
+}
+
+export const getPresignedUrl = async (fileName: string): Promise<PresignedUrlResponse> => {
+  const response = await fetch(`${API_BASE_URL}/api/hdf/presigned-url?fileName=${encodeURIComponent(fileName)}`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error fetching presigned URL: ${response.statusText}`);
+  }
+
+  return response.json();
+};
+
+export const uploadFileToS3 = async (url: string, file: File): Promise<void> => {
+  try {
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': file.type, // Ensure Content-Type matches the file type
+      },
+      body: file, // Ensure the file is sent as the body
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('S3 Response Error:', errorText); // Log the detailed error from S3
+      throw new Error(`Error uploading file to S3: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error('Error in uploadFileToS3:', error);
+    throw error;
+  }
+};
+
+
+export const uploadMultipartFile = async (formData: FormData): Promise<UploadResponse> => {
+  console.log('Uploading multipart file:', formData); 
+  const response = await fetch(`${API_BASE_URL}/api/hdf/multipart-upload`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+    credentials: 'include',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error uploading multipart file: ${response.statusText}`);
+  }
+
+  return response.json();
+};
