@@ -971,6 +971,18 @@ useEffect(() => {
         </div>
       </div>
 
+                {(basemapCoordinates || showCoordinates) && (
+                  <div className="fixed top-2 right-2 rounded-lg p-3 z-[1000] bg-white">
+                    {
+                      basemapCoordinates &&
+                      <p><span className="font-bold">Location Coordinates: </span> <span>{`${Coords.x.toFixed(3)}, ${Coords.y.toFixed(3)}`}</span></p>
+                    }
+                    {
+                      showCoordinates &&
+                      <p><span className="font-bold">Basemap Coordinates: </span> <span>{`${BasemapCoords.x.toFixed(3)}, ${BasemapCoords.y.toFixed(3)}`}</span></p>
+                    }
+                  </div>
+                )}
                 
       <div ref={mapRef} className="absolute inset-0 w-full h-full" />
     </div>
