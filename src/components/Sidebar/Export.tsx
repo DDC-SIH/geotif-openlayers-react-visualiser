@@ -46,6 +46,7 @@ export default function Export() {
         }
         selected.aoi && (body['aoi'] = boundingBox)
         selected.effects && (body['effects'] = {
+            arithmatic: selectedIndex,
             colormap: colormapSettings.type,
             min: colormapSettings.min,
             max: colormapSettings.max,
@@ -61,10 +62,10 @@ export default function Export() {
             },
             body: JSON.stringify(body)
         }).then((res) => res.json())
-          .then((data) => {
-              console.log(data);
-              setLink(data.s3_url);
-          })
+            .then((data) => {
+                console.log(data);
+                setLink(data.s3_url);
+            })
     };
 
     const handleSendAOI = () => {
