@@ -13,4 +13,7 @@
     display: none;
   }
   
-  
+  /* Add this to your global CSS */
+.react-beautiful-dnd {
+  user-select: none;
+}

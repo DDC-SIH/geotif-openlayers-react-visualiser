@@ -10,6 +10,7 @@ import {
   get as getProjection,
   getTransform,
   fromLonLat,
+  toLonLat,
   transform,
 } from "ol/proj";
 import { register } from "ol/proj/proj4";
@@ -28,13 +29,16 @@ import { citiesData } from "@/../constants/consts";
 import { mapSources } from "@/utils/mapSourcces";
 import { useGeoData } from "../../contexts/GeoDataProvider";
 import { useAppContext } from "../../contexts/AppContext";
-import MapUserPopup from "./MapUserPropup";
 import { Fill, Stroke, Style, Circle as CircleStyle } from "ol/style";
 import ImageTile from "ol/source/ImageTile.js";
 import { Raster } from 'ol/source.js';
 import { Image as ImageLayer } from 'ol/layer.js';
 
 const GeoTIFFMap = () => {
+  const [showCoordinates, setShowCoordinates] = useState(false);
+  const [basemapCoordinates, setBasemapCoordinates] = useState(false);
+  const [Coords, setCoords] = useState({ x: 0, y: 0 });
+  const [BasemapCoords, setBasemapCoords] = useState({ x: 0, y: 0 });
   const {
     setBoundingBox,
     tiffUrls,
@@ -77,6 +81,7 @@ const GeoTIFFMap = () => {
   const [polygonLayer, setPolygonLayer] = useState<VectorLayer | null>(null);
   const [snapInteraction, setSnapInteraction] = useState<Snap | null>(null);
 
+  
   // Create a dedicated vector layer for drawn features
   function shade(inputs, data) {
     const elevationImage = inputs[0];
@@ -422,6 +427,8 @@ const GeoTIFFMap = () => {
       mapInstanceRef.current.getLayers().setAt(0, basemapLayer);
     }
   }, [basemapLayer]);
+
+  
 
   useEffect(() => {
     if (tiffLayer) {
@@ -841,6 +848,49 @@ const GeoTIFFMap = () => {
     URL.revokeObjectURL(url);
   };
 
+
+  // Update useEffect to attach and detach the pointermove event
+useEffect(() => {
+  if (!mapInstanceRef.current) return;
+
+  const map = mapInstanceRef.current;
+
+  const logCoordinates = (event: any) => {
+    if (!showCoordinates) return;
+    const coordinate = event.coordinate;
+    setBasemapCoords({x:coordinate[0], y:coordinate[1]})
+    console.log("Coordinates:", coordinate);
+  };
+
+  map.on("pointermove", logCoordinates);
+
+  // Cleanup event listener
+  return () => {
+    map.un("pointermove", logCoordinates);
+  };
+}, [showCoordinates]);
+
+useEffect(() => {
+  if (mapInstanceRef.current) {
+    const map = mapInstanceRef.current;
+    const handleMapClick = (event: any) => {
+      if (basemapCoordinates) {
+        const clickedCoords = event.coordinate;
+        const lonLat = toLonLat(clickedCoords);
+        console.log("Basemap Coordinates:", { lon: lonLat[0], lat: lonLat[1] });
+        setCoords({x:lonLat[0], y:lonLat[1]})
+      }
+    };
+
+    map.on("pointermove", handleMapClick);
+
+    return () => {
+      map.un("pointermove", handleMapClick);
+    };
+  }
+}, [basemapCoordinates]);
+
+
   return (
     <div className="w-screen h-screen relative overflow-hidden">
       <style>
@@ -867,6 +917,11 @@ const GeoTIFFMap = () => {
           setBasemapLayer={setBasemapLayer}
           selectedIndex={selectedIndex}
           setSelectedIndex={setSelectedIndex}
+          setShowCoordinates={setShowCoordinates}
+          showCoordinates={showCoordinates}
+          basemapCoordinates = {basemapCoordinates}
+          setBasemapCoordinates= {setBasemapCoordinates}
+
         />
 
         {/* Search Bar and Controls Container */}
@@ -929,6 +984,7 @@ const GeoTIFFMap = () => {
         </div>
       </div>
 
+                
       <div ref={mapRef} className="absolute inset-0 w-full h-full" />
     </div>
   );
