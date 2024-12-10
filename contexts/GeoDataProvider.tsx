@@ -75,7 +75,7 @@ interface GeoDataContextType {
   setSelectedIndex: React.Dispatch<React.SetStateAction<string>>;
   colormapSettings: colormapSettings;
   setColormapSettings: React.Dispatch<React.SetStateAction<colormapSettings>>;
-  }
+}
 
 const GeoDataContext = createContext<GeoDataContextType | undefined>(undefined);
 
@@ -159,6 +159,7 @@ export const GeoDataProvider: React.FC<GeoDataProviderProps> = ({
       max: 998,
     },
   });
+
   const [isPolygonSelectionEnabled, setIsPolygonSelectionEnabled] =
     useState(false);
 
@@ -221,6 +222,11 @@ export const GeoDataProvider: React.FC<GeoDataProviderProps> = ({
     updateRenderArray();
   }, [selectedIndex]);
 
+  useEffect(() => {
+    console.log("searchResponseData", searchResponseData);
+    if (!searchResponseData) return
+    setTiffUrls(searchResponseData)
+  }, [searchResponseData])
   // Fetch the GeoJSON data when the URL changes
   useEffect(() => {
     const fetchGeoData = async () => {
