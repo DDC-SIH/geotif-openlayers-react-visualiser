@@ -7,6 +7,7 @@ import {
   Layers,
   LayoutTemplateIcon,
   LayoutTemplate,
+  Settings2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -195,7 +196,7 @@ function MapSideBar({
               setActiveSidebar(activeSidebar === "maptools" ? null : "maptools")
             }
           >
-            <LayoutTemplate
+            <Settings2
               className={`h-8 w-8 ${
                 activeSidebar === "maptools" ? "text-black" : "text-white"
               }`}
