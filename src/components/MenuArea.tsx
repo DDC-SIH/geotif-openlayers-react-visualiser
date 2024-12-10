@@ -36,7 +36,7 @@ export default function MenuArea() {
             <div className="flex items-center w-full space-x-8 justify-between px-6 ">
                 <Label htmlFor="rescale">Rescale</Label>
                 <Switch id="rescale" checked={reqInfo.rescale} onCheckedChange={() => {
-                    setReqInfo((prev) => ({ ...prev, rescale: !prev.rescale }))
+                    setReqInfo((prev:any) => ({ ...prev, rescale: !prev.rescale }))
                 }} />
             </div>
             <DownloadButton tileUrl={url} fileName={"COG"} />

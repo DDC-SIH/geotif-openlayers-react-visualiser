@@ -14,7 +14,7 @@ export function SelectFileType() {
     return (
         <Select onValueChange={(val) => {
             console.log(val);
-            setReqInfo((prev) => ({ ...prev, format: val as FileFormat }));
+            setReqInfo((prev:any) => ({ ...prev, format: val as FileFormat }));
         }}>
             <SelectTrigger className="min-w-full">
                 <SelectValue placeholder="Select a file type" />

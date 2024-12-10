@@ -5,7 +5,6 @@ import {
   MapIcon,
   DownloadCloud,
   Layers,
-  LayoutTemplateIcon,
   LayoutTemplate,
   Settings2,
 } from "lucide-react";
