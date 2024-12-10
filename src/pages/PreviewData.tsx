@@ -9,7 +9,7 @@ import {
 import { CalendarIcon, Download } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { format } from "date-fns";
+import { format, set } from "date-fns";
 import { cn } from "@/lib/utils";
 import type { TimePickerProps } from "antd";
 import { TimePicker } from "antd";
@@ -74,7 +74,7 @@ interface DateData {
 function PreviewData() {
   const { showToast } = useAppContext();
 
-  const { setStartDateTime, setEndDateTime, setProcessingLevel } = useGeoData();
+  const { setStartDateTime, setEndDateTime, setProcessingLevel, setSearchResponseData } = useGeoData();
   const navigate = useNavigate();
   const [items, setItems] = useState<{
     [date: string]: {
@@ -156,6 +156,57 @@ function PreviewData() {
       console.log(searchParams);
       const data = await searchFilesWithTime(searchParams);
       console.log(data);
+      // setSearchResponseData(Object.keys(data.bands).length > 0 ? data : null);
+      // data[]
+
+      const findDateWithBandUrls = (data) => {
+        for (const date in data) {
+          for (const time in data[date]) {
+            const bands = data[date][time].bands;
+            if (bands && bands.MIR && bands.MIR.url.startsWith("https://")) {
+              const result = {
+                MIR: {
+                  url: bands.MIR.url,
+                  min: bands.MIR.metadata.data_range.min,
+                  max: bands.MIR.metadata.data_range.max,
+                },
+                SWIR: {
+                  url: bands.SWIR.url,
+                  min: bands.SWIR.metadata.data_range.min,
+                  max: bands.SWIR.metadata.data_range.max,
+                },
+                TIR1: {
+                  url: bands.TIR1.url,
+                  min: bands.TIR1.metadata.data_range.min,
+                  max: bands.TIR1.metadata.data_range.max,
+                },
+                TIR2: {
+                  url: bands.TIR2.url,
+                  min: bands.TIR2.metadata.data_range.min,
+                  max: bands.TIR2.metadata.data_range.max,
+                },
+                VIS: {
+                  url: bands.VIS.url,
+                  min: bands.VIS.metadata.data_range.min,
+                  max: bands.VIS.metadata.data_range.max,
+                },
+                WV: {
+                  url: bands.WV.url,
+                  min: bands.WV.metadata.data_range.min,
+                  max: bands.WV.metadata.data_range.max,
+                },
+              };
+              console.log(result);
+              return result;
+            }
+          }
+        }
+      };
+
+      // console.log(findDateWithBandUrls(data));
+      setSearchResponseData(findDateWithBandUrls(data));
+
+      findDateWithBandUrls(data);
       if (data && Object.keys(data).length > 0) {
         setItems(data);
         setIsDataAvailable(true);
@@ -229,12 +280,12 @@ function PreviewData() {
     console.log("Band URL:", url);
     setSelectedBands((prevSelectedBands) => {
       const isCurrentlySelected = prevSelectedBands[date]?.[time]?.[bandName] === url;
-      
+
       if (isCurrentlySelected) {
         // Remove the band
         const newSelectedBands = { ...prevSelectedBands };
         delete newSelectedBands[date][time][bandName];
-        
+
         // Clean up empty objects
         if (Object.keys(newSelectedBands[date][time]).length === 0) {
           delete newSelectedBands[date][time];
@@ -242,7 +293,7 @@ function PreviewData() {
         if (Object.keys(newSelectedBands[date]).length === 0) {
           delete newSelectedBands[date];
         }
-        
+
         return newSelectedBands;
       } else {
         // Add the band
@@ -429,58 +480,58 @@ function PreviewData() {
                 {Object.keys(items)
                   .sort()
                   .map((date) => (
-                  <div key={date}>
-                    <h2 className="text font-bold">{date}</h2>
-                    {Object.keys(items[date])
-                    .sort()
-                    .map((time) => (
-                      <div key={time} className="mb-2">
-                      <h3 className="text-sm">
-                        Available Bands at {time.slice(0, 2)}:
-                        {time.slice(2, 4)} :
-                      </h3>
-                      <div className="grid grid-cols-6 w-full gap-2">
-                        {Object.keys(items[date][time].bands)
+                    <div key={date}>
+                      <h2 className="text font-bold">{date}</h2>
+                      {Object.keys(items[date])
                         .sort()
-                        .map((bandName) => {
-                          const bandUrl =
-                          items[date][time].bands[bandName].url || "";
-                          const isSelected = selectedBands[date]?.[time]?.[bandName] === bandUrl;
-                          return (
-                          <Button
-                            key={bandName}
-                            onClick={() =>
-                            handleBandSelectorClick(
-                              bandUrl,
-                              date,
-                              time,
-                              bandName
-                            )
-                            }
-                            variant={isSelected ? "default" : "outline"}
-                            className="w-full"
-                          >
-                            {bandName}
-                          </Button>
-                          );
-                        })}
-                      </div>
-                      </div>
-                    ))}
-                  </div>
+                        .map((time) => (
+                          <div key={time} className="mb-2">
+                            <h3 className="text-sm">
+                              Available Bands at {time.slice(0, 2)}:
+                              {time.slice(2, 4)} :
+                            </h3>
+                            <div className="grid grid-cols-6 w-full gap-2">
+                              {Object.keys(items[date][time].bands)
+                                .sort()
+                                .map((bandName) => {
+                                  const bandUrl =
+                                    items[date][time].bands[bandName].url || "";
+                                  const isSelected = selectedBands[date]?.[time]?.[bandName] === bandUrl;
+                                  return (
+                                    <Button
+                                      key={bandName}
+                                      onClick={() =>
+                                        handleBandSelectorClick(
+                                          bandUrl,
+                                          date,
+                                          time,
+                                          bandName
+                                        )
+                                      }
+                                      variant={isSelected ? "default" : "outline"}
+                                      className="w-full"
+                                    >
+                                      {bandName}
+                                    </Button>
+                                  );
+                                })}
+                            </div>
+                          </div>
+                        ))}
+                    </div>
                   ))}
               </div>
             </div>
 
-          <div className="flex justify-end w-full gap-2 mt-4">
-            <Button
-              onClick={() => setShowDownloadPopup(false)}
-              variant={"outline"}
-            >
-              Close
-            </Button>
-            <Button onClick={handleDownloadSelectedBands}>Download</Button>
-          </div>
+            <div className="flex justify-end w-full gap-2 mt-4">
+              <Button
+                onClick={() => setShowDownloadPopup(false)}
+                variant={"outline"}
+              >
+                Close
+              </Button>
+              <Button onClick={handleDownloadSelectedBands}>Download</Button>
+            </div>
           </div>
         </div>
       )}
