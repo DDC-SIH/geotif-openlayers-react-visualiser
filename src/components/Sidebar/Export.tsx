@@ -12,7 +12,7 @@ export default function Export() {
         effects: false,
         polygon: false
     });
-
+    const [link, setLink] = useState('')
     const handleClick = (type: 'aoi' | 'effects' | 'polygon') => {
         setSelected(prev => ({
             ...prev,
@@ -56,15 +56,15 @@ export default function Export() {
         // body[]
         fetch("https://6950-2401-4900-7c0c-518f-c886-24a5-a923-2e79.ngrok-free.app/process", {
             method: "POST",
-            // mode: "no-cors",
             headers: {
                 "Content-Type": "application/json",
-                // "Access-Control-Allow-Origin": "*", // Add CORS header
             },
             body: JSON.stringify(body)
-        }).then((res) => {
-            console.log(res)
-        })
+        }).then((res) => res.json())
+          .then((data) => {
+              console.log(data);
+              setLink(data.s3_url);
+          })
     };
 
     const handleSendAOI = () => {
@@ -212,6 +212,9 @@ export default function Export() {
                 >
                     Export
                 </Button>
+                {link !== '' && <Button className="my-2" onClick={() => {
+                    window.open(link)
+                }}>Download</Button>}
             </div>
         </div>
     );
