@@ -213,7 +213,8 @@ export default function Export() {
                     Export
                 </Button>
                 {link !== '' && <Button className="my-2" onClick={() => {
-                    window.open(link)
+                    window.open(link);
+                    setLink('')
                 }}>Download</Button>}
             </div>
         </div>
