@@ -2,43 +2,65 @@ import { fetchAllRequests, updateStatus } from "@/api-client";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-  } from "@/components/ui/select";
-
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { RefreshCw } from "lucide-react";
 
 function ViewAuthRequests() {
-  const [requests, setRequests] = useState<any[]>([]);  // Array to store fetched requests
+  const [requests, setRequests] = useState<any[]>([]);
+  const [filteredRequests, setFilteredRequests] = useState<any[]>([]); // For displaying filtered requests
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedMessage, setSelectedMessage] = useState<string | null>(null);  // To store selected message for the popup
+  const [selectedMessage, setSelectedMessage] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+
+  const fetchRequests = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchAllRequests();
+      const reversedData = data.reverse();
+      setRequests(reversedData);
+      setFilteredRequests(reversedData); // Initialize filtered requests
+    } catch (err) {
+      setError("Error fetching requests");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const getAllRequests = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await fetchAllRequests();
-        setRequests(data.reverse()); 
-      } catch (err) {
-        setError('Error fetching requests');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getAllRequests();
+    fetchRequests();
   }, []);
 
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    const lowerQuery = query.toLowerCase();
+    setFilteredRequests(
+      requests.filter(
+        (request) =>
+          request.firstName.toLowerCase().includes(lowerQuery) ||
+          request.lastName.toLowerCase().includes(lowerQuery) ||
+          request.email.toLowerCase().includes(lowerQuery)
+      )
+    );
+  };
+
+  const handleRefresh = () => {
+    setSearchQuery("");
+    fetchRequests();
+  };
+
   const handleMessageClick = (message: string) => {
-    setSelectedMessage(message);  // Set the message to be shown in the popup
+    setSelectedMessage(message);
   };
 
   const handleClosePopup = () => {
-    setSelectedMessage(null);  // Close the popup by clearing the selected message
+    setSelectedMessage(null);
   };
 
   const handleStatusChange = async (uniqueId: string, status: string) => {
@@ -46,9 +68,12 @@ function ViewAuthRequests() {
       const updatedData = await updateStatus(uniqueId, status);
       setRequests((prevRequests) =>
         prevRequests.map((request) =>
-          request.uniqueId === uniqueId ? { ...request, status: updatedData.updatedItem.status } : request
+          request.uniqueId === uniqueId
+            ? { ...request, status: updatedData.updatedItem.status }
+            : request
         )
       );
+      handleSearch(searchQuery); // Reapply search filter after update
     } catch (err) {
       console.error("Error updating status:", err);
       setError("Error updating status");
@@ -59,12 +84,25 @@ function ViewAuthRequests() {
     <div className="container mx-auto p-4">
       <h2 className="text-3xl font-bold mb-4">Authorization Requests</h2>
 
+      <div className="flex justify-between items-center mb-4">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => handleSearch(e.target.value)}
+          placeholder="Search by name or email..."
+          className="border border-gray-300 flex-1 rounded px-4 py-2 w-full"
+        />
+        <Button onClick={handleRefresh}  className="ml-4">
+          <RefreshCw/>
+        </Button>
+      </div>
+
       {loading && <p className="text-center text-lg">Loading...</p>}
       {error && <p className="text-center text-red-500">{error}</p>}
 
-      {requests.length > 0 ? (
+      {filteredRequests.length > 0 ? (
         <>
-          <p className="mb-4">Total Requests: {requests.length}</p>
+          <p className="mb-4">Total Requests: {filteredRequests.length}</p>
           <table className="min-w-full table-auto border-collapse border border-gray-200">
             <thead>
               <tr>
@@ -78,38 +116,51 @@ function ViewAuthRequests() {
               </tr>
             </thead>
             <tbody>
-              {requests.map((request) => (
+              {filteredRequests.map((request) => (
                 <tr key={request.uniqueId} className="border-b border-gray-300">
                   <td className="p-2 text-xs">{request.uniqueId}</td>
-                  <td className="p-2 text-sm">{request.firstName}{" "}{request.lastName}</td>
+                  <td className="p-2 text-sm">
+                    {request.firstName} {request.lastName}
+                  </td>
                   <td className="p-2 text-sm">{request.email}</td>
                   <td className="p-2 text-sm">{request.dataSource}</td>
                   <td className="p-2 text-sm">{request.category}</td>
                   <td className="p-2 text-sm">{request.profileCategory}</td>
                   <td className="p-2 flex gap-2">
-                    <Button onClick={() => handleMessageClick(request.message)} variant={'default'}>
+                    <Button
+                      onClick={() => handleMessageClick(request.message)}
+                      variant={"default"}
+                    >
                       Show Message
                     </Button>
                     <Button
-                    variant={'outline'}
-                      onClick={() => window.open(request.fileUrl, '_blank', 'noopener,noreferrer')}
+                      variant={"outline"}
+                      onClick={() =>
+                        window.open(request.fileUrl, "_blank", "noopener,noreferrer")
+                      }
                       className="text-blue-500 hover:underline"
                     >
                       View File
                     </Button>
 
-
-                <Select onValueChange={(value) => handleStatusChange(request.uniqueId, value)} value= {request.status}>
-                    <SelectTrigger >
-                        <SelectValue placeholder="Choose Status"  className="flex-1"/>
-                    </SelectTrigger>
-                    <SelectContent>
+                    <Select
+                      onValueChange={(value) =>
+                        handleStatusChange(request.uniqueId, value)
+                      }
+                      value={request.status}
+                    >
+                      <SelectTrigger>
+                        <SelectValue
+                          placeholder="Choose Status"
+                          className="flex-1"
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
                         <SelectItem value="PENDING">Pending</SelectItem>
                         <SelectItem value="DECLINED">Declined</SelectItem>
                         <SelectItem value="ACCEPTED">Accepted</SelectItem>
-                    </SelectContent>
-                </Select>
-                  
+                      </SelectContent>
+                    </Select>
                   </td>
                 </tr>
               ))}
@@ -141,4 +192,3 @@ function ViewAuthRequests() {
 }
 
 export default ViewAuthRequests;
-

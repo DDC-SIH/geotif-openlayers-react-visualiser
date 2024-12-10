@@ -18,14 +18,14 @@ const AdminDashboard = () => {
             <p className="text-gray-600 mb-4">Review and manage all authorization requests submitted by users.</p>
             <Link
               to="/admin/authorization-requests"
-              className="bg-indigo-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-indigo-700 transition-all"
+              className="bg-gray-300 text-gray-800 px-6 py-2 rounded-full font-semibold hover:bg-gray-400 transition-all"
             >
               View Requests
             </Link>
           </div>
 
           
-          {/* <div className="bg-white rounded-lg shadow-lg p-6 transition-transform transform hover:scale-[1.01] hover:shadow-xl">
+          <div className="bg-white rounded-lg shadow-lg p-6 transition-transform transform hover:scale-[1.01] hover:shadow-xl">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Other Admin Tasks</h2>
             <p className="text-gray-600 mb-4">Manage users, settings, and perform other admin tasks.</p>
             <Link
@@ -42,11 +42,11 @@ const AdminDashboard = () => {
             <p className="text-gray-600 mb-4">Generate and view reports for system analysis.</p>
             <Link
               to="/admin/reports"
-              className="bg-green-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-green-700 transition-all"
+              className="bg-gray-300 text-gray-800 px-6 py-2 rounded-full font-semibold hover:bg-gray-400 transition-all"
             >
               View Reports
             </Link>
-          </div> */}
+          </div>
         </div>
       </div>
     </div>
