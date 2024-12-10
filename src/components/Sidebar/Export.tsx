@@ -6,7 +6,7 @@ import { getArea } from 'ol/sphere';
 import GeoJSON from 'ol/format/GeoJSON';
 
 export default function Export() {
-    const { boundingBox, setSelectedAOI, selectedAOI, selectedPolygon, setSelectedPolygon, isPolygonSelectionEnabled, setIsPolygonSelectionEnabled } = useGeoData();
+    const { boundingBox, setSelectedAOI, selectedAOI, selectedPolygon, setSelectedPolygon, isPolygonSelectionEnabled, setIsPolygonSelectionEnabled, selectedIndex, colormapSettings, renderArray, setRenderArray, tiffUrls } = useGeoData();
     const [selected, setSelected] = useState({
         aoi: false,
         effects: false,
@@ -22,6 +22,49 @@ export default function Export() {
 
     const handleExport = () => {
         // Logic to export data
+        console.log("Exporting")
+        const geometry = new GeoJSON().readGeometry(selectedPolygon);
+
+        // Create GeoJSON with metadata
+        const fullGeoJSON = {
+            type: "Feature",
+            geometry: selectedPolygon,
+            properties: {
+                created: new Date().toISOString(),
+                area: getArea(geometry), // Area in square meters
+                coordinateSystem: "EPSG:4326",
+                units: "degrees"
+            }
+        };
+        console.log(renderArray.map((item) => {
+            return tiffUrls[item.key].url
+        }))
+        let body = {
+            urls: renderArray.map((item) => {
+                return tiffUrls[item.key].url
+            })
+        }
+        selected.aoi && (body['aoi'] = boundingBox)
+        selected.effects && (body['effects'] = {
+            colormap: colormapSettings.type,
+            min: colormapSettings.min,
+            max: colormapSettings.max,
+            steps: colormapSettings.steps,
+        })
+
+        selected.polygon && (body['polygon'] = fullGeoJSON)
+        // body[]
+        fetch("https://6950-2401-4900-7c0c-518f-c886-24a5-a923-2e79.ngrok-free.app/process", {
+            method: "POST",
+            // mode: "no-cors",
+            headers: {
+                "Content-Type": "application/json",
+                // "Access-Control-Allow-Origin": "*", // Add CORS header
+            },
+            body: JSON.stringify(body)
+        }).then((res) => {
+            console.log(res)
+        })
     };
 
     const handleSendAOI = () => {
@@ -36,7 +79,7 @@ export default function Export() {
 
         try {
             const geometry = new GeoJSON().readGeometry(selectedPolygon);
-            
+
             // Create GeoJSON with metadata
             const fullGeoJSON = {
                 type: "Feature",
@@ -89,6 +132,19 @@ export default function Export() {
         a.download = `aoi-bbox-${new Date().toISOString()}.json`;
         a.click();
         URL.revokeObjectURL(url);
+    };
+
+    const updateRenderArray = (newItem) => {
+        setRenderArray(prevArray => {
+            const updatedArray = [...prevArray];
+            const index = updatedArray.findIndex(item => item.key === newItem.key);
+            if (index !== -1) {
+                updatedArray[index] = newItem;
+            } else {
+                updatedArray.push(newItem);
+            }
+            return updatedArray;
+        });
     };
 
     return (

@@ -45,7 +45,9 @@ const GeoTIFFMap = () => {
     setIsPolygonSelectionEnabled,
     selectedIndex,
     setSelectedIndex,
-    setRenderArray
+    setRenderArray,
+    colormapSettings,
+    setColormapSettings,
   } = useGeoData();
   const { isLoggedIn } = useAppContext();
 
@@ -53,22 +55,7 @@ const GeoTIFFMap = () => {
   const mapInstanceRef = useRef<Map | null>(null); // New ref for map instance
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [colormapSettings, setColormapSettings] = useState({
-    type: "viridis",
-    min: 0,
-    max: 1,
-    steps: 10,
-    reverse: true,
-    alpha: 0.75,
-    brightness: 0,
-    contrast: 0.5,
-    saturation: 0.5,
-    exposure: 0.5,
-    hueshift: 0,
-    verticalExaggeration: 1.0,
-    sunElevation: 45,
-    sunAzimuth: 315,
-  });
+
   const [tiffLayer, setTiffLayer] = useState<TileLayer | null>(null);
   const [basemapLayer, setBasemapLayer] = useState<any>(mapSources[1].layer);
   const [selectedColormap, setSelectedColormap] = useState("viridis");

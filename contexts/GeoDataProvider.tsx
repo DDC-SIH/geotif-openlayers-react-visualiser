@@ -26,6 +26,22 @@ type LayerInstance = {
   id: string;
   key: keyof tiffUrls;
 };
+type colormapSettings = {
+  type: string,
+  min: number,
+  max: number,
+  steps: number,
+  reverse: boolean,
+  alpha: number,
+  brightness: number,
+  contrast: number,
+  saturation: number,
+  exposure: number,
+  hueshift: number,
+  verticalExaggeration: number,
+  sunElevation: number,
+  sunAzimuth: number,
+}
 
 interface GeoDataContextType {
   geoData: GeoJSON | GeoJSONError | null;
@@ -57,7 +73,9 @@ interface GeoDataContextType {
   setSearchResponseData: React.Dispatch<React.SetStateAction<any>>;
   selectedIndex: string;
   setSelectedIndex: React.Dispatch<React.SetStateAction<string>>;
-}
+  colormapSettings: colormapSettings;
+  setColormapSettings: React.Dispatch<React.SetStateAction<colormapSettings>>;
+  }
 
 const GeoDataContext = createContext<GeoDataContextType | undefined>(undefined);
 
@@ -82,7 +100,22 @@ export const GeoDataProvider: React.FC<GeoDataProviderProps> = ({
     "https://final-cog.s3.ap-south-1.amazonaws.com/test_cog.tif"
   );
   const [selectedIndex, setSelectedIndex] = useState("ndvi");
-
+  const [colormapSettings, setColormapSettings] = useState({
+    type: "viridis",
+    min: 0,
+    max: 1,
+    steps: 10,
+    reverse: true,
+    alpha: 0.75,
+    brightness: 0,
+    contrast: 0.5,
+    saturation: 0.5,
+    exposure: 0.5,
+    hueshift: 0,
+    verticalExaggeration: 1.0,
+    sunElevation: 45,
+    sunAzimuth: 315,
+  });
   const [geoData, setGeoData] = useState<GeoJSON | null>(null);
   const [reqInfo, setReqInfo] = useState<RequestInfo>({
     format: "png",
@@ -238,7 +271,9 @@ export const GeoDataProvider: React.FC<GeoDataProviderProps> = ({
         searchResponseData,
         setSearchResponseData,
         selectedIndex,
-        setSelectedIndex
+        setSelectedIndex,
+        colormapSettings,
+        setColormapSettings,
       }}
     >
       {children}
