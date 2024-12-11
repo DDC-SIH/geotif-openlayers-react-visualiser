@@ -40,7 +40,7 @@ export default function LayersSection() {
             <div>
                 {/* Available Layers List */}
                 <div className="mb-4">
-                    <h4 className="font-medium mb-2">Available Layers</h4>
+                    <h4 className="font-medium mb-2">Available Bands</h4>
                     {availableLayers.map((layerKey) => (
                         <div
                             key={layerKey}
