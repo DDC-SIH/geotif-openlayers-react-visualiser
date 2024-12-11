@@ -62,6 +62,7 @@ export default function LayersSection() {
                             index={index}
                             moveLayer={moveLayer}
                             removeLayer={removeLayer}
+                            
                         />
                     ))}
                 </div>
@@ -125,10 +126,13 @@ function DraggableLayer({
     return (
         <div
             ref={ref}
-            className={`flex items-center justify-between p-2 my-2 bg-gray-100 rounded ${
+            className={`flex items-center justify-between p-2 px-4 my-2 bg-gray-100 rounded relative ${
                 isDragging ? "opacity-50" : "opacity-100"
             }`}
         >
+            {index===0 && <div className="absolute top-0 left-0 w-1 h-full bg-red-500"></div>}
+            {index===1 && <div className="absolute top-0 left-0 w-1 h-full bg-green-500"></div>}
+            {index===2 && <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>}
             <p>{layer.key}</p>
             <button
                 className="px-2 py-1 rounded bg-red-500 text-white"
