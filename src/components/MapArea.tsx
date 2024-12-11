@@ -5,7 +5,6 @@ import { Map, View } from "ol";
 import TileLayer from "ol/layer/WebGLTile";
 import GeoTIFF from "ol/source/GeoTIFF";
 import colormap from "colormap";
-import { applyTransform } from "ol/extent";
 import {
   get as getProjection,
   getTransform,
@@ -25,14 +24,15 @@ import { defaults as defaultInteractions } from "ol/interaction";
 import { DragBox, Draw, Modify, Snap } from "ol/interaction";
 import { platformModifierKeyOnly } from "ol/events/condition";
 import MapSideBar from "./Sidebar/MapSideBar";
-import { citiesData } from "@/../constants/consts";
+import { citiesData, IndiaJSON, level1IndiaJSON } from "@/../constants/consts";
 import { mapSources } from "@/utils/mapSourcces";
 import { useGeoData } from "../../contexts/GeoDataProvider";
 import { useAppContext } from "../../contexts/AppContext";
 import { Fill, Stroke, Style, Circle as CircleStyle } from "ol/style";
 import ImageTile from "ol/source/ImageTile.js";
-import { Raster } from 'ol/source.js';
-import { Image as ImageLayer } from 'ol/layer.js';
+import { Raster } from "ol/source.js";
+import { Image as ImageLayer } from "ol/layer.js";
+import * as shapefile from "shapefile"; // Import the shapefile library
 
 const GeoTIFFMap = () => {
   const [showCoordinates, setShowCoordinates] = useState(false);
@@ -68,7 +68,6 @@ const GeoTIFFMap = () => {
   const [polygonLayer, setPolygonLayer] = useState<VectorLayer | null>(null);
   const [snapInteraction, setSnapInteraction] = useState<Snap | null>(null);
 
-  
   // Create a dedicated vector layer for drawn features
   function shade(inputs, data) {
     const elevationImage = inputs[0];
@@ -315,40 +314,192 @@ const GeoTIFFMap = () => {
     ];
   }
 
-  const cropToExtent = (bbox: number[]) => {
+  // const cropToExtent = (bbox: number[]) => {
+  //   if (!tiffLayer || !mapInstanceRef.current) return;
+
+  //   // Convert bbox coordinates to map projection
+  //   const [minLon, minLat, maxLon, maxLat] = bbox;
+  //   const extent = [
+  //     fromLonLat([minLon, minLat]),
+  //     fromLonLat([maxLon, maxLat]),
+  //   ].flat();
+
+  //   // Set the crop extent on the layer
+  //   tiffLayer.setExtent(extent);
+
+  //   // Animate view to the new extent
+  //   mapInstanceRef.current.getView().fit(extent, {
+  //     duration: 1000,
+  //     padding: [50, 50, 50, 50],
+  //   });
+  // };
+
+  // const cropToStateExtent = (stateName: string) => {
+  //   if (!tiffLayer || !mapInstanceRef.current) return;
+
+  //   // Parse the GeoJSON
+  //   const geojsonFormat = new GeoJSON();
+  //   const features = geojsonFormat.readFeatures(level1IndiaJSON, {
+  //     featureProjection: "EPSG:3857", // Adjust projection to match your map's projection
+  //   });
+
+  //   // Find the state by name
+  //   const feature = features.find(
+  //     (f) =>
+  //       f.get("NAME_1").toLowerCase() === stateName.toLowerCase() ||
+  //       (f.get("VARNAME_1") &&
+  //         f.get("VARNAME_1").toLowerCase().includes(stateName.toLowerCase()))
+  //   );
+
+  //   if (!feature) {
+  //     alert("State not found");
+  //     return;
+  //   }
+
+  //   // Get the geometry of the found feature
+  //   const geometry = feature.getGeometry();
+
+  //   if (!geometry) {
+  //     console.error("No geometry found for the feature");
+  //     return;
+  //   }
+
+  //   // Calculate the extent of the geometry
+  //   const stateExtent = geometry.getExtent();
+
+  //   // Set the crop extent on the layer
+  //   tiffLayer.setExtent(stateExtent);
+
+  //   // Animate view to the new extent
+  //   mapInstanceRef.current.getView().fit(stateExtent, {
+  //     duration: 1000,
+  //     padding: [50, 50, 50, 50],
+  //   });
+  // };
+
+  const cropToGeoJSONExtent = () => {
     if (!tiffLayer || !mapInstanceRef.current) return;
 
-    // Convert bbox coordinates to map projection
-    const [minLon, minLat, maxLon, maxLat] = bbox;
-    const extent = [
-      fromLonLat([minLon, minLat]),
-      fromLonLat([maxLon, maxLat]),
-    ].flat();
+    // Parse the GeoJSON
+    const geojsonFormat = new GeoJSON();
+    const features = geojsonFormat.readFeatures(IndiaJSON, {
+      featureProjection: "EPSG:3857", // Adjust projection to match your map's projection
+    });
+
+    if (features.length === 0) {
+      console.error("No features found in GeoJSON");
+      return;
+    }
+
+    // Get the geometry from the first feature
+    const geometry = features[0].getGeometry();
+
+    if (!geometry) {
+      console.error("No geometry found in the feature");
+      return;
+    }
+
+    // Calculate the extent of the geometry
+    const indiaExtent = geometry.getExtent();
 
     // Set the crop extent on the layer
-    tiffLayer.setExtent(extent);
+    tiffLayer.setExtent(indiaExtent);
 
     // Animate view to the new extent
-    mapInstanceRef.current.getView().fit(extent, {
+    mapInstanceRef.current.getView().fit(indiaExtent, {
       duration: 1000,
       padding: [50, 50, 50, 50],
     });
   };
 
-  const search = (query: string) => {
-    const result = citiesData.find(
-      (item) => item.name.toLowerCase() === query.toLowerCase()
+  let borderMaskLayer: VectorLayer | null = null;
+
+  const cropToStateBorders = (stateName: string) => {
+    if (!mapInstanceRef.current) return;
+
+    // Remove existing mask layer
+    if (borderMaskLayer) {
+      mapInstanceRef.current.removeLayer(borderMaskLayer);
+      borderMaskLayer = null;
+    }
+
+    // Parse the GeoJSON
+    const geojsonFormat = new GeoJSON();
+    const features = geojsonFormat.readFeatures(level1IndiaJSON, {
+      featureProjection: "EPSG:3857", // Adjust to your map projection
+    });
+
+    // Find the feature for the state
+    const feature = features.find(
+      (f) =>
+        f.get("NAME_1").toLowerCase() === stateName.toLowerCase() ||
+        (f.get("VARNAME_1") &&
+          f.get("VARNAME_1").toLowerCase().includes(stateName.toLowerCase()))
     );
 
-    if (result) {
-      const { bbox } = result;
-      if (bbox && bbox.length === 4) {
-        cropToExtent(bbox);
-      }
-    } else {
-      alert("No results found");
+    if (!feature) {
+      alert("State not found");
+      return;
+    }
+
+    // Create a vector source and layer for the mask
+    const vectorSource = new VectorSource({
+      features: [feature],
+    });
+
+    borderMaskLayer = new VectorLayer({
+      source: vectorSource,
+      style: new Style({
+        fill: new Fill({
+          color: "rgba(255, 255, 255, 0.7)", // Semi-transparent fill for outside area
+        }),
+      }),
+    });
+
+    // Add the mask layer to the map
+    mapInstanceRef.current.addLayer(borderMaskLayer);
+
+
+
+    // Fit the map view to the state's geometry
+    const geometry = feature.getGeometry();
+    if (geometry) {
+      mapInstanceRef.current.getView().fit(geometry.getExtent(), {
+        duration: 1000,
+        padding: [50, 50, 50, 50],
+      });
     }
   };
+  const search = (query: string) => {
+    if (query.replace(" ", "").toLowerCase() === "india") {
+      cropToGeoJSONExtent(); // National-level extent (reuse earlier code)
+    } else {
+      cropToStateBorders(query); // State-level extent
+    }
+  };
+
+  const geojsonPath = "INDIAN_BORDER.json";
+
+  // Load GeoJSON and style the boundary
+  const IndiaVectorSource = new VectorSource({
+    url: geojsonPath,
+    format: new GeoJSON(),
+  });
+
+  const vectorLayer = new VectorLayer({
+    source: IndiaVectorSource,
+    style: new Style({
+      stroke: new Stroke({
+        color: "green", // Green outline
+        width: 2, // Outline width
+      }),
+    }),
+  });
+
+
+  
+
+
 
   const clipLayer = new VectorLayer({
     style: null,
@@ -414,8 +565,6 @@ const GeoTIFFMap = () => {
       mapInstanceRef.current.getLayers().setAt(0, basemapLayer);
     }
   }, [basemapLayer]);
-
-  
 
   useEffect(() => {
     if (tiffLayer) {
@@ -571,7 +720,7 @@ const GeoTIFFMap = () => {
 
       // Transform the polygon to EPSG:4326 (longitude/latitude)
       const polygonClone = polygon.clone();
-      polygonClone.transform(map.getView().getProjection(), 'EPSG:4326');
+      polygonClone.transform(map.getView().getProjection(), "EPSG:4326");
 
       // Create GeoJSON with transformed coordinates
       const geojson = new GeoJSON().writeGeometryObject(polygonClone);
@@ -704,18 +853,18 @@ const GeoTIFFMap = () => {
 
   const setupHillshade = (map: Map) => {
     const elevation = new ImageTile({
-      url: 'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png',
-      crossOrigin: 'anonymous',
+      url: "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png",
+      crossOrigin: "anonymous",
       maxZoom: 15,
     });
 
     const raster = new Raster({
       sources: [elevation],
-      operationType: 'image',
+      operationType: "image",
       operation: shade,
     });
 
-    raster.on('beforeoperations', (event: any) => {
+    raster.on("beforeoperations", (event: any) => {
       event.data.resolution = event.resolution;
       event.data.vert = colormapSettings.verticalExaggeration;
       event.data.sunEl = colormapSettings.sunElevation;
@@ -758,7 +907,7 @@ const GeoTIFFMap = () => {
 
     const openLayersMap = new Map({
       target: mapRef.current as HTMLElement,
-      layers: [basemapLayer, layer], // Use the selected basemap layer
+      layers: [basemapLayer, layer,vectorLayer], // Use the selected basemap layer
       controls: defaultControls({
         zoom: false, // Disable default zoom controls
       }).extend([
@@ -795,7 +944,7 @@ const GeoTIFFMap = () => {
     // Apply initial colormap
     updateColormap();
 
-    if (selectedIndex === 'hillshade') {
+    if (selectedIndex === "hillshade") {
       const hillshadeLayer = setupHillshade(openLayersMap);
       setTiffLayer(hillshadeLayer as any);
     } else {
@@ -816,8 +965,6 @@ const GeoTIFFMap = () => {
     };
   }, [renderArray]);
 
-
-
   const downloadPolygon = () => {
     if (!selectedPolygon) {
       alert("No polygon selected");
@@ -835,50 +982,49 @@ const GeoTIFFMap = () => {
     URL.revokeObjectURL(url);
   };
 
-
   // Update useEffect to attach and detach the pointermove event
-useEffect(() => {
-  if (!mapInstanceRef.current) return;
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
 
-  const map = mapInstanceRef.current;
-
-  const logCoordinates = (event: any) => {
-    if (!showCoordinates) return;
-    const coordinate = event.coordinate;
-    setBasemapCoords({x:coordinate[0], y:coordinate[1]})
-    console.log("Coordinates:", coordinate);
-  };
-
-  map.on("pointermove", logCoordinates);
-
-  // Cleanup event listener
-  return () => {
-    map.un("pointermove", logCoordinates);
-  };
-}, [showCoordinates]);
-
-useEffect(() => {
-  if (mapInstanceRef.current) {
     const map = mapInstanceRef.current;
-    const handleMapClick = (event: any) => {
-      if (basemapCoordinates) {
-        const clickedCoords = event.coordinate;
-        const lonLat = toLonLat(clickedCoords);
-        console.log("Basemap Coordinates:", { lon: lonLat[0], lat: lonLat[1] });
-        setCoords({x:lonLat[0], y:lonLat[1]})
-      }
+
+    const logCoordinates = (event: any) => {
+      if (!showCoordinates) return;
+      const coordinate = event.coordinate;
+      setBasemapCoords({ x: coordinate[0], y: coordinate[1] });
+      console.log("Coordinates:", coordinate);
     };
 
-    map.on("pointermove", handleMapClick);
+    map.on("pointermove", logCoordinates);
 
+    // Cleanup event listener
     return () => {
-      map.un("pointermove", handleMapClick);
+      map.un("pointermove", logCoordinates);
     };
-  }
-}, [basemapCoordinates]);
+  }, [showCoordinates]);
 
+  useEffect(() => {
+    if (mapInstanceRef.current) {
+      const map = mapInstanceRef.current;
+      const handleMapClick = (event: any) => {
+        if (basemapCoordinates) {
+          const clickedCoords = event.coordinate;
+          const lonLat = toLonLat(clickedCoords);
+          console.log("Basemap Coordinates:", {
+            lon: lonLat[0],
+            lat: lonLat[1],
+          });
+          setCoords({ x: lonLat[0], y: lonLat[1] });
+        }
+      };
 
+      map.on("pointermove", handleMapClick);
 
+      return () => {
+        map.un("pointermove", handleMapClick);
+      };
+    }
+  }, [basemapCoordinates]);
 
 
   return (
@@ -909,9 +1055,8 @@ useEffect(() => {
           setSelectedIndex={setSelectedIndex}
           setShowCoordinates={setShowCoordinates}
           showCoordinates={showCoordinates}
-          basemapCoordinates = {basemapCoordinates}
-          setBasemapCoordinates= {setBasemapCoordinates}
-
+          basemapCoordinates={basemapCoordinates}
+          setBasemapCoordinates={setBasemapCoordinates}
         />
 
         {/* Search Bar and Controls Container */}
@@ -974,19 +1119,25 @@ useEffect(() => {
         </div>
       </div>
 
-                {(basemapCoordinates || showCoordinates) && (
-                  <div className="fixed top-2 right-2 rounded-lg p-3 z-[1000] bg-white">
-                    {
-                      basemapCoordinates &&
-                      <p><span className="font-bold">Location Coordinates: </span> <span>{`${Coords.x.toFixed(3)}, ${Coords.y.toFixed(3)}`}</span></p>
-                    }
-                    {
-                      showCoordinates &&
-                      <p><span className="font-bold">Basemap Coordinates: </span> <span>{`${BasemapCoords.x.toFixed(3)}, ${BasemapCoords.y.toFixed(3)}`}</span></p>
-                    }
-                  </div>
-                )}
-                
+      {(basemapCoordinates || showCoordinates) && (
+        <div className="fixed top-2 right-2 rounded-lg p-3 z-[1000] bg-white">
+          {basemapCoordinates && (
+            <p>
+              <span className="font-bold">Location Coordinates: </span>{" "}
+              <span>{`${Coords.x.toFixed(3)}, ${Coords.y.toFixed(3)}`}</span>
+            </p>
+          )}
+          {showCoordinates && (
+            <p>
+              <span className="font-bold">Basemap Coordinates: </span>{" "}
+              <span>{`${BasemapCoords.x.toFixed(3)}, ${BasemapCoords.y.toFixed(
+                3
+              )}`}</span>
+            </p>
+          )}
+        </div>
+      )}
+
       <div ref={mapRef} className="absolute inset-0 w-full h-full" />
     </div>
   );
