@@ -14,9 +14,10 @@ interface MiniMapProps {
     mapHeight?: string;
     zoomOut?: boolean; // New prop to enable the most zoomed-out view
     zoomedToTheBounding?: boolean; // New prop to enable zooming to layer's bounding box
+    altText?: string;
 }
 
-export default function MiniMap({ geotiffUrl, minValue = 35, maxValue = 493, zoomOut = false, zoomedToTheBounding = false, mapHeight='438px' }: MiniMapProps) {
+export default function MiniMap({ geotiffUrl, minValue = 35, maxValue = 493, zoomOut = false, zoomedToTheBounding = false, mapHeight='438px',altText }: MiniMapProps) {
     const mapRef = useRef<HTMLDivElement>(null);
     const mapInstanceRef = useRef<Map | null>(null);
 
@@ -103,6 +104,7 @@ export default function MiniMap({ geotiffUrl, minValue = 35, maxValue = 493, zoo
                     overflow: 'hidden',
                 }} 
             />
+            {altText && <span className="absolute z-[9999] left-0 bottom-0 px-2 py-0.5 text-xs bg-neutral-200 text-black rounded-lg m-1">{altText}</span>}
         </div>
     );
 }

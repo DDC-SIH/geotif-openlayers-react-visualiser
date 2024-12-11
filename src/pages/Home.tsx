@@ -46,7 +46,7 @@ function Home() {
               </Button>
             </div>
           </div>
-        <MiniMap geotiffUrl="https://somehowgetsplotted.s3.ap-south-1.amazonaws.com/somehowgetsplotted/IMG_VIS_optimized.tif" zoomOut zoomedToTheBounding mapHeight="400px" />
+        <MiniMap altText="BES,SAC/ISRO,Ahmedabad,INDIA. 04-SEP-2024 10:42:29" geotiffUrl="https://somehowgetsplotted.s3.ap-south-1.amazonaws.com/somehowgetsplotted/IMG_VIS_optimized.tif" zoomOut zoomedToTheBounding mapHeight="400px" />
       </div>
 
 
