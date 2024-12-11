@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import GeoJSON from "ol/format/GeoJSON.js";
 import "ol/ol.css"; // OpenLayers CSS
-import { Map, View } from "ol";
+import { Feature, Map, View } from "ol";
 import TileLayer from "ol/layer/WebGLTile";
 import GeoTIFF from "ol/source/GeoTIFF";
 import colormap from "colormap";
@@ -33,6 +33,7 @@ import ImageTile from "ol/source/ImageTile.js";
 import { Raster } from "ol/source.js";
 import { Image as ImageLayer } from "ol/layer.js";
 import * as shapefile from "shapefile"; // Import the shapefile library
+import { MultiPolygon } from "ol/geom";
 
 const GeoTIFFMap = () => {
   const [showCoordinates, setShowCoordinates] = useState(false);
@@ -459,8 +460,6 @@ const GeoTIFFMap = () => {
     // Add the mask layer to the map
     mapInstanceRef.current.addLayer(borderMaskLayer);
 
-
-
     // Fit the map view to the state's geometry
     const geometry = feature.getGeometry();
     if (geometry) {
@@ -495,11 +494,6 @@ const GeoTIFFMap = () => {
       }),
     }),
   });
-
-
-  
-
-
 
   const clipLayer = new VectorLayer({
     style: null,
@@ -907,7 +901,7 @@ const GeoTIFFMap = () => {
 
     const openLayersMap = new Map({
       target: mapRef.current as HTMLElement,
-      layers: [basemapLayer, layer,vectorLayer], // Use the selected basemap layer
+      layers: [basemapLayer, layer, vectorLayer], // Use the selected basemap layer
       controls: defaultControls({
         zoom: false, // Disable default zoom controls
       }).extend([
@@ -1025,7 +1019,6 @@ const GeoTIFFMap = () => {
       };
     }
   }, [basemapCoordinates]);
-
 
   return (
     <div className="w-screen h-screen relative overflow-hidden">
