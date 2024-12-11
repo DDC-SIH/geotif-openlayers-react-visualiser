@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { submitRequest } from "@/api-client";
+import { useAppContext } from "../../contexts/AppContext";
+import { useNavigate } from "react-router-dom";
 
 function AuthorizeYourself() {
   const [dataSource, setDataSource] = useState<string>();
@@ -21,7 +23,8 @@ function AuthorizeYourself() {
   const [file, setFile] = useState<File>();
   const [fileUrl, setFileUrl] = useState<string>("");
   const [error, setError] = useState<string>('');
-
+  const navigate = useNavigate();
+    const {showToast} = useAppContext();
   const handleSubmit = async () => {
     if (!dataSource || !category || !profileCategory || !message || !file) {
       setError("Please fill out all fields and upload a file.");
@@ -39,7 +42,8 @@ function AuthorizeYourself() {
       const response = await submitRequest(formData, file);
       setFileUrl(response.fileUrl);  // Set the uploaded file URL
       setError('');  // Clear any existing errors
-      alert('Request submitted successfully!');
+      showToast({message:'Request submitted successfully! Wait for our Admin to review your request', type:'SUCCESS'});
+      navigate('/');
     } catch (error) {
       setError('Error submitting request. Please try again.');
     }

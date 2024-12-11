@@ -126,6 +126,8 @@ function PreviewData() {
   const [endDate, setEndDate] = useState<Date>();
   const [processingLevel, setProcessingLevelLayer] = useState<string>();
   const [tiffPreviewUrl, setTiffPreviewUrl] = useState<string>("");
+  const [tiffPreviewMin, setTiffPreviewMin] = useState<number>(35);
+  const [tiffPreviewMax, setTiffPreviewMax] = useState<number>(492);
   const [selectedBandUrl, setSelectedBandUrl] = useState<string>("");
   const [showDownloadPopup, setShowDownloadPopup] = useState(false);
 
@@ -138,7 +140,10 @@ function PreviewData() {
         const bands = Object.keys(items[date][time].bands).sort();
         if (bands.length > 0) {
           const firstBand = bands[0];
-          return items[date][time].bands[firstBand].url; // Return the first URL
+          return {url:items[date][time].bands[firstBand].url,
+          min:items[date][time].bands[firstBand].metadata.data_range.min,
+          max:items[date][time].bands[firstBand].metadata.data_range.max
+          }; // Return the first URL
         }
       }
     }
@@ -148,8 +153,13 @@ function PreviewData() {
   // Initialize state on component mount
   useEffect(() => {
     const defaultUrl = initializeTiffPreviewUrl();
-    setTiffPreviewUrl(defaultUrl);
-    setSelectedBandUrl(defaultUrl);
+    console.log("Default TIFF URL:", defaultUrl); // Log the default URL
+    if (defaultUrl && typeof defaultUrl === 'object') {
+      setTiffPreviewUrl(defaultUrl.url);
+      setSelectedBandUrl(defaultUrl.url);
+      setTiffPreviewMin(defaultUrl.min);
+      setTiffPreviewMax(defaultUrl.max);
+    }
     console.log("Default TIFF URL:", defaultUrl); // Log the default URL
   }, [items]);
 
@@ -270,9 +280,11 @@ function PreviewData() {
     }
   };
 
-  const handleBandClick = (url: string) => {
-    console.log("Band URL:", url);
+  const handleBandClick = (url: string, bandMin:number, bandMax:number) => {
+    console.log("Band URL:", url, bandMax, bandMin);
     setTiffPreviewUrl(url);
+    setTiffPreviewMin(bandMin);
+    setTiffPreviewMax(bandMax);
     setDefaultLayer(extractBandFromUrl(url))
 
     setSelectedBandUrl(url);
@@ -436,7 +448,7 @@ function PreviewData() {
       {isDataAvailable && (
         <div className="grid grid-cols-2 gap-4">
           <p className="text-4xl font-bold col-span-2">Quick Preview</p>
-          <MiniMap geotiffUrl={tiffPreviewUrl} zoomedToTheBounding />
+          <MiniMap geotiffUrl={tiffPreviewUrl} zoomedToTheBounding minValue={tiffPreviewMin}  maxValue={tiffPreviewMax} />
           <div>
             <div className="rounded-lg border w-fit p-2 h-96 overflow-y-scroll  no-visible-scrollbar">
               {Object.keys(items)
@@ -458,10 +470,14 @@ function PreviewData() {
                               .map((bandName) => {
                                 const bandUrl =
                                   items[date][time].bands[bandName].url || "";
+                                const bandMin =
+                                  items[date][time].bands[bandName].metadata.data_range.min || 35;
+                                const bandMax =
+                                  items[date][time].bands[bandName].metadata.data_range.max || 492;
                                 return (
                                   <Button
                                     key={bandName}
-                                    onClick={() => handleBandClick(bandUrl)}
+                                    onClick={() => handleBandClick(bandUrl, bandMin, bandMax)}
                                     variant={
                                       selectedBandUrl === bandUrl
                                         ? "secondary"
