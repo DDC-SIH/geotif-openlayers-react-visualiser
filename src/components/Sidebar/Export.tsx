@@ -47,6 +47,7 @@ export default function Export() {
         reader.onload = (e) => {
           try {
             const content = JSON.parse(e.target?.result as string);
+            console.log(content)
             setGeoJSONContent(content);
             setIsPolygonSelectionEnabled(true);
             setError("");
@@ -59,7 +60,6 @@ export default function Export() {
       } else {
         setError("Please upload a .geojson file");
         setFileName("");
-        setGeoJSONContent(null);
       }
     }
   };
@@ -68,9 +68,12 @@ export default function Export() {
     // Logic to export data
     console.log("Exporting");
     const geometry = new GeoJSON().readGeometry(selectedPolygon);
-
+    let fullGeoJSON;
     // Create GeoJSON with metadata
-    const fullGeoJSON = {
+    if (geoJSONContent) {
+      fullGeoJSON = geoJSONContent;
+    } else {
+    fullGeoJSON = {
       type: "Feature",
       geometry: selectedPolygon,
       properties: {
@@ -79,6 +82,7 @@ export default function Export() {
         coordinateSystem: "EPSG:4326",
         units: "degrees",
       },
+    };
     };
     console.log(
       renderArray.map((item) => {
