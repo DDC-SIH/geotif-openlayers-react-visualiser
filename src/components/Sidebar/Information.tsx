@@ -95,7 +95,7 @@ const Collapsible = ({
         className="flex justify-between items-center cursor-pointer hover:text-blue-500"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span className="font-semibold capitalize">{title}</span>
+        <span className="font-semibold capitalize">{title.replace("_", " ")}</span>
         <button className="text-sm">
           {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
         </button>
