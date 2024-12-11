@@ -362,7 +362,6 @@ const GeoTIFFMap = () => {
     if (tiffLayer) {
       const { min, max } = getIndexMinMax(selectedIndex);
       if (selectedIndex !== "none") {
-        console.log(selectedIndex,getBandArithmeticExpression(selectedIndex))
         tiffLayer.setStyle({
           color: [
             "case",

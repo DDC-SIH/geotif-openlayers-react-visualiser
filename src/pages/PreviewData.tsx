@@ -103,7 +103,7 @@ interface DateData {
 function PreviewData() {
   const { showToast } = useAppContext();
 
-  const { setStartDateTime, setEndDateTime, setProcessingLevel, setSearchResponseData, setDefaultLayer } = useGeoData();
+  const { setStartDateTime, setEndDateTime, setProcessingLevel, setSearchResponseData, setDefaultLayer,setMetadata } = useGeoData();
   const navigate = useNavigate();
   const [items, setItems] = useState<{
     [date: string]: {
@@ -142,7 +142,8 @@ function PreviewData() {
           const firstBand = bands[0];
           return {url:items[date][time].bands[firstBand].url,
           min:items[date][time].bands[firstBand].metadata.data_range.min,
-          max:items[date][time].bands[firstBand].metadata.data_range.max
+          max:items[date][time].bands[firstBand].metadata.data_range.max,
+          metadata:items[date][time]
           }; // Return the first URL
         }
       }
@@ -159,6 +160,7 @@ function PreviewData() {
       setSelectedBandUrl(defaultUrl.url);
       setTiffPreviewMin(defaultUrl.min);
       setTiffPreviewMax(defaultUrl.max);
+      setMetadata(defaultUrl.metadata)
     }
     console.log("Default TIFF URL:", defaultUrl); // Log the default URL
   }, [items]);
@@ -280,12 +282,13 @@ function PreviewData() {
     }
   };
 
-  const handleBandClick = (url: string, bandMin:number, bandMax:number) => {
-    console.log("Band URL:", url, bandMax, bandMin);
+  const handleBandClick = (url: string, bandMin:number, bandMax:number, metadata:any) => {
+    console.log("Band URL:", url, bandMax, bandMin,metadata);
     setTiffPreviewUrl(url);
     setTiffPreviewMin(bandMin);
     setTiffPreviewMax(bandMax);
     setDefaultLayer(extractBandFromUrl(url))
+    setMetadata(metadata)
 
     setSelectedBandUrl(url);
   };
@@ -318,8 +321,11 @@ function PreviewData() {
     url: string,
     date: string,
     time: string,
-    bandName: string
+    bandName: string,
+    metadata: any
   ) => {
+    console.log(metadata)
+    setMetadata(metadata)
     console.log("Band URL:", url);
     setSelectedBands((prevSelectedBands) => {
       const isCurrentlySelected = prevSelectedBands[date]?.[time]?.[bandName] === url;
@@ -428,7 +434,7 @@ function PreviewData() {
           </PopoverContent>
         </Popover>
 
-        <Select onValueChange={setProcessingLevelLayer}>
+        <Select onValueChange={setProcessingLevelLayer} defaultValue="L1C">
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder="Choose Processing Level" />
           </SelectTrigger>
@@ -478,7 +484,7 @@ function PreviewData() {
                                 return (
                                   <Button
                                     key={bandName}
-                                    onClick={() => handleBandClick(bandUrl, bandMin, bandMax)}
+                                    onClick={() => handleBandClick(bandUrl, bandMin, bandMax,items[date][time])}
                                     variant={
                                       selectedBandUrl === bandUrl
                                         ? "secondary"
@@ -553,7 +559,8 @@ function PreviewData() {
                                           bandUrl,
                                           date,
                                           time,
-                                          bandName
+                                          bandName,
+                                          items[date][time]
                                         )
                                       }
                                       variant={isSelected ? "default" : "outline"}

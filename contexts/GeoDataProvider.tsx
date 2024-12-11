@@ -79,6 +79,8 @@ interface GeoDataContextType {
   setDefaultLayer: React.Dispatch<React.SetStateAction<string>>;
   reqInfo:any;
   setReqInfo:any;
+  metadata:any,
+  setMetadata:React.Dispatch<React.SetStateAction<any>>;
 }
 
 const GeoDataContext = createContext<GeoDataContextType | undefined>(undefined);
@@ -179,6 +181,7 @@ export const GeoDataProvider: React.FC<GeoDataProviderProps> = ({
   const [startDateTime, setStartDateTime] = useState<string>("");
   const [endDateTime, setEndDateTime] = useState<string>("");
   const [searchResponseData, setSearchResponseData] = useState<any>(null);
+  const [metadata, setMetadata] = useState<any>(null);
 
   useEffect(() => {
     const updateRenderArray = () => {
@@ -294,6 +297,8 @@ export const GeoDataProvider: React.FC<GeoDataProviderProps> = ({
         setColormapSettings,
         reqInfo,
         setReqInfo,
+        metadata,
+        setMetadata
       }}
     >
       {children}
