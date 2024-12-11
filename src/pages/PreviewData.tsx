@@ -71,10 +71,39 @@ interface DateData {
   };
 }
 
+  function extractBandFromUrl(url: string): string {
+    const bandNamePattern = /IMG_(VIS|MIR|SWIR|WV|TIR1|TIR2)_cog\.tif/;
+    const match = url.match(bandNamePattern);
+    
+    if (match) {
+        const bandName = match[1];
+        console.log("Band Name:", bandName);
+        // Use switch to handle each case
+        switch (bandName) {
+            case 'VIS':
+                return 'VIS';
+            case 'MIR':
+                return 'MIR';
+            case 'SWIR':
+                return 'SWIR';
+            case 'WV':
+                return 'WV';
+            case 'TIR1':
+                return 'TIR1';
+            case 'TIR2':
+                return 'TIR2';
+            default:
+                return 'VIS';
+        }
+    } else {
+        return 'Invalid URL or band name not found';
+    }
+}
+
 function PreviewData() {
   const { showToast } = useAppContext();
 
-  const { setStartDateTime, setEndDateTime, setProcessingLevel, setSearchResponseData } = useGeoData();
+  const { setStartDateTime, setEndDateTime, setProcessingLevel, setSearchResponseData, setDefaultLayer } = useGeoData();
   const navigate = useNavigate();
   const [items, setItems] = useState<{
     [date: string]: {
@@ -159,7 +188,7 @@ function PreviewData() {
       // setSearchResponseData(Object.keys(data.bands).length > 0 ? data : null);
       // data[]
 
-      const findDateWithBandUrls = (data) => {
+      const findDateWithBandUrls = (data:any) => {
         for (const date in data) {
           for (const time in data[date]) {
             const bands = data[date][time].bands;
@@ -205,7 +234,7 @@ function PreviewData() {
 
       // console.log(findDateWithBandUrls(data));
       setSearchResponseData(findDateWithBandUrls(data));
-
+      setDefaultLayer(extractBandFromUrl(tiffPreviewUrl))
       findDateWithBandUrls(data);
       if (data && Object.keys(data).length > 0) {
         setItems(data);
@@ -244,6 +273,8 @@ function PreviewData() {
   const handleBandClick = (url: string) => {
     console.log("Band URL:", url);
     setTiffPreviewUrl(url);
+    setDefaultLayer(extractBandFromUrl(url))
+
     setSelectedBandUrl(url);
   };
   const handleDownloadRawButtonClick = () => {

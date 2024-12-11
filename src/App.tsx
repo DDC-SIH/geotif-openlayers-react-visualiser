@@ -48,7 +48,6 @@ function App() {
 
 
         {isAdmin && <> 
-
         <Route path="/admin" element={<Layout><AdminDashboard /></Layout>} />
         <Route path="/admin/authorization-requests" element={<Layout><ViewAuthRequests /></Layout>} />
         <Route path="/admin/upload-hdf5" element={<Layout><HDF5Upload /></Layout>} />

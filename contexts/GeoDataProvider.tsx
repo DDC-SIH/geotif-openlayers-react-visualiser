@@ -75,6 +75,8 @@ interface GeoDataContextType {
   setSelectedIndex: React.Dispatch<React.SetStateAction<string>>;
   colormapSettings: colormapSettings;
   setColormapSettings: React.Dispatch<React.SetStateAction<colormapSettings>>;
+  defaultLayer: string;
+  setDefaultLayer: React.Dispatch<React.SetStateAction<string>>;
   reqInfo:any;
   setReqInfo:any;
 }
@@ -101,7 +103,7 @@ export const GeoDataProvider: React.FC<GeoDataProviderProps> = ({
   const [url, setUrl] = useState<string>(
     "https://final-cog.s3.ap-south-1.amazonaws.com/test_cog.tif"
   );
-  const [selectedIndex, setSelectedIndex] = useState("ndvi");
+  const [selectedIndex, setSelectedIndex] = useState("none");
   const [colormapSettings, setColormapSettings] = useState({
     type: "viridis",
     min: 0,
@@ -165,6 +167,7 @@ export const GeoDataProvider: React.FC<GeoDataProviderProps> = ({
   const [isPolygonSelectionEnabled, setIsPolygonSelectionEnabled] =
     useState(false);
 
+  const [defaultLayer, setDefaultLayer] = useState<any>("VIS");
   const [renderArray, setRenderArray] = useState<LayerInstance[]>([
     { id: generateUniqueId(), key: "VIS" },
     { id: generateUniqueId(), key: "VIS" },
@@ -180,6 +183,11 @@ export const GeoDataProvider: React.FC<GeoDataProviderProps> = ({
   useEffect(() => {
     const updateRenderArray = () => {
       switch (selectedIndex) {
+        case "none":
+          setRenderArray([
+            { id: generateUniqueId(), key: defaultLayer },
+          ]);
+          break;
         case "ndvi":
         case "evi":
         case "savi":
@@ -212,17 +220,17 @@ export const GeoDataProvider: React.FC<GeoDataProviderProps> = ({
             { id: generateUniqueId(), key: "TIR1" },
           ]);
           break;
-        default:
-          setRenderArray([
-            { id: generateUniqueId(), key: "VIS" },
-            { id: generateUniqueId(), key: "TIR1" },
-          ]);
-          break;
+          default:
+            setRenderArray([
+              { id: generateUniqueId(), key: "VIS" },
+              { id: generateUniqueId(), key: "TIR1" },
+            ]);
+            break;
       }
     };
 
     updateRenderArray();
-  }, [selectedIndex]);
+  }, [selectedIndex, defaultLayer]);
 
   useEffect(() => {
     console.log("searchResponseData", searchResponseData);
@@ -281,7 +289,11 @@ export const GeoDataProvider: React.FC<GeoDataProviderProps> = ({
         selectedIndex,
         setSelectedIndex,
         colormapSettings,
+        defaultLayer,
+        setDefaultLayer,
         setColormapSettings,
+        reqInfo,
+        setReqInfo,
       }}
     >
       {children}
