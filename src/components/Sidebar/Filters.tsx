@@ -8,6 +8,96 @@ import {
 } from "../ui/select";
 import { Button } from "../ui/button";
 
+const getBandArithmeticExpressionAsString = (type: string): string => {
+  const expressionToString = (expression: any): string => {
+    if (typeof expression === "number" || typeof expression === "string") {
+      return expression.toString();
+    }
+
+    if (Array.isArray(expression)) {
+      const [operator, ...operands] = expression;
+
+      switch (operator) {
+        case "+":
+          return operands.map(expressionToString).join(" + ");
+        case "-":
+          return operands.map(expressionToString).join(" - ");
+        case "*":
+          return operands.map(expressionToString).join(" * ");
+        case "/":
+          return operands.map(expressionToString).join(" / ");
+        case "sqrt":
+          return `sqrt(${operands.map(expressionToString).join(", ")})`;
+        case "band":
+          return `B${operands[0]}`;
+        case "var":
+          return operands[0];
+        default:
+          return "";
+      }
+    }
+
+    return "";
+  };
+
+  const expressions: Record<string, any> = {
+    none: ["band", 1],
+    ndvi: ["/", ["-", ["band", 2], ["band", 1]], ["+", ["band", 2], ["band", 1]]],
+    evi: [
+      "*",
+      2.5,
+      [
+        "/",
+        ["-", ["band", 3], ["band", 2]],
+        [
+          "+",
+          ["band", 3],
+          ["*", 6, ["band", 2]],
+          ["*", 7.5, ["band", 1]],
+          1,
+        ],
+      ],
+    ],
+    savi: [
+      "*",
+      1.5,
+      [
+        "/",
+        ["-", ["band", 2], ["band", 1]],
+        ["+", ["band", 2], ["band", 1], 0.5],
+      ],
+    ],
+    nbr: ["/", ["-", ["band", 2], ["band", 1]], ["+", ["band", 2], ["band", 1]]],
+    msavi: [
+      "*",
+      0.5,
+      [
+        "+",
+        2,
+        ["*", ["band", 3], 1],
+        [
+          "-",
+          [
+            "sqrt",
+            [
+              "-",
+              ["*", ["*", 2, ["band", 3]], 1],
+              ["*", 8, ["-", ["band", 3], ["band", 2]]],
+            ],
+          ],
+          1,
+        ],
+      ],
+    ],
+    ndwi: ["/", ["-", ["band", 2], ["band", 3]], ["+", ["band", 2], ["band", 3]]],
+    hillshade: ["*", 255, ["var", "hillshade"]],
+  };
+
+  const selectedExpression = expressions[type] || ["band", 1];
+  return expressionToString(selectedExpression);
+};
+
+
 
 
 interface ColormapSettings {
@@ -46,17 +136,17 @@ function Filters({
               <SelectValue placeholder="Select Index" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="none">None - Raw Data</SelectItem>
-              <SelectItem value="ndvi">NDVI - Vegetation Index</SelectItem>
-              <SelectItem value="evi">EVI - Enhanced Vegetation</SelectItem>
-              <SelectItem value="savi">SAVI - Soil Adjusted VI</SelectItem>
-              <SelectItem value="nbr">NBR - Burn Ratio</SelectItem>
-              <SelectItem value="msavi">MSAVI - Modified Soil VI</SelectItem>
-              <SelectItem value="ndwi">NDWI - Water Index</SelectItem>
+              <SelectItem value="none">None - {getBandArithmeticExpressionAsString('none')} </SelectItem>
+              <SelectItem value="ndvi">NDVI - {getBandArithmeticExpressionAsString('ndvi')}</SelectItem>
+              <SelectItem value="evi">EVI - {getBandArithmeticExpressionAsString('evi')}</SelectItem>
+              <SelectItem value="savi">SAVI - {getBandArithmeticExpressionAsString('savi')}</SelectItem>
+              <SelectItem value="nbr">NBR - {getBandArithmeticExpressionAsString('nbr')}</SelectItem>
+              <SelectItem value="msavi">MSAVI - {getBandArithmeticExpressionAsString('msavi')}</SelectItem>
+              <SelectItem value="ndwi">NDWI - {getBandArithmeticExpressionAsString('ndwi')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
-
+        
         <div className="space-y-2">
           <label className="text-sm font-medium">Colormap Type</label>
           <Select

@@ -122,9 +122,9 @@ function PreviewData() {
   const [isLoading, setIsLoading] = useState(false);
   const [isDataNotAvailable, setIsDataNotAvailable] = useState(false);
 
-  const [startDate, setStartDate] = useState<Date>();
-  const [endDate, setEndDate] = useState<Date>();
-  const [processingLevel, setProcessingLevelLayer] = useState<string>();
+  const [startDate, setStartDate] = useState<Date>(new Date('04sep2024'));
+  const [endDate, setEndDate] = useState<Date>(new Date('06SEP2024'));
+  const [processingLevel, setProcessingLevelLayer] = useState<string>('L1C');
   const [tiffPreviewUrl, setTiffPreviewUrl] = useState<string>("");
   const [tiffPreviewMin, setTiffPreviewMin] = useState<number>(35);
   const [tiffPreviewMax, setTiffPreviewMax] = useState<number>(492);
@@ -376,6 +376,7 @@ function PreviewData() {
           </PopoverTrigger>
           <PopoverContent className="w-auto p-2" align="start">
             <Calendar
+              
               mode="single"
               selected={startDate}
               onSelect={setStartDate}
