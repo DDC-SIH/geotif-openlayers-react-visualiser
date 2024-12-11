@@ -7,7 +7,7 @@ import MiniMap from "@/components/MiniMap";
 
 function Home() {
   const navigate = useNavigate();
-  const { isLoggedIn } = useAppContext();
+  const { isLoggedIn, isAuthorized } = useAppContext();
   return (
     <div className="grid grid-cols-1 gap-6 my-6">
       <div className=" grid-cols-2 grid gap-8">
@@ -29,7 +29,7 @@ function Home() {
             </p>
             <div className="flex gap-4">
               {isLoggedIn ? (
-                <Button onClick={() => navigate("/preview")} className="bg-blue-600 hover:bg-blue-700 text-white">
+                <Button onClick={() => navigate(isAuthorized?"/preview":"/authorize-yourself")} className="bg-blue-600 hover:bg-blue-700 text-white">
                   Get Started
                 </Button>
               ) : (

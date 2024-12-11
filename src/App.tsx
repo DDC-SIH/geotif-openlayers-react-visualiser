@@ -24,7 +24,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<MapView />} />
+        {/* <Route path="/" element={<MapView />} /> */}
+        <Route path="/" element={<Layout><Home /></Layout>} />
 
       {!isLoggedIn && <>
         <Route path="/sign-in" element={<Layout><SignIn /></Layout>} />
@@ -33,7 +34,6 @@ function App() {
       }
 
 
-        <Route path="/home" element={<Layout><Home /></Layout>} />
 
         {isLoggedIn && isAuthorized && <>
         <Route path="/preview" element={<Layout><PreviewData /></Layout>} />
