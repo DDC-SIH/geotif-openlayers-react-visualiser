@@ -4,11 +4,15 @@ function MapTools({
   setShowCoordinates,
   basemapCoordinates,
   setBasemapCoordinates,
+  showIndianBorders,
+  setShowIndianBorders,
 }: {
   showCoordinates: boolean;
   setShowCoordinates: (value: boolean) => void;
   basemapCoordinates: boolean;
   setBasemapCoordinates: (value: boolean) => void;
+  showIndianBorders: boolean;
+  setShowIndianBorders: (value: boolean) => void;
 }) {
   return (
     <div>
@@ -37,6 +41,19 @@ function MapTools({
               onCheckedChange={() => {
                 setBasemapCoordinates(!basemapCoordinates);
                 console.log(basemapCoordinates);
+              }}
+            />
+        </div>
+        <div className="flex justify-between text-base">
+          <label>
+            Show Indian Borders
+          </label>
+            <Switch
+              id="switch"
+              checked={showIndianBorders}
+              onCheckedChange={() => {
+                setShowIndianBorders(!showIndianBorders);
+                console.log(showIndianBorders);
               }}
             />
         </div>

@@ -38,6 +38,7 @@ import { MultiPolygon } from "ol/geom";
 const GeoTIFFMap = () => {
   const [showCoordinates, setShowCoordinates] = useState(false);
   const [basemapCoordinates, setBasemapCoordinates] = useState(false);
+  const [showIndianBorders, setShowIndianBorders] = useState(true);
   const [Coords, setCoords] = useState({ x: 0, y: 0 });
   const [BasemapCoords, setBasemapCoords] = useState({ x: 0, y: 0 });
   const {
@@ -489,7 +490,7 @@ const GeoTIFFMap = () => {
     source: IndiaVectorSource,
     style: new Style({
       stroke: new Stroke({
-        color: "green", // Green outline
+        color: "limegreen", // Green outline
         width: 2, // Outline width
       }),
     }),
@@ -884,8 +885,8 @@ const GeoTIFFMap = () => {
     const sources = renderArray.map((layer) => ({
       url: tiffUrls[layer.key].url,
       bands: [1],
-      min: tiffUrls[layer.key].min.toFixed(0),
-      max: tiffUrls[layer.key].max.toFixed(0),
+      min: (tiffUrls[layer.key].min.toFixed(3)),
+      max: (tiffUrls[layer.key].max.toFixed(3)),
     }));
     console.log(sources);
     const geoTIFFSource = new GeoTIFF({
@@ -901,7 +902,7 @@ const GeoTIFFMap = () => {
 
     const openLayersMap = new Map({
       target: mapRef.current as HTMLElement,
-      layers: [basemapLayer, layer, vectorLayer], // Use the selected basemap layer
+      layers: [basemapLayer, layer], // Use the selected basemap layer
       controls: defaultControls({
         zoom: false, // Disable default zoom controls
       }).extend([
@@ -926,6 +927,13 @@ const GeoTIFFMap = () => {
         minZoom: 2,
       }),
     });
+
+    
+    if (showIndianBorders) {
+      openLayersMap.addLayer(vectorLayer);
+    }
+
+
     // Animate the zoom transition from 2 to 4
     openLayersMap.getView().animate({
       zoom: 4,
@@ -957,7 +965,8 @@ const GeoTIFFMap = () => {
         mapInstanceRef.current = null;
       }
     };
-  }, [renderArray]);
+  }, [renderArray,showIndianBorders]);
+
 
   const downloadPolygon = () => {
     if (!selectedPolygon) {
@@ -1050,6 +1059,8 @@ const GeoTIFFMap = () => {
           showCoordinates={showCoordinates}
           basemapCoordinates={basemapCoordinates}
           setBasemapCoordinates={setBasemapCoordinates}
+          showIndianBorders={showIndianBorders}
+          setShowIndianBorders={setShowIndianBorders}
         />
 
         {/* Search Bar and Controls Container */}

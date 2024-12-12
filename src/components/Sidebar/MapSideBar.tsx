@@ -47,6 +47,8 @@ function MapSideBar({
   setShowCoordinates,
   basemapCoordinates,
   setBasemapCoordinates,
+  showIndianBorders,
+  setShowIndianBorders,
 }: {
   colormapSettings: ColormapSettings;
   setColormapSettings: any;
@@ -57,6 +59,8 @@ function MapSideBar({
   setShowCoordinates: (value: boolean) => void;
   basemapCoordinates: boolean;
   setBasemapCoordinates: (value: boolean) => void;
+  showIndianBorders: boolean;
+  setShowIndianBorders: (value: boolean) => void;
 }) {
   const { isLoggedIn } = useAppContext();
   const [activeSidebar, setActiveSidebar] = useState<string | null>(null);
@@ -287,6 +291,8 @@ function MapSideBar({
               setShowCoordinates={setShowCoordinates}
               basemapCoordinates={basemapCoordinates}
               setBasemapCoordinates={setBasemapCoordinates}
+              showIndianBorders={showIndianBorders}
+              setShowIndianBorders={setShowIndianBorders}
             />
           )}
           {activeSidebar === "info" && <Information />}
