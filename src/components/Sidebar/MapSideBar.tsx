@@ -157,7 +157,7 @@ function MapSideBar({
               }`}
             />
           </Button>
-          <Button
+          {/* <Button
             size="icon"
             variant={
               activeSidebar === "ProcessingTemplates" ? "secondary" : "ghost"
@@ -182,7 +182,7 @@ function MapSideBar({
                   : "text-white"
               }`}
             />
-          </Button>
+          </Button> */}
           <Button
             size="icon"
             variant={activeSidebar === "maptools" ? "secondary" : "ghost"}
