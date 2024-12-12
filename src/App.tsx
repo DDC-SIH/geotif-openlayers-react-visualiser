@@ -15,6 +15,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import ApiPlayground from './pages/ApiPlayground';
 import NotFound from './pages/not-found';
 import HDF5Upload from './pages/hdf5Upload';
+import TiTilerPlayground from './pages/Playground/TiTilerPlayground';
 
 
 
@@ -41,6 +42,7 @@ function App() {
         <Route path="/orders" element={<Layout><ProfileOrders /></Layout>} />
         <Route path="/api-playground" element={<Layout><ApiPlayground /></Layout>} />
         </>}
+        <Route path="/playground" element={<Layout><TiTilerPlayground /></Layout>} />
         
       {isLoggedIn && !isAuthorized && <>
       <Route path="/authorize-yourself" element={<Layout>< AuthorizeYourself/></Layout>} />
