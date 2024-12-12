@@ -135,9 +135,9 @@ export const GeoDataProvider: React.FC<GeoDataProviderProps> = ({
   >(null);
   const [tiffUrls, setTiffUrls] = useState({
     SWIR: {
-      url: "https://final-cog.s3.ap-south-1.amazonaws.com/3RIMG_04SEP2024_1015_L1B_STD_V01R00/IMG_SWIR_cog.tif",
-      min: 302,
-      max: 996,
+      url: "https://final-cog.s3.ap-south-1.amazonaws.com/3RIMG_04SEP2024_1015_L1C_ASIA_MER_V01R00/IMG_MIR_RADIANCE_cog.tif",
+      min: 0,
+      max: 0.232,
     },
     MIR: {
       url: "https://final-cog.s3.ap-south-1.amazonaws.com/3RIMG_04SEP2024_1015_L1B_STD_V01R00/IMG_MIR_cog.tif",

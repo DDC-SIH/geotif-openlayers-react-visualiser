@@ -880,7 +880,7 @@ const GeoTIFFMap = () => {
     if (tiffLayer) {
       mapInstanceRef.current?.removeLayer(tiffLayer);
     }
-
+    
     // Create sources based on renderArray
     const sources = renderArray.map((layer) => ({
       url: tiffUrls[layer.key].url,

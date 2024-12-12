@@ -71,39 +71,64 @@ interface DateData {
   };
 }
 
-  function extractBandFromUrl(url: string): string {
-    const bandNamePattern = /IMG_(VIS|MIR|SWIR|WV|TIR1|TIR2)_cog\.tif/;
-    const match = url.match(bandNamePattern);
-    
-    if (match) {
-        const bandName = match[1];
-        console.log("Band Name:", bandName);
-        // Use switch to handle each case
-        switch (bandName) {
-            case 'VIS':
-                return 'VIS';
-            case 'MIR':
-                return 'MIR';
-            case 'SWIR':
-                return 'SWIR';
-            case 'WV':
-                return 'WV';
-            case 'TIR1':
-                return 'TIR1';
-            case 'TIR2':
-                return 'TIR2';
-            default:
-                return 'VIS';
-        }
-    } else {
-        return 'Invalid URL or band name not found';
+function extractBandFromUrl(url: string): string {
+  const bandNamePattern = /IMG_(VIS|MIR|SWIR|WV|TIR1|TIR2|MIR_RADIANCE|SWIR_RADIANCE|TIR1_RADIANCE|TIR1_TEMP|TIR2_RADIANCE|TIR2_TEMP|VIS_ALBEDO|VIS_RADIANCE|WV_RADIANCE)_cog\.tif/;
+  const match = url.match(bandNamePattern);
+
+  if (match) {
+    const bandName = match[1];
+    console.log("Band Name:", bandName);
+    // Use switch to handle each case
+    switch (bandName) {
+      case "VIS":
+        return "VIS";
+      case "MIR":
+        return "MIR";
+      case "SWIR":
+        return "SWIR";
+      case "WV":
+        return "WV";
+      case "TIR1":
+        return "TIR1";
+      case "TIR2":
+        return "TIR2";
+      case "MIR_RADIANCE":
+        return "MIR_RADIANCE";
+      case "SWIR_RADIANCE":
+        return "SWIR_RADIANCE";
+      case "TIR1_RADIANCE":
+        return "TIR1_RADIANCE";
+      case "TIR1_TEMP":
+        return "TIR1_TEMP";
+      case "TIR2_RADIANCE":
+        return "TIR2_RADIANCE";
+        case "TIR2_TEMP":
+          return "TIR2_TEMP";
+      case "VIS_ALBEDO":
+        return "VIS_ALBEDO";
+      case "VIS_RADIANCE":
+        return "VIS_RADIANCE";
+      case "WV_RADIANCE":
+        return "WV_RADIANCE";
+      default:
+        return "VIS";
     }
+  } else {
+    return "Invalid URL or band name not found";
+  }
 }
 
 function PreviewData() {
   const { showToast } = useAppContext();
 
-  const { setStartDateTime, setEndDateTime, setProcessingLevel, setSearchResponseData, setDefaultLayer,setMetadata } = useGeoData();
+  const {
+    setStartDateTime,
+    setEndDateTime,
+    setProcessingLevel,
+    setSearchResponseData,
+    setDefaultLayer,
+    setMetadata,
+  } = useGeoData();
   const navigate = useNavigate();
   const [items, setItems] = useState<{
     [date: string]: {
@@ -122,9 +147,9 @@ function PreviewData() {
   const [isLoading, setIsLoading] = useState(false);
   const [isDataNotAvailable, setIsDataNotAvailable] = useState(false);
 
-  const [startDate, setStartDate] = useState<Date>(new Date('04sep2024'));
-  const [endDate, setEndDate] = useState<Date>(new Date('06SEP2024'));
-  const [processingLevel, setProcessingLevelLayer] = useState<string>('L1C');
+  const [startDate, setStartDate] = useState<Date>(new Date("04sep2024"));
+  const [endDate, setEndDate] = useState<Date>(new Date("06SEP2024"));
+  const [processingLevel, setProcessingLevelLayer] = useState<string>("L1C");
   const [tiffPreviewUrl, setTiffPreviewUrl] = useState<string>("");
   const [tiffPreviewMin, setTiffPreviewMin] = useState<number>(35);
   const [tiffPreviewMax, setTiffPreviewMax] = useState<number>(492);
@@ -140,10 +165,11 @@ function PreviewData() {
         const bands = Object.keys(items[date][time].bands).sort();
         if (bands.length > 0) {
           const firstBand = bands[0];
-          return {url:items[date][time].bands[firstBand].url,
-          min:items[date][time].bands[firstBand].metadata.data_range.min,
-          max:items[date][time].bands[firstBand].metadata.data_range.max,
-          metadata:items[date][time]
+          return {
+            url: items[date][time].bands[firstBand].url,
+            min: items[date][time].bands[firstBand].metadata.data_range.min,
+            max: items[date][time].bands[firstBand].metadata.data_range.max,
+            metadata: items[date][time],
           }; // Return the first URL
         }
       }
@@ -155,12 +181,12 @@ function PreviewData() {
   useEffect(() => {
     const defaultUrl = initializeTiffPreviewUrl();
     console.log("Default TIFF URL:", defaultUrl); // Log the default URL
-    if (defaultUrl && typeof defaultUrl === 'object') {
+    if (defaultUrl && typeof defaultUrl === "object") {
       setTiffPreviewUrl(defaultUrl.url);
       setSelectedBandUrl(defaultUrl.url);
       setTiffPreviewMin(defaultUrl.min);
       setTiffPreviewMax(defaultUrl.max);
-      setMetadata(defaultUrl.metadata)
+      setMetadata(defaultUrl.metadata);
     }
     console.log("Default TIFF URL:", defaultUrl); // Log the default URL
   }, [items]);
@@ -200,42 +226,24 @@ function PreviewData() {
         console.log(data);
 
         const findDateWithBandUrls = (data: any) => {
+          const result: any = {};
           for (const date in data) {
             for (const time in data[date]) {
               const bands = data[date][time].bands;
-              if (bands && bands.MIR && bands.MIR.url.startsWith("https://")) {
-                const result = {
-                  MIR: {
-                    url: bands.MIR.url.replace('.tiff', '.tif'),
-                    min: bands.MIR.metadata.data_range.min,
-                    max: bands.MIR.metadata.data_range.max,
-                  },
-                  SWIR: {
-                    url: bands.SWIR.url.replace('.tiff', '.tif'),
-                    min: bands.SWIR.metadata.data_range.min,
-                    max: bands.SWIR.metadata.data_range.max,
-                  },
-                  TIR1: {
-                    url: bands.TIR1.url.replace('.tiff', '.tif'),
-                    min: bands.TIR1.metadata.data_range.min,
-                    max: bands.TIR1.metadata.data_range.max,
-                  },
-                  TIR2: {
-                    url: bands.TIR2.url.replace('.tiff', '.tif'),
-                    min: bands.TIR2.metadata.data_range.min,
-                    max: bands.TIR2.metadata.data_range.max,
-                  },
-                  VIS: {
-                    url: bands.VIS.url.replace('.tiff', '.tif'),
-                    min: bands.VIS.metadata.data_range.min,
-                    max: bands.VIS.metadata.data_range.max,
-                  },
-                  WV: {
-                    url: bands.WV.url.replace('.tiff', '.tif'),
-                    min: bands.WV.metadata.data_range.min,
-                    max: bands.WV.metadata.data_range.max,
-                  },
-                };
+              for (const bandName in bands) {
+                console.log(bandName,bands[bandName]);
+                if (
+                  bands[bandName] &&
+                  bands[bandName].url.startsWith("https://")
+                ) {
+                  result[bandName] = {
+                    url: bands[bandName].url.replace(".tiff", ".tif"),
+                    min: bands[bandName].metadata.data_range.min,
+                    max: bands[bandName].metadata.data_range.max,
+                  };
+                }
+              }
+              if (Object.keys(result).length > 0) {
                 console.log(result);
                 return result;
               }
@@ -244,7 +252,10 @@ function PreviewData() {
         };
 
         setSearchResponseData(findDateWithBandUrls(data));
-        setDefaultLayer(extractBandFromUrl(tiffPreviewUrl.replace('.tiff', '.tif')));
+        console.log(" data 1: ",findDateWithBandUrls(data));
+        setDefaultLayer(
+          extractBandFromUrl(tiffPreviewUrl.replace(".tiff", ".tif"))
+        );
         findDateWithBandUrls(data);
         if (data && Object.keys(data).length > 0) {
           setItems(data);
@@ -280,39 +291,84 @@ function PreviewData() {
       // setSearchResponseData(Object.keys(data.bands).length > 0 ? data : null);
       // data[]
 
-      const findDateWithBandUrls = (data:any) => {
+      const findDateWithBandUrls = (data: any) => {
         for (const date in data) {
           for (const time in data[date]) {
             const bands = data[date][time].bands;
             if (bands && bands.MIR && bands.MIR.url.startsWith("https://")) {
               const result = {
                 MIR: {
-                  url: bands.MIR.url.replace('.tiff', '.tif'),
+                  url: bands.MIR.url.replace(".tiff", ".tif"),
                   min: bands.MIR.metadata.data_range.min,
                   max: bands.MIR.metadata.data_range.max,
                 },
+                MIR_RADIANCE: {
+                  url: bands.MIR_RADIANCE.url.replace(".tiff", ".tif"),
+                  min: bands.MIR_RADIANCE.metadata.data_range.min,
+                  max: bands.MIR_RADIANCE.metadata.data_range.max,
+                },
                 SWIR: {
-                  url: bands.SWIR.url.replace('.tiff', '.tif'),
+                  url: bands.SWIR.url.replace(".tiff", ".tif"),
                   min: bands.SWIR.metadata.data_range.min,
                   max: bands.SWIR.metadata.data_range.max,
                 },
+                SWIR_RADIANCE: {
+                  url: bands.SWIR_RADIANCE.url.replace(".tiff", ".tif"),
+                  min: bands.SWIR_RADIANCE.metadata.data_range.min,
+                  max: bands.SWIR_RADIANCE.metadata.data_range.max,
+                },
                 TIR1: {
-                  url: bands.TIR1.url.replace('.tiff', '.tif'),
+                  url: bands.TIR1.url.replace(".tiff", ".tif"),
                   min: bands.TIR1.metadata.data_range.min,
                   max: bands.TIR1.metadata.data_range.max,
                 },
+                TIR1_TEMP: {
+                  url: bands.TIR1_TEMP.url.replace(".tiff", ".tif"),
+                  min: bands.TIR1_TEMP.metadata.data_range.min,
+                  max: bands.TIR1_TEMP.metadata.data_range.max,
+                },
+                TIR1_RADIANCE: {
+                  url: bands.TIR1_RADIANCE.url.replace(".tiff", ".tif"),
+                  min: bands.TIR1_RADIANCE.metadata.data_range.min,
+                  max: bands.TIR1_RADIANCE.metadata.data_range.max,
+                },
                 TIR2: {
-                  url: bands.TIR2.url.replace('.tiff', '.tif'),
+                  url: bands.TIR2.url.replace(".tiff", ".tif"),
                   min: bands.TIR2.metadata.data_range.min,
                   max: bands.TIR2.metadata.data_range.max,
                 },
+                TIR2_RADIANCE: {
+                  url: bands.TIR2_RADIANCE.url.replace(".tiff", ".tif"),
+                  min: bands.TIR2_RADIANCE.metadata.data_range.min,
+                  max: bands.TIR2_RADIANCE.metadata.data_range.max,
+                },
+                TIR2_TEMP: {
+                  url: bands.TIR2_TEMP.url.replace(".tiff", ".tif"),
+                  min: bands.TIR2_TEMP.metadata.data_range.min,
+                  max: bands.TIR2_TEMP.metadata.data_range.max,
+                },
                 VIS: {
-                  url: bands.VIS.url.replace('.tiff', '.tif'),
+                  url: bands.VIS.url.replace(".tiff", ".tif"),
                   min: bands.VIS.metadata.data_range.min,
                   max: bands.VIS.metadata.data_range.max,
                 },
+                VIS_ALBEDO: {
+                  url: bands.VIS_ALBEDO.url.replace(".tiff", ".tif"),
+                  min: bands.VIS_ALBEDO.metadata.data_range.min,
+                  max: bands.VIS_ALBEDO.metadata.data_range.max,
+                },
+                VIS_RADIANCE: {
+                  url: bands.VIS_RADIANCE.url.replace(".tiff", ".tif"),
+                  min: bands.VIS_RADIANCE.metadata.data_range.min,
+                  max: bands.VIS_RADIANCE.metadata.data_range.max,
+                },
+                WV_RADIANCE: {
+                  url: bands.WV_RADIANCE.url.replace(".tiff", ".tif"),
+                  min: bands.WV_RADIANCE.metadata.data_range.min,
+                  max: bands.WV_RADIANCE.metadata.data_range.max,
+                },
                 WV: {
-                  url: bands.WV.url.replace('.tiff', '.tif'),
+                  url: bands.WV.url.replace(".tiff", ".tif"),
                   min: bands.WV.metadata.data_range.min,
                   max: bands.WV.metadata.data_range.max,
                 },
@@ -326,7 +382,9 @@ function PreviewData() {
 
       // console.log(findDateWithBandUrls(data));
       setSearchResponseData(findDateWithBandUrls(data));
-      setDefaultLayer(extractBandFromUrl(tiffPreviewUrl.replace('.tiff', '.tif')))
+      setDefaultLayer(
+        extractBandFromUrl(tiffPreviewUrl.replace(".tiff", ".tif"))
+      );
       findDateWithBandUrls(data);
       if (data && Object.keys(data).length > 0) {
         setItems(data);
@@ -362,15 +420,20 @@ function PreviewData() {
     }
   };
 
-  const handleBandClick = (url: string, bandMin:number, bandMax:number, metadata:any) => {
-    console.log("Band URL:", url, bandMax, bandMin,metadata);
-    setTiffPreviewUrl(url.replace('.tiff', '.tif'));
+  const handleBandClick = (
+    url: string,
+    bandMin: number,
+    bandMax: number,
+    metadata: any
+  ) => {
+    console.log("Band URL:", url, bandMax, bandMin, metadata);
+    setTiffPreviewUrl(url.replace(".tiff", ".tif"));
     setTiffPreviewMin(bandMin);
     setTiffPreviewMax(bandMax);
-    setDefaultLayer(extractBandFromUrl(url.replace('.tiff', '.tif')))
-    setMetadata(metadata)
+    setDefaultLayer(extractBandFromUrl(url.replace(".tiff", ".tif")));
+    setMetadata(metadata);
 
-    setSelectedBandUrl(url.replace('.tiff', '.tif'));
+    setSelectedBandUrl(url.replace(".tiff", ".tif"));
   };
   const handleDownloadRawButtonClick = () => {
     setShowDownloadPopup(true);
@@ -382,13 +445,13 @@ function PreviewData() {
         startDate: startDate?.toISOString(),
         endDate: endDate?.toISOString(),
         processingLevel,
-        selectedBands
+        selectedBands,
       });
       showToast({ message: "Ordered Successfully", type: "SUCCESS" });
       Object.values(selectedBands).forEach((times) => {
         Object.values(times).forEach((bands) => {
           Object.values(bands).forEach((url) => {
-        window.open(url, '_blank');
+            window.open(url, "_blank");
           });
         });
       });
@@ -403,7 +466,6 @@ function PreviewData() {
     [date: string]: { [time: string]: { [bandName: string]: string } };
   }>({});
 
-
   const handleBandSelectorClick = (
     url: string,
     date: string,
@@ -411,11 +473,12 @@ function PreviewData() {
     bandName: string,
     metadata: any
   ) => {
-    console.log(metadata)
-    setMetadata(metadata)
+    console.log(metadata);
+    setMetadata(metadata);
     console.log("Band URL:", url);
     setSelectedBands((prevSelectedBands) => {
-      const isCurrentlySelected = prevSelectedBands[date]?.[time]?.[bandName] === url;
+      const isCurrentlySelected =
+        prevSelectedBands[date]?.[time]?.[bandName] === url;
 
       if (isCurrentlySelected) {
         // Remove the band
@@ -469,7 +532,6 @@ function PreviewData() {
           </PopoverTrigger>
           <PopoverContent className="w-auto p-2" align="start">
             <Calendar
-              
               mode="single"
               selected={startDate}
               onSelect={setStartDate}
@@ -542,9 +604,14 @@ function PreviewData() {
       {isDataAvailable && (
         <div className="grid grid-cols-2 gap-4">
           <p className="text-4xl font-bold col-span-2">Quick Preview</p>
-          <MiniMap geotiffUrl={tiffPreviewUrl} zoomedToTheBounding minValue={tiffPreviewMin}  maxValue={tiffPreviewMax} />
+          <MiniMap
+            geotiffUrl={tiffPreviewUrl}
+            zoomedToTheBounding
+            minValue={tiffPreviewMin}
+            maxValue={tiffPreviewMax}
+          />
           <div>
-            <div className="rounded-lg border w-fit p-2 h-96 overflow-y-scroll  no-visible-scrollbar">
+            <div className="rounded-lg border w-[40rem] p-2 h-96 overflow-y-scroll  no-visible-scrollbar">
               {Object.keys(items)
                 .sort()
                 .map((date) => (
@@ -558,20 +625,29 @@ function PreviewData() {
                             Available Bands at {time.slice(0, 2)}:
                             {time.slice(2, 4)} :
                           </h3>
-                          <div className="grid grid-cols-6 w-full gap-2">
+                          <div className="grid grid-flow-col-dense w-full gap-2">
                             {Object.keys(items[date][time].bands)
                               .sort()
                               .map((bandName) => {
                                 const bandUrl =
                                   items[date][time].bands[bandName].url || "";
                                 const bandMin =
-                                  items[date][time].bands[bandName].metadata.data_range.min || 35;
+                                  items[date][time].bands[bandName].metadata
+                                    .data_range.min;
                                 const bandMax =
-                                  items[date][time].bands[bandName].metadata.data_range.max || 492;
+                                  items[date][time].bands[bandName].metadata
+                                    .data_range.max;
                                 return (
                                   <Button
                                     key={bandName}
-                                    onClick={() => handleBandClick(bandUrl, bandMin, bandMax,items[date][time])}
+                                    onClick={() =>
+                                      handleBandClick(
+                                        bandUrl,
+                                        bandMin,
+                                        bandMax,
+                                        items[date][time]
+                                      )
+                                    }
                                     variant={
                                       selectedBandUrl === bandUrl
                                         ? "secondary"
@@ -637,7 +713,9 @@ function PreviewData() {
                                 .map((bandName) => {
                                   const bandUrl =
                                     items[date][time].bands[bandName].url || "";
-                                  const isSelected = selectedBands[date]?.[time]?.[bandName] === bandUrl;
+                                  const isSelected =
+                                    selectedBands[date]?.[time]?.[bandName] ===
+                                    bandUrl;
                                   return (
                                     <Button
                                       key={bandName}
@@ -650,7 +728,9 @@ function PreviewData() {
                                           items[date][time]
                                         )
                                       }
-                                      variant={isSelected ? "default" : "outline"}
+                                      variant={
+                                        isSelected ? "default" : "outline"
+                                      }
                                       className="w-full"
                                     >
                                       {bandName}
