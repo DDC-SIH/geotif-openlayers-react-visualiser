@@ -144,9 +144,7 @@ function Filters({
   selectedIndex: string;
   setSelectedIndex: (value: string) => void;
 }) {
-  const [customExpression, setCustomExpression] = React.useState<string>(
-    getBandArithmeticExpressionAsString(selectedIndex)
-  );
+
 
   const { setBoundingBox, tiffUrls, renderArray, setRenderArray } =
     useGeoData();
@@ -175,19 +173,19 @@ function Filters({
 
       <div className="space-y-4">
         <div className="space-y-2">
-          <label className="text-sm font-medium">Band Arithmetic</label>
+          <label className="text-sm font-medium">Band Arithmetic Presets</label>
           <Select onValueChange={setSelectedIndex} value={selectedIndex}>
             <SelectTrigger>
               <SelectValue placeholder="Select Index" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="none">None - Raw Data </SelectItem>
-              <SelectItem value="ndvi">NDVI - Vegetation Index</SelectItem>
-              <SelectItem value="evi">EVI - Enhanced Vegetation</SelectItem>
-              <SelectItem value="savi">SAVI - Soil Adjusted VI</SelectItem>
-              <SelectItem value="nbr">NBR - Burn Ratio</SelectItem>
-              <SelectItem value="msavi">MSAVI - Modified Soil VI</SelectItem>
-              <SelectItem value="ndwi">NDWI - Water Index</SelectItem>
+              <SelectItem value="none">{getBandArithmeticExpressionAsString("none")} </SelectItem>
+              <SelectItem value="ndvi">{getBandArithmeticExpressionAsString("ndvi")}</SelectItem>
+              <SelectItem value="evi">{getBandArithmeticExpressionAsString("evi")}</SelectItem>
+              <SelectItem value="savi">{getBandArithmeticExpressionAsString("savi")}</SelectItem>
+              <SelectItem value="nbr">{getBandArithmeticExpressionAsString("nbr")}</SelectItem>
+              <SelectItem value="msavi">{getBandArithmeticExpressionAsString("msavi")}</SelectItem>
+              <SelectItem value="ndwi">{getBandArithmeticExpressionAsString("ndwi")}</SelectItem>
             </SelectContent>
           </Select>
         </div>

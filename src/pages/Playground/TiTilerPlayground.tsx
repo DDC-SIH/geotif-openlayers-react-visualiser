@@ -26,6 +26,7 @@ export default function TiTilerPlayground() {
   const [advancedOptions, setAdvancedOptions] = useState({})
   const [imageUrl, setImageUrl] = useState("")
   const [apiUrl, setApiUrl] = useState("")
+  const [curlCommand, setCurlCommand] = useState("")
   const [tiffInfo, setTiffInfo] = useState<TiffInfo | null>(null)
   const [bandArithmetic, setBandArithmetic] = useState("")
   const [colorMap, setColorMap] = useState("")
@@ -75,10 +76,12 @@ export default function TiTilerPlayground() {
     e.preventDefault()
 
       // Parse band indexes into URL params
-  const bandParams = bandIndexes
-  .split(',')
-  .map((value, index) => `bidx${index + 1}=${value.trim()}`)
-  .join('&');
+      console.log(bandIndexes)
+const bandParams = bandIndexes
+    .split(',')
+    .filter(value => value.trim() !== "")
+    .map((value, index) => `bidx${index + 1}=${value.trim()}`)
+    .join('&');
 
 
   const queryParams = new URLSearchParams({ 
@@ -90,6 +93,7 @@ export default function TiTilerPlayground() {
     const bboxString = `${bbox.minx},${bbox.miny},${bbox.maxx},${bbox.maxy}`
     const generatedApiUrl = `${ENDPOINT}/cog/bbox/${bboxString}/${width}x${height}.${format}?${queryParams}&${bandParams}`;
     setApiUrl(generatedApiUrl)
+    setCurlCommand(`curl -X 'GET' "${generatedApiUrl}" -H 'accept: image/png' --output preview.${format}`)
     console.log(generatedApiUrl)
     try {
       const response = await fetch(generatedApiUrl)
@@ -188,9 +192,7 @@ export default function TiTilerPlayground() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="png">PNG</SelectItem>
-                <SelectItem value="jpg">JPEG</SelectItem>
                 <SelectItem value="tif">TIFF</SelectItem>
-                <SelectItem value="webp">WebP</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -212,19 +214,31 @@ export default function TiTilerPlayground() {
         </form>
 
         <div className="mt-6">
-          <h3 className="text-lg font-semibold mb-2">Generated API URL</h3>
           {apiUrl && (
-            <div className="flex items-center space-x-2">
-              <Input value={apiUrl} readOnly className="flex-grow" />
-              <Button
-                onClick={() => {
-                  navigator.clipboard.writeText(apiUrl)
-                //   toast({ title: "Copied", description: "API URL copied to clipboard" })
-                }}
-              >
-                Copy
-              </Button>
-            </div>
+                <><h3 className="text-lg font-semibold mb-2">Generated API URL</h3><div className="flex items-center space-x-2">
+                          <Input value={apiUrl} readOnly className="flex-grow" />
+                          <Button
+                              onClick={() => {
+                                  navigator.clipboard.writeText(apiUrl)
+                                  //   toast({ title: "Copied", description: "API URL copied to clipboard" })
+                              } }
+                          >
+                              Copy
+                          </Button>
+                      </div></>
+          )}
+          {curlCommand && (
+                <><h3 className="text-lg font-semibold mb-2">Curl Command</h3><div className="flex items-center space-x-2">
+                          <Input value={curlCommand.replace('.tif', '.png')} readOnly className="flex-grow" />
+                          <Button
+                              onClick={() => {
+                                  navigator.clipboard.writeText(curlCommand)
+                                  //   toast({ title: "Copied", description: "API URL copied to clipboard" })
+                              } }
+                          >
+                              Copy
+                          </Button>
+                      </div></>
           )}
         </div>
         <ImageDisplay imageUrl={imageUrl} />

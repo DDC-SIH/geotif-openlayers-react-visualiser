@@ -134,33 +134,33 @@ export const GeoDataProvider: React.FC<GeoDataProviderProps> = ({
     GeoJSONGeometry | GeoJSONGeometryCollection | null
   >(null);
   const [tiffUrls, setTiffUrls] = useState({
-    MIR: {
-      url: "https://somehowgetsplotted.s3.ap-south-1.amazonaws.com/somehowgetsplotted/IMG_MIR_optimized.tif",
+    SWIR: {
+      url: "https://final-cog.s3.ap-south-1.amazonaws.com/3RIMG_04SEP2024_1015_L1B_STD_V01R00/IMG_SWIR_cog.tif",
       min: 302,
       max: 996,
     },
-    SWIR: {
-      url: "https://somehowgetsplotted.s3.ap-south-1.amazonaws.com/somehowgetsplotted/IMG_SWIR_optimized.tif",
+    MIR: {
+      url: "https://final-cog.s3.ap-south-1.amazonaws.com/3RIMG_04SEP2024_1015_L1B_STD_V01R00/IMG_MIR_cog.tif",
       min: 11,
       max: 551,
     },
     TIR1: {
-      url: "https://somehowgetsplotted.s3.ap-south-1.amazonaws.com/somehowgetsplotted/IMG_TIR1_optimized.tif",
+      url: "https://final-cog.s3.ap-south-1.amazonaws.com/3RIMG_04SEP2024_1015_L1B_STD_V01R00/IMG_TIR1_cog.tif",
       min: 238,
       max: 961,
     },
     TIR2: {
-      url: "https://somehowgetsplotted.s3.ap-south-1.amazonaws.com/somehowgetsplotted/IMG_TIR2_optimized.tif",
+      url: "https://final-cog.s3.ap-south-1.amazonaws.com/3RIMG_04SEP2024_1015_L1B_STD_V01R00/IMG_TIR2_cog.tif",
       min: 283,
       max: 945,
     },
     VIS: {
-      url: "https://somehowgetsplotted.s3.ap-south-1.amazonaws.com/somehowgetsplotted/IMG_VIS_optimized.tif",
+      url: "https://final-cog.s3.ap-south-1.amazonaws.com/3RIMG_04SEP2024_1015_L1B_STD_V01R00/IMG_VIS_cog.tif",
       min: 35,
       max: 493,
     },
     WV: {
-      url: "https://somehowgetsplotted.s3.ap-south-1.amazonaws.com/somehowgetsplotted/IMG_WV_optimized.tif",
+      url: "https://final-cog.s3.ap-south-1.amazonaws.com/3RIMG_04SEP2024_1015_L1B_STD_V01R00/IMG_WV_cog.tif",
       min: 776,
       max: 998,
     },
@@ -169,7 +169,7 @@ export const GeoDataProvider: React.FC<GeoDataProviderProps> = ({
   const [isPolygonSelectionEnabled, setIsPolygonSelectionEnabled] =
     useState(false);
 
-  const [defaultLayer, setDefaultLayer] = useState<any>("VIS");
+  const [defaultLayer, setDefaultLayer] = useState<any>("SWIR");
   const [renderArray, setRenderArray] = useState<LayerInstance[]>([
     { id: generateUniqueId(), key: "VIS" },
     { id: generateUniqueId(), key: "VIS" },

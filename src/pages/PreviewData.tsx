@@ -206,32 +206,32 @@ function PreviewData() {
               if (bands && bands.MIR && bands.MIR.url.startsWith("https://")) {
                 const result = {
                   MIR: {
-                    url: bands.MIR.url,
+                    url: bands.MIR.url.replace('.tiff', '.tif'),
                     min: bands.MIR.metadata.data_range.min,
                     max: bands.MIR.metadata.data_range.max,
                   },
                   SWIR: {
-                    url: bands.SWIR.url,
+                    url: bands.SWIR.url.replace('.tiff', '.tif'),
                     min: bands.SWIR.metadata.data_range.min,
                     max: bands.SWIR.metadata.data_range.max,
                   },
                   TIR1: {
-                    url: bands.TIR1.url,
+                    url: bands.TIR1.url.replace('.tiff', '.tif'),
                     min: bands.TIR1.metadata.data_range.min,
                     max: bands.TIR1.metadata.data_range.max,
                   },
                   TIR2: {
-                    url: bands.TIR2.url,
+                    url: bands.TIR2.url.replace('.tiff', '.tif'),
                     min: bands.TIR2.metadata.data_range.min,
                     max: bands.TIR2.metadata.data_range.max,
                   },
                   VIS: {
-                    url: bands.VIS.url,
+                    url: bands.VIS.url.replace('.tiff', '.tif'),
                     min: bands.VIS.metadata.data_range.min,
                     max: bands.VIS.metadata.data_range.max,
                   },
                   WV: {
-                    url: bands.WV.url,
+                    url: bands.WV.url.replace('.tiff', '.tif'),
                     min: bands.WV.metadata.data_range.min,
                     max: bands.WV.metadata.data_range.max,
                   },
@@ -244,7 +244,7 @@ function PreviewData() {
         };
 
         setSearchResponseData(findDateWithBandUrls(data));
-        setDefaultLayer(extractBandFromUrl(tiffPreviewUrl));
+        setDefaultLayer(extractBandFromUrl(tiffPreviewUrl.replace('.tiff', '.tif')));
         findDateWithBandUrls(data);
         if (data && Object.keys(data).length > 0) {
           setItems(data);
@@ -287,32 +287,32 @@ function PreviewData() {
             if (bands && bands.MIR && bands.MIR.url.startsWith("https://")) {
               const result = {
                 MIR: {
-                  url: bands.MIR.url,
+                  url: bands.MIR.url.replace('.tiff', '.tif'),
                   min: bands.MIR.metadata.data_range.min,
                   max: bands.MIR.metadata.data_range.max,
                 },
                 SWIR: {
-                  url: bands.SWIR.url,
+                  url: bands.SWIR.url.replace('.tiff', '.tif'),
                   min: bands.SWIR.metadata.data_range.min,
                   max: bands.SWIR.metadata.data_range.max,
                 },
                 TIR1: {
-                  url: bands.TIR1.url,
+                  url: bands.TIR1.url.replace('.tiff', '.tif'),
                   min: bands.TIR1.metadata.data_range.min,
                   max: bands.TIR1.metadata.data_range.max,
                 },
                 TIR2: {
-                  url: bands.TIR2.url,
+                  url: bands.TIR2.url.replace('.tiff', '.tif'),
                   min: bands.TIR2.metadata.data_range.min,
                   max: bands.TIR2.metadata.data_range.max,
                 },
                 VIS: {
-                  url: bands.VIS.url,
+                  url: bands.VIS.url.replace('.tiff', '.tif'),
                   min: bands.VIS.metadata.data_range.min,
                   max: bands.VIS.metadata.data_range.max,
                 },
                 WV: {
-                  url: bands.WV.url,
+                  url: bands.WV.url.replace('.tiff', '.tif'),
                   min: bands.WV.metadata.data_range.min,
                   max: bands.WV.metadata.data_range.max,
                 },
@@ -326,7 +326,7 @@ function PreviewData() {
 
       // console.log(findDateWithBandUrls(data));
       setSearchResponseData(findDateWithBandUrls(data));
-      setDefaultLayer(extractBandFromUrl(tiffPreviewUrl))
+      setDefaultLayer(extractBandFromUrl(tiffPreviewUrl.replace('.tiff', '.tif')))
       findDateWithBandUrls(data);
       if (data && Object.keys(data).length > 0) {
         setItems(data);
@@ -364,13 +364,13 @@ function PreviewData() {
 
   const handleBandClick = (url: string, bandMin:number, bandMax:number, metadata:any) => {
     console.log("Band URL:", url, bandMax, bandMin,metadata);
-    setTiffPreviewUrl(url);
+    setTiffPreviewUrl(url.replace('.tiff', '.tif'));
     setTiffPreviewMin(bandMin);
     setTiffPreviewMax(bandMax);
-    setDefaultLayer(extractBandFromUrl(url))
+    setDefaultLayer(extractBandFromUrl(url.replace('.tiff', '.tif')))
     setMetadata(metadata)
 
-    setSelectedBandUrl(url);
+    setSelectedBandUrl(url.replace('.tiff', '.tif'));
   };
   const handleDownloadRawButtonClick = () => {
     setShowDownloadPopup(true);
