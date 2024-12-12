@@ -5,7 +5,7 @@ function MapView() {
   return (
     <div className="relative flex">
       <MapComponent />
-      <TimeLineSlider />
+      {/* <TimeLineSlider /> */}
     </div>
   );
 }

@@ -107,7 +107,7 @@ export default function Export() {
     selected.polygon && (body["polygon"] = fullGeoJSON);
     // body[]
     fetch(
-      "https://c798-2409-40c1-2a-3d89-f5f4-7f44-41da-9d05.ngrok-free.app/process",
+      "https://5992-2409-40c1-2a-3d89-a18a-ff15-8238-279e.ngrok-free.app/process",
       {
         method: "POST",
         headers: {

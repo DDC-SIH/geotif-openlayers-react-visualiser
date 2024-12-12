@@ -452,7 +452,7 @@ const GeoTIFFMap = () => {
       source: vectorSource,
       style: new Style({
         fill: new Fill({
-          color: "rgba(255, 255, 255, 0.7)", // Semi-transparent fill for outside area
+          color: "rgba(255, 255, 255, 0.4)",
         }),
       }),
     });
@@ -1095,7 +1095,7 @@ const GeoTIFFMap = () => {
                 className="h-9 border-none bg-transparent px-2 focus:outline-none"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
-                    search(searchQuery);
+                    search(searchQuery.replace(" ", ""));
                   }
                 }}
               />
