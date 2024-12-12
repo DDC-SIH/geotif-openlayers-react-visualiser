@@ -39,6 +39,7 @@ export default function MiniMap({ geotiffUrl, minValue = 35, maxValue = 493, zoo
                     bands: [1],
                     min: minValue,
                     max: maxValue,
+                    nodata:0
                 },
             ],
         });

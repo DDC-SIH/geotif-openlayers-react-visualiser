@@ -37,13 +37,13 @@ function Home() {
                   Login
                 </Button>
               )}
-              <Button
+              {/* <Button
                 onClick={() => navigate("#")}
                 variant={"outline"}
                 className="border-blue-600 text-blue-600 hover:bg-blue-100"
               >
                 View Demo
-              </Button>
+              </Button> */}
             </div>
           </div>
         <MiniMap altText="BES,SAC/ISRO,Ahmedabad,INDIA. 04-SEP-2024 10:42:29" geotiffUrl="https://somehowgetsplotted.s3.ap-south-1.amazonaws.com/somehowgetsplotted/IMG_VIS_optimized.tif" zoomOut zoomedToTheBounding mapHeight="400px" />

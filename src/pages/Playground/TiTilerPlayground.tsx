@@ -22,7 +22,7 @@ const ENDPOINT = "https://5ng8ntubj6.execute-api.ap-south-1.amazonaws.com"
 
 
 export default function TiTilerPlayground() {
-  const [url, setUrl] = useState("")
+  const [url, setUrl] = useState("https://kdg-raw.s3.ap-south-1.amazonaws.com/test_combined.tif")
   const [bbox, setBbox] = useState<BoundingBox>({ minx: -180, miny: -90, maxx: 180, maxy: 90 })
   const [width, setWidth] = useState(256)
   const [height, setHeight] = useState(256)
