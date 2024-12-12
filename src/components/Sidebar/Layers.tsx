@@ -55,16 +55,18 @@ export default function LayersSection() {
 
                 {/* Active Layers List */}
                 <div>
-                    {renderArray.map((layer, index) => (
-                        <DraggableLayer
-                            key={layer.id}
-                            layer={layer}
-                            index={index}
-                            moveLayer={moveLayer}
-                            removeLayer={removeLayer}
-                            
-                        />
-                    ))}
+                    {renderArray
+                        .slice()
+                        .sort((a, b) => a.key.localeCompare(b.key))
+                        .map((layer, index) => (
+                            <DraggableLayer
+                                key={layer.id}
+                                layer={layer}
+                                index={index}
+                                moveLayer={moveLayer}
+                                removeLayer={removeLayer}
+                            />
+                        ))}
                 </div>
             </div>
         </DndProvider>
