@@ -14,8 +14,12 @@ import { AdvancedOptions } from './components/advanced-options'
 import { ImageDisplay } from './components/image-display'
 import { MapPreview } from './components/map-preview'
 import { TiffInfo, BoundingBox } from './types/tiff-info'
+import { uploadTifFile } from '@/api-client'
 
 const ENDPOINT = "https://5ng8ntubj6.execute-api.ap-south-1.amazonaws.com"
+
+
+
 
 export default function TiTilerPlayground() {
   const [url, setUrl] = useState("")
@@ -37,6 +41,9 @@ export default function TiTilerPlayground() {
       fetchTiffInfo(url)
     }
   }, [url])
+
+
+
 
   const fetchTiffInfo = async (tiffUrl: string) => {
     try {
@@ -72,6 +79,16 @@ export default function TiTilerPlayground() {
     }
   }
 
+  const handleFileUpload = async (file: File) => {
+    try {
+      const result = await uploadTifFile(file);
+      if (result && result.data.Location) {
+        setUrl(result.data.Location); // Update URL state with the S3 URL
+      }
+    } catch (error) {
+      console.error("File upload failed:", error);
+    }
+  };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -109,11 +126,26 @@ const bandParams = bandIndexes
   return (
     <Card className="w-full max-w-5xl my-10 mx-auto">
       <CardHeader>
-        <CardTitle>Data Interaction Platform</CardTitle>
-        <CardDescription>Manipulate Your .tif files in realtime</CardDescription>
+        <CardTitle className='text-4xl'>Data Interaction Platform</CardTitle>
+        <CardDescription className='text-xl'>Manipulate Your .tif files in realtime</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+          <Label htmlFor="upload">Upload TIFF File</Label>
+            <Input
+              id="upload"
+              type="file"
+              accept=".tif"
+              onChange={(e) => {
+                if (e.target.files?.[0]) {
+                  handleFileUpload(e.target.files[0]);
+                }
+              }}
+            />
+          </div>
+
+          {/* URL Input */}
           <div className="space-y-2">
             <Label htmlFor="url">TIFF URL</Label>
             <Input

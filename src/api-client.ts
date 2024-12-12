@@ -446,3 +446,34 @@ export const downloadZip = async (downloadDateTime: string): Promise<void> => {
     throw error;
   }
 };
+
+
+
+
+
+export const uploadTifFile = async (file: File) => {
+  if (file.type !== 'image/tiff') {
+    throw new Error('Only .tif files are allowed.');
+  }
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/upload-tif/`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorDetails = await response.json();
+      throw new Error(errorDetails.message || 'File upload failed.');
+    }
+
+    const result: UploadResponse = await response.json();
+    return result;
+  } catch (error) {
+    console.error('Error uploading file:', error);
+    return { message: 'Error uploading file', error };
+  }
+};
