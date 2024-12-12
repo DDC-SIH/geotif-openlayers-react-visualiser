@@ -109,8 +109,8 @@ const bandParams = bandIndexes
   return (
     <Card className="w-full max-w-5xl my-10 mx-auto">
       <CardHeader>
-        <CardTitle>TiTiler API Playground</CardTitle>
-        <CardDescription>Generate images using the TiTiler API</CardDescription>
+        <CardTitle>Data Interaction Platform</CardTitle>
+        <CardDescription>Manipulate Your .tif files in realtime</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">

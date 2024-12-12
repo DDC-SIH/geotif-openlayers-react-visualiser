@@ -887,6 +887,7 @@ const GeoTIFFMap = () => {
       bands: [1],
       min: (tiffUrls[layer.key].min.toFixed(3)),
       max: (tiffUrls[layer.key].max.toFixed(3)),
+      nodata: 0,
     }));
     console.log(sources);
     const geoTIFFSource = new GeoTIFF({
