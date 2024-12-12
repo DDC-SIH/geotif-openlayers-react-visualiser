@@ -93,13 +93,13 @@ const bandParams = bandIndexes
     const bboxString = `${bbox.minx},${bbox.miny},${bbox.maxx},${bbox.maxy}`
     const generatedApiUrl = `${ENDPOINT}/cog/bbox/${bboxString}/${width}x${height}.${format}?${queryParams}&${bandParams}`;
     setApiUrl(generatedApiUrl)
-    setCurlCommand(`curl -X 'GET' "${generatedApiUrl}" -H 'accept: image/png' --output preview.${format}`)
+    setCurlCommand(`curl -X 'GET' "${generatedApiUrl}" -H 'accept: image/png' --output preview.png`)
     console.log(generatedApiUrl)
     try {
       const response = await fetch(generatedApiUrl)
       console.log(response)
       if (!response.ok) throw new Error('API request failed')
-      setImageUrl(generatedApiUrl)
+      setImageUrl(`${ENDPOINT}/cog/bbox/${bboxString}/${width}x${height}.png?${queryParams}&${bandParams}`)
     //   toast({ title: "Success", description: "Image generated successfully" })
     } catch (error) {
     //   toast({ title: "Error", description: "Failed to generate image", variant: "destructive" })
@@ -133,6 +133,10 @@ const bandParams = bandIndexes
               onChange={(e) => setBandArithmetic(e.target.value)}
               placeholder="e.g., b1/b2"
             />
+          </div>
+          <div>
+            <Label htmlFor="bandArithmetic">Example Description (rio-tiler's band math expression)</Label>
+            <p><b>b1/b2;b2+b3</b>  -  Semicolon (;) delimited expressions (band1: b1/b2, band2: b2+b3).</p>
           </div>
 
           <div className="space-y-2">
@@ -228,7 +232,7 @@ const bandParams = bandIndexes
                       </div></>
           )}
           {curlCommand && (
-                <><h3 className="text-lg font-semibold mb-2">Curl Command</h3><div className="flex items-center space-x-2">
+                <><h3 className="mt-4 text-lg font-semibold mb-2">Curl Command</h3><div className="flex items-center space-x-2">
                           <Input value={curlCommand.replace('.tif', '.png')} readOnly className="flex-grow" />
                           <Button
                               onClick={() => {

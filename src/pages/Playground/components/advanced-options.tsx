@@ -92,15 +92,6 @@ export function AdvancedOptions({ options, setOptions, tiffInfo,bandIndexes,setB
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="color_formula">Color Formula</Label>
-        <Input
-          id="color_formula"
-          value={options.color_formula || ''}
-          onChange={(e) => handleOptionChange('color_formula', e.target.value)}
-          placeholder="e.g., gamma b 1.3"
-        />
-      </div>
     </div>
   )
 }

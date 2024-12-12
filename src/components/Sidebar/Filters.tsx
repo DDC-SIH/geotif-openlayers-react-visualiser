@@ -179,13 +179,13 @@ function Filters({
               <SelectValue placeholder="Select Index" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="none">{getBandArithmeticExpressionAsString("none")} </SelectItem>
-              <SelectItem value="ndvi">{getBandArithmeticExpressionAsString("ndvi")}</SelectItem>
-              <SelectItem value="evi">{getBandArithmeticExpressionAsString("evi")}</SelectItem>
-              <SelectItem value="savi">{getBandArithmeticExpressionAsString("savi")}</SelectItem>
-              <SelectItem value="nbr">{getBandArithmeticExpressionAsString("nbr")}</SelectItem>
-              <SelectItem value="msavi">{getBandArithmeticExpressionAsString("msavi")}</SelectItem>
-              <SelectItem value="ndwi">{getBandArithmeticExpressionAsString("ndwi")}</SelectItem>
+              <SelectItem value="none">{`Expression 1`} </SelectItem>
+              <SelectItem value="ndvi">{`Expression 2`}</SelectItem>
+              <SelectItem value="evi">{`Expression 3`}</SelectItem>
+              <SelectItem value="savi">{`Expression 4`}</SelectItem>
+              <SelectItem value="nbr">{`Expression 5`}</SelectItem>
+              <SelectItem value="msavi">{`Expression 6`}</SelectItem>
+              <SelectItem value="ndwi">{`Expression 7`}</SelectItem>
             </SelectContent>
           </Select>
         </div>

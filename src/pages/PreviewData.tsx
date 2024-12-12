@@ -385,6 +385,13 @@ function PreviewData() {
         selectedBands
       });
       showToast({ message: "Ordered Successfully", type: "SUCCESS" });
+      Object.values(selectedBands).forEach((times) => {
+        Object.values(times).forEach((bands) => {
+          Object.values(bands).forEach((url) => {
+        window.open(url, '_blank');
+          });
+        });
+      });
       setShowDownloadPopup(false);
     } catch (error) {
       console.error("Failed to add download:", error);
@@ -592,7 +599,7 @@ function PreviewData() {
                   )
                 }
               >
-                Open in Editor <OpenInNewWindowIcon />
+                Open in Visualizer <OpenInNewWindowIcon />
               </Button>
               <Button
                 variant={"outline"}

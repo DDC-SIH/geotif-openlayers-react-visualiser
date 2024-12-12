@@ -414,3 +414,35 @@ export const uploadMultipartFile = async (formData: FormData): Promise<UploadRes
 
   return response.json();
 };
+
+
+
+export const downloadZip = async (downloadDateTime: string): Promise<void> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/users/downloadZip?downloadDateTime=${encodeURIComponent(downloadDateTime)}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to download the file");
+    }
+
+    // Handle the response - trigger download
+    const blob = await response.blob();
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = downloadUrl;
+    a.download = `download_${downloadDateTime}.zip`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+  } catch (error) {
+    console.error("Error downloading zip:", error);
+    throw error;
+  }
+};
